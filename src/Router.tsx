@@ -1,8 +1,9 @@
 import React from "react"
 import { Route, Routes } from "react-router-dom"
-import { Bands } from "./pages/Bands/Bands"
 import { NotFound } from "./pages/NotFound"
 import { Home } from "./pages/Home/Home"
+import { Account } from "./pages/Account/Account"
+import { Trips } from "./pages/Trips/Trips"
 
 export interface RouteItem {
     path: string
@@ -15,8 +16,8 @@ interface RouterProps {}
 
 export const routes: RouteItem[] = [
     { path: "/", index: true, element: <Home />, label: "Início", id: "home" },
-    { element: <Bands />, label: "Bandas", path: "/bandas", id: "band" },
-    { element: <Bands />, label: "Artistas", path: "/artistas", id: "artist" },
+    { path: "/account", element: <Account />, label: "Minha conta", id: "account" },
+    { path: "/trips", element: <Trips />, label: "Minhas viagens", id: "trips" },
 ]
 
 export const Router: React.FC<RouterProps> = (props) => {
