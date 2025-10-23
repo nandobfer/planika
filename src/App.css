@@ -83,7 +83,7 @@ img {
     height: 8px;
 } */
 
-::-webkit-scrollbar-thumb {
+/* ::-webkit-scrollbar-thumb {
     background-color: #ff6404;
     border-radius: 4px;
 }
@@ -91,7 +91,7 @@ img {
 ::selection {
     color: white;
     background: #ff6404;
-}
+} */
 
 .link {
     cursor: pointer;

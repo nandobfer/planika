@@ -1,6 +1,6 @@
 import { Box, CircularProgress, IconButton, lighten, Typography, useMediaQuery } from "@mui/material"
-import { colors } from "../style/colors"
 import { Refresh } from "@mui/icons-material"
+import { useMuiTheme } from "../hooks/useMuiTheme"
 
 export const Title: React.FC<{
     name: string
@@ -11,12 +11,12 @@ export const Title: React.FC<{
     refresh?: () => void
     refreshing?: boolean
 }> = ({ name, right, left, space, center, refresh, refreshing }) => {
-
+    const { theme } = useMuiTheme()
 
     return (
         <Box
             sx={{
-                color: lighten(colors.secondary, 0.3),
+                color: lighten(theme.palette.secondary.main, 0.3),
                 fontWeight: "bold",
                 borderBottom: "2px solid",
                 borderColor: "primary.main",
@@ -32,7 +32,7 @@ export const Title: React.FC<{
                 <Typography
                     variant="h6"
                     sx={{
-                        color: colors.primary,
+                        color: theme.palette.primary.main,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                     }}
