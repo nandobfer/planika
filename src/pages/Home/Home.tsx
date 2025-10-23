@@ -3,6 +3,7 @@ import { Box } from "@mui/material"
 import { Features } from "./Features"
 import { Hero } from "./Hero"
 import { FeaturedFeatures } from "./FeaturedFeatures"
+import { Cta } from "./Cta"
 
 interface HomeProps {}
 
@@ -12,6 +13,7 @@ export const Home: React.FC<HomeProps> = (props) => {
             <Hero />
             <Features />
             <FeaturedFeatures />
+            <Cta />
         </Box>
     )
 }

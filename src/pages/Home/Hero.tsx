@@ -1,6 +1,7 @@
 import React from "react"
 import { Box, Button, Typography } from "@mui/material"
 import { Image } from "@mantine/core"
+import { CtaButtons } from "../../components/CtaButtons"
 
 interface HeroProps {}
 
@@ -19,14 +20,7 @@ export const Hero: React.FC<HeroProps> = (props) => {
                     Vá além de simples listas de bagagem. O Planika ajuda grupos a planejar orçamentos de viagem visualmente com categorias
                     estruturadas e colaboração em tempo real.
                 </Typography>
-                <Box sx={{ gap: 2 }}>
-                    <Button variant="contained" color="primary" size="large">
-                        Começar agora
-                    </Button>
-                    <Button variant="contained" color="secondary" size="large">
-                        Assistir demonstração
-                    </Button>
-                </Box>
+                <CtaButtons />
             </Box>
 
             <Image src={"/hero-dashboard.jpg"} width="100%" fit="contain" style={{ borderRadius: 8 }} />
