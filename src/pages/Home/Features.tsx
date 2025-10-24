@@ -60,7 +60,7 @@ const features: FeatureItem[] = [
 
 const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark"; mobile?: boolean }> = ({ feature, mode, mobile }) => {
     return (
-        <Paper sx={{ padding: 3, flexDirection: "column", height: mobile ? 300 : 1, width: mobile ? 250 : 1 }}>
+        <Paper sx={{ padding: 3, flexDirection: "column", height: mobile ? 300 : 1, width: mobile ? 225 : 1, gap: 2 }}>
             <Box sx={{ justifyContent: "space-between" }}>
                 <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                     {feature.title}
@@ -92,7 +92,7 @@ export const Features: React.FC<FeaturesProps> = (props) => {
         <Box
             sx={{
                 flexDirection: "column",
-                gap: 2,
+                gap: 5,
                 padding: 10,
                 background: `linear-gradient(0deg,${theme.palette.background.default} 50%, ${gradientTo} 100%)`,
             }}
@@ -106,13 +106,13 @@ export const Features: React.FC<FeaturesProps> = (props) => {
             </Typography>
 
             {isMobile ? (
-                <Box sx={{ gap: 3, width: "100vw", overflowX: "auto", padding: 10, margin: -10 }}>
+                <Box sx={{ gap: 5, width: "100vw", overflowX: "auto", padding: 10, margin: -10 }}>
                     {features.map((feature, index) => (
                         <FeatureComponent feature={feature} mode={mode} mobile />
                     ))}
                 </Box>
             ) : (
-                <Grid container spacing={3} columns={3}>
+                <Grid container spacing={5} columns={3}>
                     {features.map((feature, index) => (
                         <Grid size={1} key={index}>
                             <FeatureComponent feature={feature} mode={mode} />

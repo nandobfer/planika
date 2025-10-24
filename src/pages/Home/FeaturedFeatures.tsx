@@ -44,7 +44,7 @@ export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
         <Box
             sx={{
                 flexDirection: "column",
-                gap: 2,
+                gap: 5,
                 background: `linear-gradient(0deg,${gradientTo} 50%, ${theme.palette.background.default} 100%)`,
                 padding: 10,
             }}
@@ -52,7 +52,7 @@ export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
             {features.map((feature, index) => (
                 <Box key={index} sx={{ gap: 5, alignItems: "center", flexDirection: { xs: "column", md: index % 2 === 0 ? "row" : "row-reverse" } }}>
                     <Box sx={{ flex: 1, flexDirection: "column", gap: 2, padding: 3 }}>
-                        <Box sx={{ flexDirection: "column", gap: 3 }}>
+                        <Box sx={{ flexDirection: "column", gap: 5 }}>
                             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                                 {feature.title}
                             </Typography>

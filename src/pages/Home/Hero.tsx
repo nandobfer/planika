@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material"
 import { Image } from "@mantine/core"
 import { CtaButtons } from "../../components/CtaButtons"
 import { useMuiTheme } from "../../hooks/useMuiTheme"
+import { InlineTypography } from "../../components/InlineTypography"
 
 interface HeroProps {}
 
@@ -31,12 +32,9 @@ export const Hero: React.FC<HeroProps> = (props) => {
                     disableRotation={false}
                 />
             </Box> */}
-            <Box sx={{ flexDirection: "column", gap: 2, alignItems: "center", width: 0.7, zIndex: 1 }}>
+            <Box sx={{ flexDirection: "column", gap: 5, alignItems: "center", width: 0.7, zIndex: 1 }}>
                 <Typography variant="h1" sx={{ fontWeight: "bold", textAlign: "center" }}>
-                    Planeje sua viagem
-                </Typography>
-                <Typography color="primary" variant="h1" sx={{ fontWeight: "bold" }}>
-                    Juntos
+                    Planeje sua viagem <InlineTypography highlight>Juntos</InlineTypography>
                 </Typography>
 
                 <Typography variant="h5" sx={{ textAlign: "center" }}>

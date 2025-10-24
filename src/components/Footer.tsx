@@ -9,17 +9,17 @@ const Link: React.FC<{ children: React.ReactNode; link: string }> = (props) => {
     const {mode} = useMuiTheme()
 
     return (
-    <Typography
-        color={mode === 'light' ? 'secondary' : "primary"}
-        variant="inherit"
-        component={"span"}
-        className="link"
-        style={{ fontWeight: "bold" }}
-        onClick={() => window.open(props.link, "_new")}
-    >
-        {props.children}
-    </Typography>
-)
+        <Typography
+            color={mode === "light" ? "info" : "primary"}
+            variant="inherit"
+            component={"span"}
+            className="link"
+            style={{ fontWeight: "bold" }}
+            onClick={() => window.open(props.link, "_new")}
+        >
+            {props.children}
+        </Typography>
+    )
 }
 
 export const Footer: React.FC<FooterProps> = ({}) => {

@@ -9,7 +9,10 @@ interface InlineTypographyProps extends TypographyProps {
 export const InlineTypography: React.FC<InlineTypographyProps> = (props) => {
     return (
         <Typography
+            component={"span"}
             sx={{
+                fontSize: "inherit",
+                fontWeight: "inherit",
                 display: "inline-flex",
                 color: props.url ? "success.main" : props.highlight ? "primary.main" : undefined,
                 cursor: props.url ? "pointer" : undefined,
