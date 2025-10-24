@@ -10,11 +10,12 @@ import { useFilesDialogModal } from "./useFilesDialogModal"
 export const useUser = () => {
     const context = useContext(UserContext)
     const navigate = useNavigate()
-    const updateProfilePic = useFilesDialogModal({ accept: "image/*", request: (formData) => patchProfilePic(formData) })
+    const profilePicSettings = useFilesDialogModal({ accept: "image/*", request: (formData) => patchProfilePic(formData) })
 
     const logout = () => {
         context.setUser(null)
         context.setAccessToken(null)
+        navigate("/")
     }
 
     const handleLogin = (token: string) => {
@@ -45,5 +46,5 @@ export const useUser = () => {
         context.setUser(response.data)
     }
 
-    return { ...context, logout, handleLogin, authenticatedApi, patch, updateProfilePic }
+    return { ...context, logout, handleLogin, authenticatedApi, patch, profilePicSettings }
 }

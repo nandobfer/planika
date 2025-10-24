@@ -43,6 +43,7 @@ export const Providers: React.FC<ProvidersProps> = (props) => {
                                         <Footer />
                                         <Snackbar />
                                         <ConfirmDialog />
+
                                     </UserProvider>
                                 </GoogleOAuthProvider>
                             </QueryClientProvider>

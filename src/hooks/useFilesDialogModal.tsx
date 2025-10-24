@@ -12,7 +12,6 @@ export function useFilesDialogModal<T>(options: FileDialogInterface<T>) {
 
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [targetId, setTargetId] = useState<string | null>(null)
 
     const handleClose = () => {
         setIsOpen(false)
@@ -21,8 +20,8 @@ export function useFilesDialogModal<T>(options: FileDialogInterface<T>) {
     const openModal = () => setIsOpen(true)
 
     const handleImageChange = async (files: FileList | null | File[]) => {
-        console.log(options, targetId)
-        if (files && targetId) {
+        console.log(options)
+        if (files) {
             setLoading(true)
             try {
                 const formData = new FormData()
@@ -66,5 +65,5 @@ export function useFilesDialogModal<T>(options: FileDialogInterface<T>) {
 
     const Modal = <FilesDialogModal loading={loading} handleClose={handleClose} chooseFile={chooseFile} isOpen={isOpen} handlePaste={handlePaste} />
 
-    return { Modal, handleClose, isOpen, loading, openModal, chooseFile, setTargetId }
+    return { Modal, handleClose, isOpen, loading, openModal, chooseFile }
 }
