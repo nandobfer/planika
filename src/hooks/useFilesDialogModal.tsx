@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react"
 import { FilesDialogModal } from "../components/FilesDialogModal"
 import { useFileDialog } from "@mantine/hooks"
-import { useUser } from "./useUser"
 
 export interface FileDialogInterface<T> {
     request: (formData: FormData) => Promise<T>
@@ -10,8 +9,6 @@ export interface FileDialogInterface<T> {
 
 export function useFilesDialogModal<T>(options: FileDialogInterface<T>) {
     const accept = options.accept || "image/*"
-
-    const { authenticatedApi: api } = useUser()
 
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)

@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, TextField, Typography } from "@mui/material"
+import { Avatar, Box, TextField, Typography } from "@mui/material"
 import { useFormik } from "formik"
 import type { UserForm } from "../../../types/server/class/User"
 import { useUser } from "../../../hooks/useUser"
@@ -40,6 +40,7 @@ export const Profile: React.FC<ProfileProps> = () => {
 
     return (
         <Box sx={{ flexDirection: "column", gap: 3, flex: 1 }}>
+            <Avatar src={file ? URL.createObjectURL(file) : (formik.values.picture || undefined)} />
             <form onSubmit={formik.handleSubmit}>
                 <TextField label="Nome" value={formik.values.name} onChange={formik.handleChange} name="name" />
                 <TextField label="E-mail" value={formik.values.email} onChange={formik.handleChange} name="email" />
