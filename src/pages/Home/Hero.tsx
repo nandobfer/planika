@@ -1,14 +1,38 @@
 import React from "react"
-import { Box, Button, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { Image } from "@mantine/core"
 import { CtaButtons } from "../../components/CtaButtons"
+import { useMuiTheme } from "../../hooks/useMuiTheme"
 
 interface HeroProps {}
 
 export const Hero: React.FC<HeroProps> = (props) => {
+    const { theme, mode } = useMuiTheme()
+    const gradientTo = mode === "dark" ? theme.palette.action.disabled : theme.palette.primary.main
     return (
-        <Box sx={{ flexDirection: "column", gap: 2, alignItems: "center", padding: 2 }}>
-            <Box sx={{ flexDirection: "column", gap: 2, alignItems: "center", width: 0.7 }}>
+        <Box
+            sx={{
+                flexDirection: "column",
+                gap: 5,
+                alignItems: "center",
+                padding: 10,
+                background: `linear-gradient(0deg,${gradientTo} 50%, ${theme.palette.background.default} 100%)`,
+                // borderRadius: 8,
+            }}
+        >
+            {/* <Box sx={{ position: "absolute", width: "100%", height: "200vh", zIndex: 0, top: 0 }}>
+                <Particles
+                    particleColors={[theme.palette.primary.main]}
+                    particleCount={200}
+                    particleSpread={10}
+                    speed={0.1}
+                    particleBaseSize={100}
+                    moveParticlesOnHover={true}
+                    alphaParticles={false}
+                    disableRotation={false}
+                />
+            </Box> */}
+            <Box sx={{ flexDirection: "column", gap: 2, alignItems: "center", width: 0.7, zIndex: 1 }}>
                 <Typography variant="h1" sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Planeje sua viagem
                 </Typography>
@@ -23,7 +47,7 @@ export const Hero: React.FC<HeroProps> = (props) => {
                 <CtaButtons />
             </Box>
 
-            <Image src={"/hero-dashboard.jpg"} width="100%" fit="contain" style={{ borderRadius: 8 }} />
+            <Image src={"/hero-dashboard.jpg"} width="100%" fit="contain" style={{ borderRadius: 8, zIndex: 1 }} />
         </Box>
     )
 }

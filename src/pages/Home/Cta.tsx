@@ -16,9 +16,8 @@ export const Cta: React.FC<CtaProps> = (props) => {
                 flexDirection: "column",
                 gap: 2,
                 alignItems: "center",
-                padding: 5,
-                width: '100vw',
-                borderRadius: 8,
+                width: 1,
+                padding: 10,
                 background: `linear-gradient(0deg,${theme.palette.background.default} 50%, ${gradientTo} 100%)`,
             }}
         >

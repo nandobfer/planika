@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Grid, Paper, Typography } from "@mui/material"
+import { Box, Grid, Paper, Typography, useMediaQuery } from "@mui/material"
 import type { MuiIcon } from "../../types/MuiIcon"
 import type { MuiColor } from "../../types/MuiColor"
 import { AccountTree, Assessment, CalendarMonth, CheckCircle, FilterAlt, Groups } from "@mui/icons-material"
@@ -58,11 +58,46 @@ const features: FeatureItem[] = [
     },
 ]
 
+const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark"; mobile?: boolean }> = ({ feature, mode, mobile }) => {
+    return (
+        <Paper sx={{ padding: 3, flexDirection: "column", height: mobile ? 300 : 1, width: mobile ? 250 : 1 }}>
+            <Box sx={{ justifyContent: "space-between" }}>
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                    {feature.title}
+                </Typography>
+                <Paper
+                    elevation={mode === "dark" ? 5 : undefined}
+                    sx={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: 1.5,
+                        marginTop: -3,
+                        marginRight: -3,
+                        bgcolor: mode === "light" ? "background.default" : undefined,
+                    }}
+                >
+                    <feature.icon color={feature.color} sx={{ height: "auto", width: 30 }} />
+                </Paper>
+            </Box>
+            <Typography>{feature.description}</Typography>
+        </Paper>
+    )
+}
+
 export const Features: React.FC<FeaturesProps> = (props) => {
-    const { mode } = useMuiTheme()
+    const isMobile = useMediaQuery("(orientation: portrait)")
+    const { theme, mode } = useMuiTheme()
+    const gradientTo = mode === "dark" ? theme.palette.action.disabled : theme.palette.primary.main
 
     return (
-        <Box sx={{ flexDirection: "column", gap: 2 }}>
+        <Box
+            sx={{
+                flexDirection: "column",
+                gap: 2,
+                padding: 10,
+                background: `linear-gradient(0deg,${theme.palette.background.default} 50%, ${gradientTo} 100%)`,
+            }}
+        >
             <Typography variant="h2" sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Tudo que você precisa para planejar suas viagens
             </Typography>
@@ -71,33 +106,21 @@ export const Features: React.FC<FeaturesProps> = (props) => {
                 Recursos poderosos projetados para grupos que desejam clareza e controle sobre as despesas da viagem.
             </Typography>
 
-            <Grid container spacing={3} columns={3}>
-                {features.map((feature, index) => (
-                    <Grid size={1} key={index}>
-                        <Paper sx={{ padding: 3, flexDirection: "column", height: 1 }}>
-                            <Box sx={{ justifyContent: "space-between" }}>
-                                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                                    {feature.title}
-                                </Typography>
-                                <Paper
-                                    elevation={mode === "dark" ? 5 : undefined}
-                                    sx={{
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        padding: 1.5,
-                                        marginTop: -3,
-                                        marginRight: -3,
-                                        bgcolor: mode === "light" ? "background.default" : undefined,
-                                    }}
-                                >
-                                    <feature.icon color={feature.color} sx={{ height: "auto", width: 30 }} />
-                                </Paper>
-                            </Box>
-                            <Typography>{feature.description}</Typography>
-                        </Paper>
-                    </Grid>
-                ))}
-            </Grid>
+            {isMobile ? (
+                <Box sx={{ gap: 3, width: "100vw", overflowX: "auto", padding: 10, margin: -10 }}>
+                    {features.map((feature, index) => (
+                        <FeatureComponent feature={feature} mode={mode} mobile />
+                    ))}
+                </Box>
+            ) : (
+                <Grid container spacing={3} columns={3}>
+                    {features.map((feature, index) => (
+                        <Grid size={1} key={index}>
+                            <FeatureComponent feature={feature} mode={mode} />
+                        </Grid>
+                    ))}
+                </Grid>
+            )}
         </Box>
     )
 }

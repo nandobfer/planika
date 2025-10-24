@@ -2,6 +2,7 @@ import React from "react"
 import { Box, Typography } from "@mui/material"
 import { CheckCircle, CheckCircleOutline } from "@mui/icons-material"
 import { Image } from "@mantine/core"
+import { useMuiTheme } from "../../hooks/useMuiTheme"
 
 interface FeaturedFeaturesProps {}
 
@@ -15,9 +16,12 @@ interface FeatureItem {
 const features: FeatureItem[] = [
     {
         title: "Planeje Juntos em Tempo Real",
-        description:
-            "Todos os participantes podem atualizar o orçamento da viagem simultaneamente, mantendo todos alinhados nos custos e reservas.",
-        items: ["Convites por e-mail para seu grupo de viagem", "Autenticação via Google para acesso seguro", "Atualizações ao vivo para todos os participantes"],
+        description: "Todos os participantes podem atualizar o orçamento da viagem simultaneamente, mantendo todos alinhados nos custos e reservas.",
+        items: [
+            "Convites por e-mail para seu grupo de viagem",
+            "Autenticação via Google para acesso seguro",
+            "Atualizações ao vivo para todos os participantes",
+        ],
         image: "/collaboration.jpg",
     },
     {
@@ -34,10 +38,20 @@ const features: FeatureItem[] = [
 ]
 
 export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
+    const { theme, mode } = useMuiTheme()
+    const gradientTo = mode === "dark" ? theme.palette.action.disabled : theme.palette.primary.main
+
     return (
-        <Box sx={{ flexDirection: "column", gap: 2 }}>
+        <Box
+            sx={{
+                flexDirection: "column",
+                gap: 2,
+                background: `linear-gradient(0deg,${gradientTo} 50%, ${theme.palette.background.default} 100%)`,
+                padding: 10,
+            }}
+        >
             {features.map((feature, index) => (
-                <Box key={index} sx={{ gap: 5, alignItems: "center", flexDirection: index % 2 === 0 ? "row" : "row-reverse" }}>
+                <Box key={index} sx={{ gap: 5, alignItems: "center", flexDirection: { xs: "column", md: index % 2 === 0 ? "row" : "row-reverse" } }}>
                     <Box sx={{ flex: 1, flexDirection: "column", gap: 2, padding: 3 }}>
                         <Box sx={{ flexDirection: "column", gap: 3 }}>
                             <Typography variant="h4" sx={{ fontWeight: "bold" }}>

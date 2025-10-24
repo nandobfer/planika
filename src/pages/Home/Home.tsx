@@ -9,7 +9,7 @@ interface HomeProps {}
 
 export const Home: React.FC<HomeProps> = (props) => {
     return (
-        <Box sx={{ flexDirection: "column", gap: 5, alignItems: "center", padding: 2 }}>
+        <Box sx={{ flexDirection: "column", alignItems: "center" }}>
             <Hero />
             <Features />
             <FeaturedFeatures />

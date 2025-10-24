@@ -33,7 +33,6 @@ export const Providers: React.FC<ProvidersProps> = (props) => {
                                         <Box
                                             sx={{
                                                 flexDirection: "column",
-                                                padding: 2,
                                                 minHeight: "85vh",
                                                 bgcolor: "background.default",
                                                 color: "text.primary",

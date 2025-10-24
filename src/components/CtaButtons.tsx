@@ -5,7 +5,7 @@ interface CtaButtonsProps {}
 
 export const CtaButtons: React.FC<CtaButtonsProps> = (props) => {
     return (
-        <Box sx={{ gap: 2 }}>
+        <Box sx={{ gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
             <Button variant="contained" color="primary" size="large">
                 Começar agora
             </Button>
