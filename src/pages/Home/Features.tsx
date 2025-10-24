@@ -86,7 +86,7 @@ const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark";
 
 export const Features: React.FC<FeaturesProps> = (props) => {
     const isMobile = useMediaQuery("(orientation: portrait)")
-    const { theme, gradientTo, mode } = useMuiTheme()
+    const { gradientStyle, mode } = useMuiTheme()
 
     return (
         <Box
@@ -94,7 +94,7 @@ export const Features: React.FC<FeaturesProps> = (props) => {
                 flexDirection: "column",
                 gap: 5,
                 padding: 10,
-                background: `linear-gradient(0deg,${theme.palette.background.default} 50%, ${gradientTo} 100%)`,
+                ...gradientStyle,
             }}
         >
             <Typography variant="h2" sx={{ fontWeight: "bold", textAlign: "center" }}>

@@ -1,69 +1,40 @@
-# React + TypeScript + Vite
+# Planika
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a web-based application designed for collaborative financial planning and expense tracking. The core idea is to move beyond a simple list of expenses and provide a structured, visual, and interactive way for individuals or groups to plan and monitor a budget.
 
-Currently, two official plugins are available:
+The application is built around a hierarchical budget structure, real-time collaboration, and temporal visualization of expenses.
+Core Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. Interactive Tree View Budget
 
-## Expanding the ESLint configuration
+- The budget is organized in a hierarchical tree structure, where parent nodes represent broad categories (e.g., "Vacation," "Home Renovation") and child nodes represent specific line items (e.g., "Flights," "Hotel," "Paint," "Contractor").
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Users can click on any node to select it. Selecting a node automatically selects its entire branch, providing a clear visual indication of the selected category and its sub-items (e.g., highlighted in green).
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- This view displays relevant totals for the selected branch, such as the allocated budget, projected costs, or actual spending.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### 2. Dynamic Filtering & Exploration
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- The entire interface is interactive. Clicking on any value—be it a budget category, a total, a status, or a person's name—will filter the entire application view to show only the relevant data connected to that item. This allows for quick, ad-hoc analysis and drilling down into specific details.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 3. Real-Time Collaboration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Multiple users can work on the same budget plan simultaneously, with changes reflected in real-time for all participants using WebSockets (via [Socket.IO](https://socket.io/)).
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- The budget owner can invite other participants by sending them an email invitation.
+
+- To collaborate, invited users are required to authenticate using their Google account. This simplifies the login process and securely manages user identities.
+
+### 4. Timeline Visualization
+
+- A dedicated timeline view plots expenses over time, based on their scheduled or actual dates.
+
+- This helps visualize cash flow, identify high-spending periods, and understand the temporal distribution of costs.
+
+- The feature may also include the ability to view expenses by location if that data is available for an expense item.
+
+### 5. Expense Status and Accountability Tracking
+
+- Each expense item can be assigned a status to indicate its current state: Pending, Reserved (e.g., funds are set aside), or Paid.
+
+- Each item can also be assigned a Payer/Responsible Person. This clarifies financial responsibility within a group, showing who is expected to pay for or who has already paid for a specific expense.

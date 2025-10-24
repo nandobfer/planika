@@ -18,7 +18,7 @@ interface ProvidersProps {
 }
 
 export const Providers: React.FC<ProvidersProps> = (props) => {
-    const {theme} = useMuiTheme()
+    const { theme } = useMuiTheme()
 
     return (
         <ThemeProvider theme={theme}>
@@ -33,9 +33,9 @@ export const Providers: React.FC<ProvidersProps> = (props) => {
                                         <Box
                                             sx={{
                                                 flexDirection: "column",
-                                                minHeight: "85vh",
                                                 bgcolor: "background.default",
                                                 color: "text.primary",
+                                                flex: 1,
                                             }}
                                         >
                                             {props.children}

@@ -8,7 +8,7 @@ import { InlineTypography } from "../../components/InlineTypography"
 interface HeroProps {}
 
 export const Hero: React.FC<HeroProps> = (props) => {
-    const { theme, gradientTo } = useMuiTheme()
+    const { invertedGradientStyle } = useMuiTheme()
     return (
         <Box
             sx={{
@@ -16,7 +16,7 @@ export const Hero: React.FC<HeroProps> = (props) => {
                 gap: 5,
                 alignItems: "center",
                 padding: 10,
-                background: `linear-gradient(0deg,${gradientTo} 50%, ${theme.palette.background.default} 100%)`,
+                ...invertedGradientStyle,
                 // borderRadius: 8,
             }}
         >

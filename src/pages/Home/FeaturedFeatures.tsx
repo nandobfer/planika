@@ -38,15 +38,15 @@ const features: FeatureItem[] = [
 ]
 
 export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
-    const { theme, gradientTo } = useMuiTheme()
+    const { invertedGradientStyle } = useMuiTheme()
 
     return (
         <Box
             sx={{
                 flexDirection: "column",
                 gap: 5,
-                background: `linear-gradient(0deg,${gradientTo} 50%, ${theme.palette.background.default} 100%)`,
                 padding: 10,
+                ...invertedGradientStyle,
             }}
         >
             {features.map((feature, index) => (

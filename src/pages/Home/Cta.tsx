@@ -7,7 +7,7 @@ import { InlineTypography } from "../../components/InlineTypography"
 interface CtaProps {}
 
 export const Cta: React.FC<CtaProps> = (props) => {
-    const { theme, gradientTo } = useMuiTheme()
+    const { gradientStyle } = useMuiTheme()
 
     return (
         <Box
@@ -17,7 +17,7 @@ export const Cta: React.FC<CtaProps> = (props) => {
                 alignItems: "center",
                 width: 1,
                 padding: 10,
-                background: `linear-gradient(0deg,${theme.palette.background.default} 50%, ${gradientTo} 100%)`,
+                ...gradientStyle,
             }}
         >
             <Typography variant="h1" sx={{ fontWeight: "bold", textAlign: "center" }}>

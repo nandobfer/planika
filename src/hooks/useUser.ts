@@ -5,10 +5,12 @@ import type { User } from "../types/server/class/User"
 import axios from "axios"
 import { api_url } from "../backend/api"
 import { useNavigate } from "react-router-dom"
+import { useFilesDialogModal } from "./useFilesDialogModal"
 
 export const useUser = () => {
     const context = useContext(UserContext)
     const navigate = useNavigate()
+    const updateProfilePic = useFilesDialogModal({ accept: "image/*", request: (formData) => patchProfilePic(formData) })
 
     const logout = () => {
         context.setUser(null)
@@ -23,10 +25,25 @@ export const useUser = () => {
         navigate("/trips")
     }
 
-    const adminApi = useMemo(
+    const authenticatedApi = useMemo(
         () => axios.create({ baseURL: api_url, headers: { Authorization: `Bearer ${context.accessToken?.value}` } }),
         [context.accessToken]
     )
 
-    return { ...context, logout, handleLogin, adminApi }
+    const patch = async (data: Partial<User>) => {
+        if (!context.accessToken) throw new Error("No access token")
+
+        const response = await authenticatedApi.patch<User>("/user", data)
+        context.setUser(response.data)
+    }
+
+    const patchProfilePic = async (formData: FormData) => {
+        if (!context.accessToken) throw new Error("No access token")
+
+        const response = await authenticatedApi.patch<User>("/user", formData)
+
+        context.setUser(response.data)
+    }
+
+    return { ...context, logout, handleLogin, authenticatedApi, patch, updateProfilePic }
 }
