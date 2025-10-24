@@ -26,11 +26,7 @@ export const AccountNavigation: React.FC<AccountNavigationProps> = (props) => {
         >
             {tabs.map((tab) => (
                 <Button
-                    sx={{
-                        flexShrink: 0,
-                        minWidth: "fit-content",
-                        whiteSpace: "nowrap",
-                    }}
+                    sx={{ minWidth: "fit-content" }}
                     key={tab.route}
                     onClick={() => navigate(tab.route)}
                     variant={currentTab.route === tab.route ? "contained" : "text"}
