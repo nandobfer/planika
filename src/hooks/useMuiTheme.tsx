@@ -1,4 +1,4 @@
-import { createTheme, LinearProgress, useMediaQuery, type PaletteMode } from "@mui/material"
+import { createTheme, lighten, LinearProgress, useMediaQuery, type PaletteMode } from "@mui/material"
 import { useMemo } from "react"
 import { ptBR } from "@mui/x-data-grid/locales"
 import { colors } from "../style/colors"
@@ -81,5 +81,7 @@ export const useMuiTheme = () => {
         },
     }
 
-    return { theme, mode, setMode, autofillStyle }
+    const gradientTo = mode === "dark" ? theme.palette.action.disabledBackground : lighten(theme.palette.primary.main, 0.7)
+
+    return { theme, mode, setMode, autofillStyle, gradientTo }
 }

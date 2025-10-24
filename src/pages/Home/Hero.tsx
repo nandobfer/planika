@@ -7,8 +7,7 @@ import { useMuiTheme } from "../../hooks/useMuiTheme"
 interface HeroProps {}
 
 export const Hero: React.FC<HeroProps> = (props) => {
-    const { theme, mode } = useMuiTheme()
-    const gradientTo = mode === "dark" ? theme.palette.action.disabled : theme.palette.primary.main
+    const { theme, gradientTo } = useMuiTheme()
     return (
         <Box
             sx={{

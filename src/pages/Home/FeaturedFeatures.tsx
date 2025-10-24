@@ -38,8 +38,7 @@ const features: FeatureItem[] = [
 ]
 
 export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
-    const { theme, mode } = useMuiTheme()
-    const gradientTo = mode === "dark" ? theme.palette.action.disabled : theme.palette.primary.main
+    const { theme, gradientTo } = useMuiTheme()
 
     return (
         <Box

@@ -6,9 +6,8 @@ import { useMuiTheme } from "../../hooks/useMuiTheme"
 interface CtaProps {}
 
 export const Cta: React.FC<CtaProps> = (props) => {
-    const {theme, mode} = useMuiTheme()
+    const { theme, gradientTo } = useMuiTheme()
 
-    const gradientTo = mode === "dark" ? theme.palette.action.disabled : theme.palette.primary.main
 
     return (
         <Box

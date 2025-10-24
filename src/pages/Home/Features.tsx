@@ -86,8 +86,7 @@ const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark";
 
 export const Features: React.FC<FeaturesProps> = (props) => {
     const isMobile = useMediaQuery("(orientation: portrait)")
-    const { theme, mode } = useMuiTheme()
-    const gradientTo = mode === "dark" ? theme.palette.action.disabled : theme.palette.primary.main
+    const { theme, gradientTo, mode } = useMuiTheme()
 
     return (
         <Box
