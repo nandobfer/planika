@@ -4,9 +4,11 @@ import { jwtDecode } from "jwt-decode"
 import type { User } from "../types/server/class/User"
 import axios from "axios"
 import { api_url } from "../backend/api"
+import { useNavigate } from "react-router-dom"
 
 export const useUser = () => {
     const context = useContext(UserContext)
+    const navigate = useNavigate()
 
     const logout = () => {
         context.setUser(null)
@@ -18,6 +20,7 @@ export const useUser = () => {
         context.setUser(decryped.user)
         console.log(decryped.user)
         context.setAccessToken({ ...decryped, value: token })
+        navigate("/trips")
     }
 
     const adminApi = useMemo(
