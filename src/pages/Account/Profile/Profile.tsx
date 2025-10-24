@@ -41,6 +41,7 @@ export const Profile: React.FC<ProfileProps> = () => {
 
     return (
         <Box sx={{ flexDirection: "column", gap: 3, flex: 1 }}>
+            {/* <Typography variant="h5">Perfil</Typography> */}
             <Box sx={{ alignItems: "center", gap: 3, flexDirection: { xs: "column", md: "row" } }}>
                 <IconButton onClick={profilePicSettings.openModal}>
                     <Avatar
@@ -51,8 +52,8 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <Button onClick={profilePicSettings.openModal}>Clique para alterar a imagem de perfil</Button>
             </Box>
             <form onSubmit={formik.handleSubmit}>
-                <TextField label="Nome" value={formik.values.name} onChange={formik.handleChange} name="name" />
-                <TextField label="E-mail" value={formik.values.email} onChange={formik.handleChange} name="email" />
+                <TextField label="Nome" value={formik.values.name} onChange={formik.handleChange} name="name" required />
+                <TextField label="E-mail" value={formik.values.email} onChange={formik.handleChange} name="email" required type="email" />
 
                 <SaveButton onClick={formik.submitForm} disabled={disabledButton} />
             </form>
