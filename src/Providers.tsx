@@ -35,6 +35,7 @@ export const Providers: React.FC<ProvidersProps> = (props) => {
                                                 flexDirection: "column",
                                                 bgcolor: "background.default",
                                                 color: "text.primary",
+                                                overflowX: "hidden",
                                                 flex: 1,
                                             }}
                                         >
@@ -43,7 +44,6 @@ export const Providers: React.FC<ProvidersProps> = (props) => {
                                         <Footer />
                                         <Snackbar />
                                         <ConfirmDialog />
-
                                     </UserProvider>
                                 </GoogleOAuthProvider>
                             </QueryClientProvider>

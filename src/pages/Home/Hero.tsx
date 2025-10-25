@@ -33,7 +33,7 @@ export const Hero: React.FC<HeroProps> = (props) => {
                 />
             </Box> */}
             <Box sx={{ flexDirection: "column", gap: 5, alignItems: "center", width: 0.7, zIndex: 1 }}>
-                <Typography variant="h1" sx={{ fontWeight: "bold", textAlign: "center" }}>
+                <Typography variant="h2" sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Planeje sua viagem <InlineTypography highlight>Juntos</InlineTypography>
                 </Typography>
 

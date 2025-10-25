@@ -20,7 +20,7 @@ export const Cta: React.FC<CtaProps> = (props) => {
                 ...gradientStyle,
             }}
         >
-            <Typography variant="h1" sx={{ fontWeight: "bold", textAlign: "center" }}>
+            <Typography variant="h2" sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Pronto para planejar sua próxima <InlineTypography highlight>Aventura Juntos?</InlineTypography>
             </Typography>
             <Typography variant="h5" sx={{ textAlign: "center" }}>
