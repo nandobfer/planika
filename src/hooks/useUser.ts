@@ -13,9 +13,9 @@ export const useUser = () => {
     const profilePicSettings = useFilesDialogModal({ accept: "image/*", request: (formData) => patchProfilePic(formData) })
 
     const logout = () => {
+        navigate("/")
         context.setUser(null)
         context.setAccessToken(null)
-        navigate("/")
     }
 
     const handleLogin = (token: string) => {
@@ -35,6 +35,7 @@ export const useUser = () => {
         if (!context.accessToken) throw new Error("No access token")
 
         const response = await authenticatedApi.patch<User>("/user", data)
+        console.log(response.data)
         context.setUser(response.data)
     }
 
@@ -46,5 +47,11 @@ export const useUser = () => {
         context.setUser(response.data)
     }
 
-    return { ...context, logout, handleLogin, authenticatedApi, patch, profilePicSettings }
+    const tryChangePassword = async (current_password: string, new_password: string) => {
+        if (!context.accessToken) throw new Error("No access token")
+
+        await authenticatedApi.post("/user/change-password", { current_password, new_password })
+    }
+
+    return { ...context, logout, handleLogin, authenticatedApi, patch, profilePicSettings, tryChangePassword }
 }

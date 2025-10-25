@@ -1,9 +1,7 @@
 import React from "react"
 import { Button, type ButtonProps } from "@mui/material"
 
-interface SaveButtonProps extends ButtonProps {
-    onClick: () => void
-}
+interface SaveButtonProps extends ButtonProps {}
 
 export const SaveButton: React.FC<SaveButtonProps> = (props) => {
     return (

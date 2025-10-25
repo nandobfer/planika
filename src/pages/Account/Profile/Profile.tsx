@@ -31,6 +31,7 @@ export const Profile: React.FC<ProfileProps> = () => {
             } finally {
                 EventBus.emit("account-loading", false)
                 snackbar({ text: "Perfil atualizado com sucesso!", severity: "success" })
+                formik.resetForm()
             }
         },
         enableReinitialize: true,
@@ -55,7 +56,7 @@ export const Profile: React.FC<ProfileProps> = () => {
                 <TextField label="Nome" value={formik.values.name} onChange={formik.handleChange} name="name" required />
                 <TextField label="E-mail" value={formik.values.email} onChange={formik.handleChange} name="email" required type="email" />
 
-                <SaveButton onClick={formik.submitForm} disabled={disabledButton} />
+                <SaveButton disabled={disabledButton} />
             </form>
 
             {profilePicSettings.Modal}

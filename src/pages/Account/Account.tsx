@@ -17,13 +17,14 @@ export const Account: React.FC<AccountProps> = (props) => {
     const disabledStyle = settings.loading ? { filter: "grayscale(100%) blur(1px)", pointerEvents: "none" } : {}
 
     return (
-        <Box sx={{ flexDirection: "column", padding: 5, gap: { xs: 2, md: 5 }, height: 1 }}>
+        <Box sx={{ flexDirection: "column", padding: 5, gap: { xs: 2, md: 5 }, height: 1, position: "relative" }}>
             <Title name="Minha conta" />
 
+            {settings.loading && <LinearProgress sx={{ width: 1, position: "absolute", top: 0, right: 0, left: 0 }} variant="indeterminate" />}
             <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, height: 1, paddingBottom: { md: 8 } }}>
                 <AccountNavigation settings={settings} flex={0.2} />
 
-                {settings.loading ? <LinearProgress variant="indeterminate" /> : <Divider orientation={isMobile ? "horizontal" : "vertical"} />}
+                <Divider orientation={isMobile ? "horizontal" : "vertical"} />
 
                 <Box sx={{ flex: 0.5, flexDirection: "column", ...disabledStyle }}>
                     <Routes>
