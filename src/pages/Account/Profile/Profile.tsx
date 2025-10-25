@@ -43,14 +43,19 @@ export const Profile: React.FC<ProfileProps> = () => {
     return (
         <Box sx={{ flexDirection: "column", gap: 3, flex: 1 }}>
             {/* <Typography variant="h5">Perfil</Typography> */}
-            <Box sx={{ alignItems: "center", gap: 3, flexDirection: { xs: "column", md: "row" } }}>
+            <Box sx={{ alignItems: "center", gap: 3, flexDirection: { xs: "column-reverse", md: "row" } }}>
                 <IconButton onClick={profilePicSettings.openModal}>
                     <Avatar
                         src={file ? URL.createObjectURL(file) : formik.values.picture || undefined}
                         sx={{ width: avatar_size, height: avatar_size }}
                     />
                 </IconButton>
-                <Button onClick={profilePicSettings.openModal}>Clique para alterar a imagem de perfil</Button>
+                <Box sx={{ flexDirection: "column" }}>
+                    <Typography variant="h5" sx={{ marginLeft: 1 }}>
+                        Perfil
+                    </Typography>
+                    <Button onClick={profilePicSettings.openModal}>Clique para alterar a imagem de perfil</Button>
+                </Box>
             </Box>
             <form onSubmit={formik.handleSubmit}>
                 <TextField label="Nome" value={formik.values.name} onChange={formik.handleChange} name="name" required />

@@ -29,7 +29,7 @@ const tabs: AccountSetting[] = [
     { label: "Segurança", description: "Controle configurações de autenticação e segurança da conta", route: "security", component: <Security /> },
     {
         label: "Preferências",
-        description: "Personalize moeda padrão, fuso horário e preferências de exibição",
+        description: "Personalize moeda padrão, idioma, fuso horário e preferências de exibição",
         route: "preferences",
         component: <Preferences />,
     },
