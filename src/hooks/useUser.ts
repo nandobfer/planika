@@ -1,9 +1,9 @@
 import { useContext, useMemo } from "react"
 import UserContext from "../contexts/UserContext"
 import { jwtDecode } from "jwt-decode"
-import type { User } from "../types/server/class/User"
+import type { GoogleAuthResponse, User, UserForm } from "../types/server/class/User"
 import axios from "axios"
-import { api_url } from "../backend/api"
+import { api, api_url } from "../backend/api"
 import { useNavigate } from "react-router-dom"
 import { useFilesDialogModal } from "./useFilesDialogModal"
 
@@ -24,6 +24,15 @@ export const useUser = () => {
         console.log(decryped.user)
         context.setAccessToken({ ...decryped, value: token })
         navigate("/trips")
+    }
+
+    const handleGoogleSuccess = async (data: GoogleAuthResponse) => {
+        const response = await api.post<string>("/login/google", data)
+        console.log(response.data)
+        handleLogin(response.data)
+
+        // const decoded = jwtDecode(data.credential)
+        // console.log(decoded)
     }
 
     const authenticatedApi = useMemo(
@@ -53,5 +62,10 @@ export const useUser = () => {
         await authenticatedApi.post("/user/change-password", { current_password, new_password })
     }
 
-    return { ...context, logout, handleLogin, authenticatedApi, patch, profilePicSettings, tryChangePassword }
+    const trySignup = async (data: UserForm) => {
+        const response = await api.post<string>("/user", data)
+        handleLogin(response.data)
+    }
+
+    return { ...context, logout, handleLogin, authenticatedApi, patch, profilePicSettings, tryChangePassword, handleGoogleSuccess, trySignup }
 }

@@ -5,6 +5,7 @@ import { Home } from "./pages/Home/Home"
 import { Account } from "./pages/Account/Account"
 import { Trips } from "./pages/Trips/Trips"
 import { useUser } from "./hooks/useUser"
+import { Signup } from "./pages/Signup"
 
 export interface RouteItem {
     path: string
@@ -15,7 +16,10 @@ export interface RouteItem {
 }
 interface RouterProps {}
 
-export const routes: RouteItem[] = [{ path: "/", index: true, element: <Home />, label: "Início", id: "home" }]
+export const routes: RouteItem[] = [
+    { path: "/", index: true, element: <Home />, label: "Início", id: "home" },
+    { path: "/signup", element: <Signup />, label: "Cadastro", id: "signup" },
+]
 
 export const authenticatedRoutes: RouteItem[] = [
     { path: "/account/*", element: <Account />, label: "Minha conta", id: "account" },

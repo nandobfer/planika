@@ -18,7 +18,7 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
     const [loading, setLoading] = useState(false)
 
     const { autofillStyle } = useMuiTheme()
-    const { handleLogin } = useUser()
+    const { handleLogin, handleGoogleSuccess } = useUser()
     const { mutate } = useMutation({
         mutationFn: async (credentials: LoginForm) => await api.post<string>("/login", credentials).then((response) => response.data),
         onSuccess: (token) => {
@@ -52,14 +52,8 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
         setLoading(true)
 
         try {
-            const response = await api.post<string>("/login/google", data)
-            console.log(response.data)
-            handleLogin(response.data)
-
-            // const decoded = jwtDecode(data.credential)
-            // console.log(decoded)
+            handleGoogleSuccess(data)
         } catch (error) {
-            console.log(error)
             onGoogleError()
         } finally {
             setLoading(false)
@@ -90,7 +84,7 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
             {loading && <LinearProgress variant="indeterminate" sx={{ width: 1, position: "absolute", bottom: 0, left: 0 }} />}
             {/* <Typography>Entrar</Typography> */}
 
-            <form style={{ display: "contents" }} onSubmit={formik.handleSubmit}>
+            <form onSubmit={formik.handleSubmit}>
                 <TextField
                     label="e-mail"
                     value={formik.values.login}
