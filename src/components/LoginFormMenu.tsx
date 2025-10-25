@@ -10,11 +10,15 @@ import type { GoogleAuthResponse, LoginForm } from "../types/server/class/User"
 import { GoogleLogin } from "@react-oauth/google"
 import { useMuiTheme } from "../hooks/useMuiTheme"
 
-interface LoginFormMenuProps {}
+interface LoginFormMenuProps {
+    width?: number
+    loadingPosition?: "top" | "bottom"
+}
 
-const containerWidth = 270
 
 export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
+    const loadingPosition = props.loadingPosition || "bottom"
+    const containerWidth = props.width || 270
     const [loading, setLoading] = useState(false)
 
     const { autofillStyle } = useMuiTheme()
@@ -81,7 +85,7 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
                 }
             }}
         >
-            {loading && <LinearProgress variant="indeterminate" sx={{ width: 1, position: "absolute", bottom: 0, left: 0 }} />}
+            {loading && <LinearProgress variant="indeterminate" sx={{ width: 1, position: "absolute", [loadingPosition]: 0, left: 0 }} />}
             {/* <Typography>Entrar</Typography> */}
 
             <form onSubmit={formik.handleSubmit}>

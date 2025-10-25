@@ -60,7 +60,7 @@ const features: FeatureItem[] = [
 
 const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark"; mobile?: boolean }> = ({ feature, mode, mobile }) => {
     return (
-        <Paper sx={{ padding: 3, flexDirection: "column", height: mobile ? 300 : 1, width: mobile ? 225 : 1, gap: 2 }}>
+        <Paper sx={{ padding: 3, flexDirection: "column", flex: 1, height: { md: 1 }, width: mobile ? 225 : 1, gap: 2 }}>
             <Box sx={{ justifyContent: "space-between" }}>
                 <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                     {feature.title}

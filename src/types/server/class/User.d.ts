@@ -40,7 +40,8 @@ export declare class User {
     id: string;
     name: string;
     email: string;
-    picture?: string | null;
+    defaultCurrency?: string;
+    picture?: string;
     static new(data: UserForm): Promise<User>;
     static login(data: LoginForm): Promise<User | null>;
     static getAll(): Promise<User[]>;

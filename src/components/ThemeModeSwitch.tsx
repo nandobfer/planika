@@ -9,7 +9,7 @@ export const ThemeModeSwitch: React.FC<ThemeModeSwitchProps> = (props) => {
     const { mode, setMode } = useMuiTheme()
 
     return (
-        <Box sx={{ alignItems: "center", width: "min-content", marginLeft: "auto", marginRight: "auto" }}>
+        <Box sx={{ alignItems: "center", width: "min-content" }}>
             <DarkMode fontSize="small" color={mode === "dark" ? "primary" : "disabled"} />
             <Switch size="small" checked={mode === "light"} onChange={() => setMode(mode === "dark" ? "light" : "dark")} />
             <LightMode fontSize="small" color={mode === "light" ? "primary" : "disabled"} />

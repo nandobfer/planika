@@ -60,7 +60,7 @@ export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
                             <Box sx={{ flexDirection: "column", gap: 1 }}>
                                 {feature.items.map((item, itemIndex) => (
                                     <Box key={itemIndex} sx={{ gap: 1, alignItems: "center" }}>
-                                        <CheckCircleOutline color="success" />
+                                        <CheckCircleOutline color="primary" />
                                         <Typography variant="h6" sx={{ fontWeight: "normal" }}>
                                             {item}
                                         </Typography>

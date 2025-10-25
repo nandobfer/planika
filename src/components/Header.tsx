@@ -100,7 +100,9 @@ export const Header: React.FC<HeaderProps> = (props) => {
                 <Box sx={{ flexDirection: "column", gap: 1 }}>
                     {user ? <AccountMenu user={user} handleAccountMenuClose={handleAccountMenuClose} /> : <LoginFormMenu />}
                     <Divider />
-                    <ThemeModeSwitch />
+                    <Box sx={{ justifyContent: "center", alignItems: "center" }}>
+                        <ThemeModeSwitch />
+                    </Box>
                 </Box>
             </Menu>
             {/* <Popper open={!!accountMenuAnchor} anchorEl={accountMenuAnchor} placement="bottom-end">
