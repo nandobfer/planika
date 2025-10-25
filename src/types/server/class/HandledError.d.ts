@@ -1,10 +1,6 @@
 import { WithoutFunctions } from "./helpers";
-export declare enum HandledErrorCode {
-    nagazap_not_found = 1,
-    nagazap_no_info = 2
-}
-export declare class HandledError {
+export declare class HandledPrismaError {
     text: string;
-    code: HandledErrorCode;
-    constructor(data: WithoutFunctions<HandledError>);
+    key: string;
+    constructor(data: WithoutFunctions<HandledPrismaError>);
 }

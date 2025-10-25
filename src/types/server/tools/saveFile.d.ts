@@ -1,5 +1,4 @@
-import { FileUpload } from "../class/helpers";
-export declare const saveFile: (path: string, file: FileUpload, callback?: () => void) => {
+export declare const saveFile: (path: string, buffer: Buffer<ArrayBufferLike>, file_name: string, callback?: () => void) => {
     url: string;
     filepath: string;
 };

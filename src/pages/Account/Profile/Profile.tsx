@@ -25,13 +25,13 @@ export const Profile: React.FC<ProfileProps> = () => {
             try {
                 if (shouldPatch) {
                     await patch({ name: values.name, email: values.email })
+                    snackbar({ text: "Perfil atualizado com sucesso!", severity: "success" })
+                    formik.resetForm()
                 }
             } catch (error) {
                 console.log(error)
             } finally {
                 EventBus.emit("account-loading", false)
-                snackbar({ text: "Perfil atualizado com sucesso!", severity: "success" })
-                formik.resetForm()
             }
         },
         enableReinitialize: true,

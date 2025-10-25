@@ -7,6 +7,7 @@ import { EventBus } from "../../../tools/EventBus"
 import { useUser } from "../../../hooks/useUser"
 import { useSnackbar } from "burgos-snackbar"
 import { AxiosError } from "axios"
+import type { HandledPrismaError } from "../../../types/server/class/HandledError"
 
 interface SecurityProps {}
 
@@ -24,8 +25,9 @@ export const Security: React.FC<SecurityProps> = () => {
                 snackbar({ text: "Senha alterada com sucesso!", severity: "success" })
                 formik.resetForm()
             } catch (error) {
-                if (error instanceof AxiosError && error.response?.data.message) {
-                    formik.setFieldError("current_password", error.response.data.message)
+                if (error instanceof AxiosError && error.response?.data.key) {
+                    const handledError = error.response.data as HandledPrismaError
+                    formik.setFieldError(handledError.key, handledError.text)
                 } else {
                     snackbar({ text: "Erro ao alterar a senha.", severity: "error" })
                 }

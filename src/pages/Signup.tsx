@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, Button, TextField } from "@mui/material"
+import { Box, Button, IconButton, LinearProgress, TextField } from "@mui/material"
 import { LoginFormMenu } from "../components/LoginFormMenu"
 import { GoogleLogin } from "@react-oauth/google"
 import { type GoogleAuthResponse, type UserForm } from "../types/server/class/User"
@@ -7,12 +7,18 @@ import { useUser } from "../hooks/useUser"
 import { useFormik } from "formik"
 import { Title } from "../components/Title"
 import * as yup from "yup"
+import { Visibility, VisibilityOff } from "@mui/icons-material"
+import { AxiosError } from "axios"
+import type { HandledPrismaError } from "../types/server/class/HandledError"
+import { useMuiTheme } from "../hooks/useMuiTheme"
 
 interface SignupProps {}
 const containerWidth = 400
 
 export const Signup: React.FC<SignupProps> = (props) => {
     const [loading, setLoading] = useState(false)
+    const [seePassword, setSeePassword] = useState(false)
+    const { autofillStyle } = useMuiTheme()
 
     const { handleGoogleSuccess, trySignup } = useUser()
 
@@ -42,7 +48,11 @@ export const Signup: React.FC<SignupProps> = (props) => {
             try {
                 await trySignup(values)
             } catch (error) {
-                console.log(error)
+                if (error instanceof AxiosError && error.response?.data.key) {
+                    const handledError = error.response.data as HandledPrismaError
+                    console.log(handledError)
+                    formik.setFieldError(handledError.key, handledError.text)
+                }
             } finally {
                 setLoading(false)
             }
@@ -57,8 +67,9 @@ export const Signup: React.FC<SignupProps> = (props) => {
 
     return (
         <Box sx={{ flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: 10 }}>
-            <Box sx={{ flexDirection: "column", width: containerWidth, gap: 2 }}>
+            <Box sx={{ flexDirection: "column", width: containerWidth, gap: 2, pointerEvents: loading ? "none" : undefined }}>
                 <Title name="Cadastrar-se" />
+                {loading && <LinearProgress variant="indeterminate" />}
                 <form onSubmit={formik.handleSubmit}>
                     <TextField
                         label="nome"
@@ -84,19 +95,30 @@ export const Signup: React.FC<SignupProps> = (props) => {
                         helperText={formik.errors.email}
                         autoComplete="off"
                         size="small"
+                        sx={autofillStyle}
                     />
                     <TextField
                         label="senha"
                         value={formik.values.password}
                         name="password"
                         onChange={formik.handleChange}
-                        type="password"
+                        type={seePassword ? "text" : "password"}
                         disabled={loading}
                         required
                         error={!!formik.errors.password}
                         helperText={formik.errors.password}
                         autoComplete="off"
                         size="small"
+                        sx={autofillStyle}
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <IconButton size="small" onClick={() => setSeePassword(!seePassword)}>
+                                        {seePassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                                    </IconButton>
+                                ),
+                            },
+                        }}
                     />
                     <Button variant="contained" type="submit" fullWidth disabled={loading}>
                         Cadastrar
