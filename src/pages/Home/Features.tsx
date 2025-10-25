@@ -74,6 +74,7 @@ const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark";
                         marginTop: -3,
                         marginRight: -3,
                         bgcolor: mode === "light" ? "background.default" : undefined,
+                        height: "min-content",
                     }}
                 >
                     <feature.icon color={feature.color} sx={{ height: "auto", width: 30 }} />
