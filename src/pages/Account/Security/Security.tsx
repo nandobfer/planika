@@ -83,7 +83,10 @@ export const Security: React.FC<SecurityProps> = () => {
                     error={!!formik.errors.confirm_password}
                     helperText={formik.errors.confirm_password}
                 />
-                <SaveButton onClick={formik.submitForm} />
+                <SaveButton
+                    onClick={formik.submitForm}
+                    disabled={!formik.values.confirm_password || !formik.values.new_password || !formik.values.current_password}
+                />
             </form>
         </Box>
     )
