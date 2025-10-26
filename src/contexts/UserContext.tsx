@@ -45,5 +45,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         }
     }, [user, firstRender])
 
+    useEffect(() => {
+        console.log(accessToken)
+    }, [accessToken])
+
     return <UserContext.Provider value={{ user, setUser, accessToken, setAccessToken }}>{children}</UserContext.Provider>
 }

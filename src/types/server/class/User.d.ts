@@ -1,8 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { WithoutFunctions } from "./helpers";
 import { UploadedFile } from "express-fileupload";
+import { Trip, TripForm } from "./Trip/Trip";
 export type UserPrisma = Prisma.UserGetPayload<{}>;
-export type UserForm = Omit<WithoutFunctions<User>, "id"> & {
+export type UserForm = Omit<WithoutFunctions<User>, "id" | "createdAt"> & {
     password: string;
     id?: string | null;
 };
@@ -42,6 +43,7 @@ export declare class User {
     email: string;
     defaultCurrency?: string;
     picture?: string;
+    createdAt: number;
     static new(data: UserForm): Promise<User>;
     static login(data: LoginForm): Promise<User | null>;
     static getAll(): Promise<User[]>;
@@ -56,4 +58,6 @@ export declare class User {
     updateImage(file: UploadedFile): Promise<string>;
     delete(): Promise<this>;
     getToken(): string;
+    getParticipatingTrips(): Promise<any>;
+    newTrip(data: TripForm): Promise<Trip>;
 }

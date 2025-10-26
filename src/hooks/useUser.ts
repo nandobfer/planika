@@ -14,8 +14,10 @@ export const useUser = () => {
 
     const logout = () => {
         navigate("/")
-        context.setUser(null)
-        context.setAccessToken(null)
+        setTimeout(() => {
+            context.setUser(null)
+            context.setAccessToken(null)
+        })
     }
 
     const handleLogin = (token: string) => {
@@ -37,7 +39,7 @@ export const useUser = () => {
 
     const authenticatedApi = useMemo(
         () => axios.create({ baseURL: api_url, headers: { Authorization: `Bearer ${context.accessToken?.value}` } }),
-        [context.accessToken]
+        [context.accessToken?.value]
     )
 
     const patch = async (data: Partial<User>) => {
@@ -67,5 +69,28 @@ export const useUser = () => {
         handleLogin(response.data)
     }
 
-    return { ...context, logout, handleLogin, authenticatedApi, patch, profilePicSettings, tryChangePassword, handleGoogleSuccess, trySignup }
+    const searchUser = async (query: string) => {
+        const response = await api.get<User[]>("/user/search", { params: { query } })
+        console.log(response.data)
+        return response.data
+    }
+
+    const fetchAllUsers = async () => {
+        const response = await api.get<User[]>("/user")
+        return response.data
+    }
+
+    return {
+        ...context,
+        logout,
+        handleLogin,
+        authenticatedApi,
+        patch,
+        profilePicSettings,
+        tryChangePassword,
+        handleGoogleSuccess,
+        trySignup,
+        searchUser,
+        fetchAllUsers,
+    }
 }

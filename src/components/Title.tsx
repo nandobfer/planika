@@ -41,7 +41,11 @@ export const Title: React.FC<{
                 </Typography>
             </Box>
             {right && right}
-            {refresh && <IconButton onClick={refresh}>{refreshing ? <CircularProgress size="1.5rem" /> : <Refresh />}</IconButton>}
+            {refresh && (
+                <IconButton size="small" onClick={refresh}>
+                    {refreshing ? <CircularProgress size={"1rem"} /> : <Refresh fontSize="small" />}
+                </IconButton>
+            )}
         </Box>
     )
 }
