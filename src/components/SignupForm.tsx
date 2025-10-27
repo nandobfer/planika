@@ -10,6 +10,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material"
 import { AxiosError } from "axios"
 import type { HandledPrismaError } from "../types/server/class/HandledError"
 import { useMuiTheme } from "../hooks/useMuiTheme"
+import { yup_validations } from "../tools/yup_validations"
 
 interface SignupFormProps {
     width?: number
@@ -61,7 +62,7 @@ export const SignupForm: React.FC<SignupFormProps> = (props) => {
         validationSchema: yup.object().shape({
             name: yup.string().required(),
             email: yup.string().email("E-mail inválido.").required(),
-            password: yup.string().min(6, "A senha deve ter ao menos 6 caracteres.").required(),
+            password: yup_validations.password,
         }),
         validateOnChange: false,
     })

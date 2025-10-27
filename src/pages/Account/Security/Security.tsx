@@ -8,6 +8,7 @@ import { useUser } from "../../../hooks/useUser"
 import { useSnackbar } from "burgos-snackbar"
 import { AxiosError } from "axios"
 import type { HandledPrismaError } from "../../../types/server/class/HandledError"
+import { yup_validations } from "../../../tools/yup_validations"
 
 interface SecurityProps {}
 
@@ -37,7 +38,7 @@ export const Security: React.FC<SecurityProps> = () => {
         },
         validationSchema: yup.object().shape({
             current_password: yup.string().required(),
-            new_password: yup.string().min(6, "A nova senha deve ter ao menos 6 caracteres.").required(),
+            new_password: yup_validations.password,
             confirm_password: yup
                 .string()
                 .oneOf([yup.ref("new_password")], "As senhas não coincidem.")

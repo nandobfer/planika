@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { Box, LinearProgress, Typography } from "@mui/material"
-import { Route, Routes } from "react-router-dom"
+import { Box, Button, LinearProgress, Typography } from "@mui/material"
+import { Route, Routes, useNavigate } from "react-router-dom"
 import { SendRecoveryEmail } from "./SendRecoveryEmail"
 import { VerifyCode } from "./VerifyCode"
 import { useMuiTheme } from "../../hooks/useMuiTheme"
@@ -12,6 +12,7 @@ interface PasswordRecoveryProps {}
 export const PasswordRecovery: React.FC<PasswordRecoveryProps> = (props) => {
     const [loading, setLoading] = useState(false)
 
+    const navigate = useNavigate()
     const { disabledStyle } = useMuiTheme()
 
     const handleLoadingUpdate = (isLoading: boolean) => {
@@ -42,15 +43,24 @@ export const PasswordRecovery: React.FC<PasswordRecoveryProps> = (props) => {
                     "& .recovery-character-selected": {
                         outlineColor: "primary.main",
                         borderColor: "transparent",
-
-                    }
+                    },
                 }}
             >
                 <Routes>
                     <Route path="" index element={<SendRecoveryEmail />} />
                     <Route path="code" element={<VerifyCode />} />
                     <Route path="reset-password" element={<ResetPassword />} />
-                    <Route path="success" element={<Typography>Senha redefinida com sucesso! Agora você pode fazer login.</Typography>} />
+                    <Route
+                        path="success"
+                        element={
+                            <>
+                                <Typography>Senha redefinida com sucesso! Agora você pode fazer login.</Typography>
+                                <Button sx={{ alignSelf: "flex-end" }} variant="contained" onClick={() => navigate("/get-started")}>
+                                    Ir para login
+                                </Button>
+                            </>
+                        }
+                    />
                 </Routes>
             </Box>
         </Box>
