@@ -20,7 +20,6 @@ export function useFilesDialogModal<T>(options: FileDialogInterface<T>) {
     const openModal = () => setIsOpen(true)
 
     const handleImageChange = async (files: FileList | null | File[]) => {
-        console.log(options)
         if (files) {
             setLoading(true)
             try {

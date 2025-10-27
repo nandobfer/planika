@@ -82,7 +82,7 @@ export const useTrips = () => {
     }
 
     useEffect(() => {
-        reactNavigate(`/trips/${currentTab.route}`)
+        reactNavigate(`/my-trips/${currentTab.route}`)
 
         EventBus.on("trip-loading", handleTripsLoading)
 

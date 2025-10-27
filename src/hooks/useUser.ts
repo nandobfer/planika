@@ -24,18 +24,18 @@ export const useUser = () => {
     const handleLogin = (token: string, onSuccess?: () => void) => {
         const decryped = jwtDecode<{ user: User; exp: number; iat: number }>(token)
         context.setUser(decryped.user)
-        console.log(decryped.user)
+        // console.log(decryped.user)
         context.setAccessToken({ ...decryped, value: token })
         if (onSuccess) {
             onSuccess()
         } else {
-            navigate("/trips")
+            navigate("/my-trips")
         }
     }
 
     const handleGoogleSuccess = async (data: GoogleAuthResponse, onSuccess?: () => void) => {
         const response = await api.post<string>("/login/google", data)
-        console.log(response.data)
+        // console.log(response.data)
         handleLogin(response.data, onSuccess)
 
         // const decoded = jwtDecode(data.credential)

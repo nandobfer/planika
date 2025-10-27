@@ -7,6 +7,7 @@ import dayjs from "dayjs"
 
 interface BasicInfoProps {
     tripForm: ReturnType<typeof useTripForm>
+    fromSettings?: boolean
 }
 
 export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
@@ -47,7 +48,7 @@ export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
                     />
                 </Box>
 
-                <SaveButton>Continuar</SaveButton>
+                <SaveButton>{props.fromSettings ? "Salvar" : "Continuar"}</SaveButton>
             </form>
         </Box>
     )

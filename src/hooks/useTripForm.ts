@@ -5,11 +5,11 @@ import { useUser } from "./useUser"
 import { EventBus } from "../tools/EventBus"
 import type { TripParticipant, TripParticipantForm } from "../types/server/class/Trip/TripParticipant"
 
-export const useTripForm = () => {
+export const useTripForm = (initialTrip?: Trip) => {
     const [step, setStep] = useState(0)
     const [skipped, setSkipped] = useState(new Set<number>())
-    const [currentTrip, setCurrentTrip] = useState<Trip | null>(null)
-    const [participants, setParticipants] = useState<TripParticipant[]>([])
+    const [currentTrip, setCurrentTrip] = useState<Trip | null>(initialTrip || null)
+    const [participants, setParticipants] = useState<TripParticipant[]>(currentTrip?.participants || [])
 
     const { user, authenticatedApi } = useUser()
 
@@ -31,6 +31,7 @@ export const useTripForm = () => {
                 setCurrentTrip(trip)
                 setParticipants(trip.participants)
                 handleNext()
+                EventBus.emit("trip-updated")
             } catch (error) {
                 console.log(error)
             } finally {

@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
                 <Box sx={{ alignItems: "center", gap: 3 }}>
                     {user ? (
                         <Button
-                            onClick={() => navigate("/trips")}
+                            onClick={() => navigate("/my-trips")}
                             variant="contained"
                             size="small"
                             color={mode === "light" ? "secondary" : "primary"}

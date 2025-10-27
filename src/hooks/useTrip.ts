@@ -9,7 +9,7 @@ export const useTrip = (tripId: string) => {
     const [loading, setLoading] = useState(false)
 
     const { authenticatedApi } = useUser()
-    const { data: trip } = useQuery({ queryKey: ["trip", tripId], queryFn: () => fetchTrip(), initialData: null })
+    const { data: trip, refetch } = useQuery({ queryKey: ["trip", tripId], queryFn: () => fetchTrip(), initialData: null })
 
     const handleTripsLoading = (value: boolean) => {
         setLoading(value)
@@ -41,11 +41,13 @@ export const useTrip = (tripId: string) => {
 
     useEffect(() => {
         EventBus.on("trip-loading", handleTripsLoading)
+        EventBus.on("trip-updated", refetch)
 
         return () => {
             EventBus.off("trip-loading", handleTripsLoading)
+            EventBus.off("trip-updated", refetch)
         }
     }, [])
 
-    return { trip, loading, acceptInvitation }
+    return { trip, loading, acceptInvitation, refetch }
 }

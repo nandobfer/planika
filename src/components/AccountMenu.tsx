@@ -9,8 +9,8 @@ interface AccountMenuProps {
     handleAccountMenuClose: () => void
 }
 
-const menuItems: {label: string, route: string}[] = [
-    { label: "Viagens", route: "/trips" },
+const menuItems: { label: string; route: string }[] = [
+    { label: "Viagens", route: "/my-trips" },
     { label: "Minha conta", route: "/account" },
 ]
 

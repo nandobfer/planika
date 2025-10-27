@@ -10,6 +10,7 @@ import { ParticipantInviteModal } from "./ParticipantInviteModal"
 
 interface ParticipantsFormProps {
     tripForm: ReturnType<typeof useTripForm>
+    fromSettings?: boolean
 }
 
 type UserOption = User | { type: "invite"; email: string }
@@ -57,14 +58,12 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
     const handleUserSelect = (option: UserOption | null) => {
         if (!option) return
 
-        console.log("Selected option:", option)
+        // console.log("Selected option:", option)
 
         if ("type" in option && option.type === "invite") {
-            // TODO: Implement invite by email functionality
             setInviteTarget(option.email)
         } else {
-            // TODO: Implement add user functionality
-            console.log("Add user:", option)
+            // console.log("Add user:", option)
             setInviteTarget(option as User)
         }
 
@@ -100,6 +99,7 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
                         return user.name
                     }}
                     filterOptions={(options) => options}
+                    getOptionKey={(option) => option.email}
                     renderOption={(_props, option) => {
                         if ("type" in option && option.type === "invite") {
                             return (
@@ -132,12 +132,14 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
                 {props.tripForm.participants.map((participant) => (
                     <ParticipantContainer key={participant.id} participant={participant} />
                 ))}
-                <Box sx={{ width: 1, gap: 2, justifyContent: "flex-end" }}>
-                    <Button onClick={props.tripForm.handleBack}>Voltar</Button>
-                    <Button variant="contained" onClick={props.tripForm.handleNext}>
-                        Continuar
-                    </Button>
-                </Box>
+                {!props.fromSettings && (
+                    <Box sx={{ width: 1, gap: 2, justifyContent: "flex-end" }}>
+                        <Button onClick={props.tripForm.handleBack}>Voltar</Button>
+                        <Button variant="contained" onClick={props.tripForm.handleNext}>
+                            Continuar
+                        </Button>
+                    </Box>
+                )}
             </form>
 
             <ParticipantInviteModal target={inviteTarget} onClose={() => setInviteTarget(null)} tripForm={props.tripForm} />

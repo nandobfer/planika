@@ -9,6 +9,7 @@ import { Signup } from "./pages/Signup"
 import { GetStarted } from "./pages/GetStarted"
 import { PasswordRecovery } from "./pages/PasswordRecovery/PasswordRecovery"
 import { AcceptInvitePage } from "./pages/AcceptInvitePage"
+import { TripPage } from "./pages/TripPage/TripPage"
 
 export interface RouteItem {
     path: string
@@ -29,7 +30,8 @@ export const routes: RouteItem[] = [
 
 export const authenticatedRoutes: RouteItem[] = [
     { path: "/account/*", element: <Account />, label: "Minha conta", id: "account" },
-    { path: "/trips/*", element: <Trips />, label: "Minhas viagens", id: "trips" },
+    { path: "/my-trips/*", element: <Trips />, label: "Minhas viagens", id: "trips" },
+    { path: "/trips/:id/*", element: <TripPage />, label: "Viagem", id: "trip" },
 ]
 
 export const Router: React.FC<RouterProps> = (props) => {

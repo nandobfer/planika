@@ -21,7 +21,6 @@ export const ParticipantInviteModal: React.FC<ParticipantInviteModalProps> = (pr
     const [role, setRole] = useState<ParticipantRole>("collaborator")
     const [email, setEmail] = useState("")
 
-    console.log({ email })
 
     const resetEmail = () => setEmail(targetUser ? "" : (props.target as string))
 
