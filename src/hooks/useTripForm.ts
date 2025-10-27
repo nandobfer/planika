@@ -70,6 +70,12 @@ export const useTripForm = () => {
 
             const newParticipant = response.data
             setParticipants((prev) => [...prev, newParticipant])
+            setCurrentTrip((current) => {
+                if (!current) return current
+
+                current.participants.push(newParticipant)
+                return current
+            })
         } catch (error) {
             console.log(error)
         } finally {

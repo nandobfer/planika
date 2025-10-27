@@ -26,7 +26,7 @@ export const TripsNavigation: React.FC<TripsNavigationProps> = (props) => {
         >
             {tabs.map((tab) => (
                 <Button
-                    sx={{ minWidth: "fit-content", fontWeight: tab.variant ? "bold" : "normal", marginBottom: tab.variant ? 1 : undefined }}
+                    sx={{ minWidth: "fit-content", fontWeight: tab.variant ? "bold" : "normal", marginBottom: { md: tab.variant ? 1 : undefined } }}
                     key={tab.route}
                     onClick={() => navigate(tab.route)}
                     variant={currentTab.route === tab.route ? "contained" : tab.variant ? "outlined" : "text"}

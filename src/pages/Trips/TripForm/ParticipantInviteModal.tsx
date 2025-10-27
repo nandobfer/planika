@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Box, Button, Dialog, Typography } from "@mui/material"
 import type { User } from "../../../types/server/class/User"
 import { Title } from "../../../components/Title"
@@ -19,7 +19,11 @@ export const ParticipantInviteModal: React.FC<ParticipantInviteModalProps> = (pr
     const targetUser = typeof props.target !== "string" ? (props.target as User) : null
 
     const [role, setRole] = useState<ParticipantRole>("collaborator")
-    const [email, setEmail] = useState(targetUser ? "" : (props.target as string))
+    const [email, setEmail] = useState("")
+
+    console.log({ email })
+
+    const resetEmail = () => setEmail(targetUser ? "" : (props.target as string))
 
     const onSubmit = async () => {
         if (!props.tripForm.currentTrip) return
@@ -36,6 +40,10 @@ export const ParticipantInviteModal: React.FC<ParticipantInviteModalProps> = (pr
         props.tripForm.inviteParticipant(data)
         props.onClose()
     }
+
+    useEffect(() => {
+        resetEmail()
+    }, [props.target, targetUser])
 
     return (
         <Dialog open={open} onClose={props.onClose} maxWidth="sm" fullWidth>
