@@ -15,7 +15,9 @@ export const TripContainer: React.FC<TripContainerProps> = (props) => {
     return (
         <Paper sx={{ flexDirection: "column", padding: 2, gap: 2 }}>
             <Box sx={{ justifyContent: "space-between", alignItems: "center" }}>
-                <Typography variant="subtitle1">{props.trip.name}</Typography>
+                <Typography variant="subtitle1" sx={{ opacity: !props.trip.name ? 0.5 : undefined }}>
+                    {props.trip.name || "Viagem sem nome"}
+                </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.5 }}>
                     Última edição:{" "}
                     {new Date(props.trip.updatedAt).toLocaleString("pt-br", {
@@ -28,7 +30,7 @@ export const TripContainer: React.FC<TripContainerProps> = (props) => {
                 </Typography>
             </Box>
 
-            {props.trip.description && <TextField  multiline value={props.trip.description} slotProps={{ input: { readOnly: true } }} />}
+            {props.trip.description && <TextField multiline value={props.trip.description} slotProps={{ input: { readOnly: true } }} />}
 
             <Box sx={{ gap: 2, alignItems: "center" }}>
                 {props.trip.startDate && (
