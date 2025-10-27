@@ -16,7 +16,7 @@ interface ParticipantsFormProps {
 type UserOption = User | { type: "invite"; email: string }
 
 export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
-    const { searchUser } = useUser()
+    const { searchUser, user } = useUser()
 
     const [inputValue, setInputValue] = useState("")
     const [debouncedInput, setDebouncedInput] = useState("")
@@ -81,6 +81,7 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
         <Box sx={{ flexDirection: "column", gap: 2, width: 1 }}>
             <form onSubmit={onSubmit}>
                 <Autocomplete
+                    disabled={!props.tripForm.isAdmin}
                     options={options}
                     inputValue={inputValue}
                     onInputChange={(_, newInputValue) => {
@@ -129,9 +130,16 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
                     noOptionsText={inputValue ? "Nenhum usuário encontrado" : "Digite para buscar ou convidar por e-mail"}
                     freeSolo={false}
                 />
-                {props.tripForm.participants.map((participant) => (
-                    <ParticipantContainer key={participant.id} participant={participant} />
-                ))}
+                {props.tripForm.participants.map((participant) => {
+                    const canEdit = props.tripForm.isAdmin && participant.userId !== user?.id
+                    return (
+                        <ParticipantContainer
+                            key={participant.id}
+                            participant={participant}
+                            onChangeRole={canEdit ? (role) => props.tripForm.updateParticipantRole(participant.id, role) : undefined}
+                        />
+                    )
+                })}
                 {!props.fromSettings && (
                     <Box sx={{ width: 1, gap: 2, justifyContent: "flex-end" }}>
                         <Button onClick={props.tripForm.handleBack}>Voltar</Button>

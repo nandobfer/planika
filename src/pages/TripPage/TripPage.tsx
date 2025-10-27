@@ -35,8 +35,8 @@ export const TripPage: React.FC<TripPageProps> = (props) => {
                 />
 
                 <Routes>
-                    <Route path="" index element={<ExpensesPage />} />
-                    <Route path="settings/*" element={<TripSettings />} />
+                    <Route path="" index element={<ExpensesPage loading={loading} />} />
+                    <Route path="settings/*" element={<TripSettings loading={loading} />} />
                 </Routes>
             </Box>
         </Box>

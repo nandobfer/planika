@@ -19,7 +19,13 @@ export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
     return (
         <Box sx={{ flexDirection: "column", gap: 2 }}>
             <form onSubmit={props.tripForm.formik.handleSubmit}>
-                <TextField label="Título" value={props.tripForm.formik.values.name} onChange={props.tripForm.formik.handleChange} name="name" />
+                <TextField
+                    label="Título"
+                    value={props.tripForm.formik.values.name}
+                    onChange={props.tripForm.formik.handleChange}
+                    name="name"
+                    disabled={!props.tripForm.isAdmin}
+                />
                 <TextField
                     label="Descrição"
                     value={props.tripForm.formik.values.description}
@@ -27,6 +33,7 @@ export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
                     name="description"
                     multiline
                     minRows={5}
+                    disabled={!props.tripForm.isAdmin}
                 />
 
                 <Box sx={{ gap: 2, width: 1, flexDirection: { xs: "column", md: "row" } }}>
@@ -37,6 +44,7 @@ export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
                         onChange={(value) => props.tripForm.formik.setFieldValue("startDate", value?.toDate().getTime())}
                         // disablePast
                         orientation="portrait"
+                        disabled={!props.tripForm.isAdmin}
                     />
                     <MobileDatePicker
                         label="Data de término"
@@ -45,10 +53,11 @@ export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
                         onChange={(value) => props.tripForm.formik.setFieldValue("endDate", value?.toDate().getTime())}
                         // disablePast
                         orientation="portrait"
+                        disabled={!props.tripForm.isAdmin}
                     />
                 </Box>
 
-                <SaveButton>{props.fromSettings ? "Salvar" : "Continuar"}</SaveButton>
+                <SaveButton disabled={!props.tripForm.isAdmin}>{props.fromSettings ? "Salvar" : "Continuar"}</SaveButton>
             </form>
         </Box>
     )

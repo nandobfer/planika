@@ -5,7 +5,7 @@ import { BasicInfoForm } from "../pages/Trips/TripForm/BasicInfoForm"
 import { useTripForm } from "./useTripForm"
 import { ParticipantsForm } from "../pages/Trips/TripForm/ParticipantsForm"
 
-export type TripSettingRoute = "info" | "participants"
+export type TripSettingRoute = "info" | "participants" | "back"
 
 export interface TripTabSetting {
     label: string
@@ -19,11 +19,17 @@ export interface TripTabSetting {
 export const useTripSettings = (_trip: Trip) => {
     const reactNavigate = useNavigate()
 
-
     const tripForm = useTripForm(_trip)
-    const {currentTrip: trip} = tripForm
+    const { currentTrip: trip } = tripForm
 
     const tabs: TripTabSetting[] = [
+        {
+            label: "Voltar",
+            description: "voltar",
+            variant: true,
+            route: "back",
+            component: <BasicInfoForm tripForm={tripForm} fromSettings />,
+        },
         {
             label: "Informações",
             description: "Gerencie as informações básicas da viagem",
@@ -39,15 +45,15 @@ export const useTripSettings = (_trip: Trip) => {
         },
     ]
 
-    const [currentTab, setCurrentTab] = useState<TripTabSetting>(tabs[0])
+    const [currentTab, setCurrentTab] = useState<TripTabSetting>(tabs[1])
 
     const navigate = (tab: TripSettingRoute) => {
-        setCurrentTab(tabs.find((t) => t.route === tab) || tabs[0])
+        setCurrentTab(tabs.find((t) => t.route === tab) || tabs[1])
     }
 
     useEffect(() => {
         reactNavigate(`/trips/${trip!.id}/settings/${currentTab.route}`)
     }, [currentTab])
 
-    return { currentTab, navigate, tabs,  trip: trip! }
+    return { currentTab, navigate, tabs, trip: trip! }
 }

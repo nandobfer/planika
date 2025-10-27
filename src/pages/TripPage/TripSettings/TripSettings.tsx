@@ -7,7 +7,9 @@ import { useTripSettings } from "../../../hooks/useTripSettings"
 import { useMuiTheme } from "../../../hooks/useMuiTheme"
 import { SettingDescription } from "../../Account/SettingDescription"
 
-interface TripSettingsProps {}
+interface TripSettingsProps {
+    loading: boolean
+}
 
 export const TripSettings: React.FC<TripSettingsProps> = (props) => {
     const initialTrip = useLocation().state as Trip
@@ -19,7 +21,7 @@ export const TripSettings: React.FC<TripSettingsProps> = (props) => {
         <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, height: 1, paddingBottom: { md: 8 } }}>
             <TripsSettingsNavigation flex={0.2} settings={settings} />
             <Divider orientation={isMobile ? "horizontal" : "vertical"} />
-            <Box sx={{ flex: 0.5, flexDirection: "column", ...(settings.loading ? disabledStyle : {}) }}>
+            <Box sx={{ flex: 0.5, flexDirection: "column", ...(props.loading ? disabledStyle : {}) }}>
                 <Routes>
                     {settings.tabs.map((tab) => (
                         <Route key={tab.route} path={tab.route} element={tab.component} index={tab.index} />

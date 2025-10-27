@@ -3,7 +3,7 @@ import type { Trip, TripForm } from "../types/server/class/Trip/Trip"
 import { useState } from "react"
 import { useUser } from "./useUser"
 import { EventBus } from "../tools/EventBus"
-import type { TripParticipant, TripParticipantForm } from "../types/server/class/Trip/TripParticipant"
+import type { ParticipantRole, TripParticipant, TripParticipantForm } from "../types/server/class/Trip/TripParticipant"
 
 export const useTripForm = (initialTrip?: Trip) => {
     const [step, setStep] = useState(0)
@@ -12,6 +12,7 @@ export const useTripForm = (initialTrip?: Trip) => {
     const [participants, setParticipants] = useState<TripParticipant[]>(currentTrip?.participants || [])
 
     const { user, authenticatedApi } = useUser()
+    const isAdmin = participants.find((p) => p.userId === user?.id)?.role === "administrator"
 
     const formik = useFormik<TripForm>({
         initialValues: {
@@ -84,5 +85,31 @@ export const useTripForm = (initialTrip?: Trip) => {
         }
     }
 
-    return { formik, step, setStep, handleNext, handleBack, isStepSkipped, participants, inviteParticipant, currentTrip }
+    const updateParticipantRole = async (participantId: string, role: ParticipantRole) => {
+        EventBus.emit("trip-loading", true)
+        const data: Partial<TripParticipantForm> = { role }
+        try {
+            const response = await authenticatedApi.patch<TripParticipant>("/trip/participant", data, { params: { participant_id: participantId } })
+            setParticipants((prev) => prev.map((p) => (p.id === participantId ? response.data : p)))
+            return response.data
+        } catch (error) {
+            console.error("Error updating participant role:", error)
+        } finally {
+            EventBus.emit("trip-loading", false)
+        }
+    }
+
+    return {
+        formik,
+        step,
+        setStep,
+        handleNext,
+        handleBack,
+        isStepSkipped,
+        participants,
+        inviteParticipant,
+        currentTrip,
+        updateParticipantRole,
+        isAdmin,
+    }
 }

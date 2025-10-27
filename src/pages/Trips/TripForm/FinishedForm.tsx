@@ -8,5 +8,10 @@ interface FinishedFormProps {
 }
 
 export const FinishedForm: React.FC<FinishedFormProps> = (props) => {
-    return <Box sx={{ flexDirection: "column" }}>{props.tripForm.currentTrip && <TripContainer trip={props.tripForm.currentTrip} />}</Box>
+    return (
+        <Box sx={{ flexDirection: "column" }}>
+            {/* Trip Summary */}
+            {props.tripForm.currentTrip && <TripContainer trip={props.tripForm.currentTrip} />}
+        </Box>
+    )
 }
