@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Box, Typography } from "@mui/material"
+import React from "react"
+import { Typography } from "@mui/material"
 import { Title } from "../../components/Title"
 import VerificationInput from "react-verification-input"
 import { useLocation, useNavigate } from "react-router-dom"
