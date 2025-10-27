@@ -5,6 +5,8 @@ import VerificationInput from "react-verification-input"
 import { useLocation, useNavigate } from "react-router-dom"
 import { EventBus } from "../../tools/EventBus"
 import { useUser } from "../../hooks/useUser"
+import { useSnackbar } from "burgos-snackbar"
+import { AxiosError } from "axios"
 
 interface VerifyCodeProps {}
 
@@ -12,6 +14,7 @@ export const VerifyCode: React.FC<VerifyCodeProps> = (props) => {
     const email = useLocation().state as string
     const { sendCodeVerification } = useUser()
     const navigate = useNavigate()
+    const { snackbar } = useSnackbar()
 
     const onSubmit = async (ev?: React.FormEvent) => {
         ev?.preventDefault()
@@ -23,6 +26,9 @@ export const VerifyCode: React.FC<VerifyCodeProps> = (props) => {
             const recovery = await sendCodeVerification(email, code)
             navigate("/recovery/reset-password", { state: recovery })
         } catch (error) {
+            if (error instanceof AxiosError && error.response?.data) {
+                snackbar({ text: error.response.data as string, severity: "error" })
+            }
             console.log(error)
         } finally {
             EventBus.emit("password-recovery-loading", false)
@@ -35,6 +41,7 @@ export const VerifyCode: React.FC<VerifyCodeProps> = (props) => {
             <Typography>Insira o código de verificação enviado para o seu e-mail.</Typography>
 
             <VerificationInput
+                autoFocus
                 length={5}
                 placeholder=""
                 validChars="0-9"
