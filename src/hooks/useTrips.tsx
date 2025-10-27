@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { EventBus } from "../tools/EventBus"
 import { useNavigate } from "react-router-dom"
 import { TripFormPage } from "../pages/Trips/TripForm/TripFormPage"
+import { api } from "../backend/api"
 
 export type TripsPageRoute = "new-trip" | "ongoing-trips" | "completed-trips"
 
@@ -44,7 +45,7 @@ export const useTrips = () => {
             description: "Crie uma nova viagem para começar a planejar",
             route: "new-trip",
             component: <TripFormPage />,
-            variant: true
+            variant: true,
         },
         {
             label: "Viagens em andamento",
@@ -67,6 +68,19 @@ export const useTrips = () => {
         setLoading(value)
     }
 
+    const getTrip = async (tripId: string): Promise<Trip | null> => {
+        setLoading(true)
+        try {
+            const response = await api.get<Trip>("/trip", { params: { trip_id: tripId } })
+            return response.data
+        } catch (error) {
+            console.log(error)
+            return null
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         reactNavigate(`/trips/${currentTab.route}`)
 
@@ -77,5 +91,5 @@ export const useTrips = () => {
         }
     }, [currentTab])
 
-    return { isFetching, data, refetch, tabs, currentTab, navigate, loading }
+    return { isFetching, data, refetch, tabs, currentTab, navigate, loading, getTrip }
 }

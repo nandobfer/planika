@@ -14,7 +14,8 @@ import { useNavigate } from "react-router-dom"
 interface LoginFormMenuProps {
     width?: number
     loadingPosition?: "top" | "bottom"
-    handleAccountMenuClose: () => void
+    handleAccountMenuClose?: () => void
+    onSuccess?: () => void
 }
 
 export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
@@ -28,7 +29,7 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
     const { mutate } = useMutation({
         mutationFn: async (credentials: LoginForm) => await api.post<string>("/login", credentials).then((response) => response.data),
         onSuccess: (token) => {
-            handleLogin(token)
+            handleLogin(token, props.onSuccess)
         },
         onError: (error: AxiosError) => {
             if (error.response?.status === 401) {
@@ -58,7 +59,7 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
         setLoading(true)
 
         try {
-            handleGoogleSuccess(data)
+            handleGoogleSuccess(data, props.onSuccess)
         } catch (error) {
             onGoogleError()
         } finally {
@@ -72,7 +73,7 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
 
     const onForgotPassword = () => {
         navigate("/recovery", { state: formik.values.login })
-        props.handleAccountMenuClose()
+        props.handleAccountMenuClose?.()
     }
 
     return (

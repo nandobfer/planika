@@ -14,6 +14,7 @@ import { yup_validations } from "../tools/yup_validations"
 
 interface SignupFormProps {
     width?: number
+    onSuccess?: () => void
 }
 
 export const SignupForm: React.FC<SignupFormProps> = (props) => {
@@ -29,7 +30,7 @@ export const SignupForm: React.FC<SignupFormProps> = (props) => {
         setLoading(true)
 
         try {
-            handleGoogleSuccess(data)
+            handleGoogleSuccess(data, props.onSuccess)
         } catch (error) {
             onGoogleError()
         } finally {
@@ -48,7 +49,7 @@ export const SignupForm: React.FC<SignupFormProps> = (props) => {
             setLoading(true)
 
             try {
-                await trySignup(values)
+                await trySignup(values, props.onSuccess)
             } catch (error) {
                 if (error instanceof AxiosError && error.response?.data.key) {
                     const handledError = error.response.data as HandledPrismaError

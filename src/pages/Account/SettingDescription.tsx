@@ -5,7 +5,7 @@ import { useMuiTheme } from "../../hooks/useMuiTheme"
 
 interface SettingDescriptionProps {
     flex: number
-    tab: AccountSetting
+    children: React.ReactNode
 }
 
 export const SettingDescription: React.FC<SettingDescriptionProps> = (props) => {
@@ -19,7 +19,7 @@ export const SettingDescription: React.FC<SettingDescriptionProps> = (props) => 
                 ...gradientStyle,
             }}
         >
-            <Typography>{props.tab.description}</Typography>
+            <Typography>{props.children}</Typography>
         </Paper>
     )
 }

@@ -8,6 +8,7 @@ import { useUser } from "./hooks/useUser"
 import { Signup } from "./pages/Signup"
 import { GetStarted } from "./pages/GetStarted"
 import { PasswordRecovery } from "./pages/PasswordRecovery/PasswordRecovery"
+import { AcceptInvitePage } from "./pages/AcceptInvitePage"
 
 export interface RouteItem {
     path: string
@@ -23,6 +24,7 @@ export const routes: RouteItem[] = [
     { path: "/signup", element: <Signup />, label: "Cadastro", id: "signup" },
     { path: "/get-started", element: <GetStarted />, label: "Começar", id: "get-started" },
     { path: "/recovery/*", element: <PasswordRecovery />, label: "Recuperação de conta", id: "recovery" },
+    { path: "/accept-invite", element: <AcceptInvitePage />, label: "Aceitar convite", id: "accept-invite" },
 ]
 
 export const authenticatedRoutes: RouteItem[] = [

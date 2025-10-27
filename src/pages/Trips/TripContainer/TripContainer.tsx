@@ -1,19 +1,30 @@
 import React from "react"
-import { Avatar, Box, Button, Divider, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
+import { Avatar, Box, Button, Divider, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { Trip } from "../../../types/server/class/Trip/Trip"
 import { CalendarMonth, EventAvailable } from "@mui/icons-material"
-import { SaveButton } from "../../Account/SaveButton"
 import { ParticipantContainer } from "../TripForm/ParticipantContainer"
+import { useNavigate } from "react-router-dom"
 
 interface TripContainerProps {
     trip: Trip
+    onAcceptInvite?: () => Promise<void>
 }
 
 const max_participants_displayed = 2
 
 export const TripContainer: React.FC<TripContainerProps> = (props) => {
+    const navigate = useNavigate()
+
+    const onAccessClick = async () => {
+        if (props.onAcceptInvite) {
+            await props.onAcceptInvite()
+        }
+
+        navigate(`/trips/${props.trip.id}`)
+    }
+
     return (
-        <Paper sx={{ flexDirection: "column", padding: 2, gap: 2 }}>
+        <Paper sx={{ flexDirection: "column", padding: 2, gap: 2, flex: 1 }}>
             <Box sx={{ justifyContent: "space-between", alignItems: "center" }}>
                 <Typography variant="subtitle1" sx={{ opacity: !props.trip.name ? 0.5 : undefined }}>
                     {props.trip.name || "Viagem sem nome"}
@@ -89,8 +100,8 @@ export const TripContainer: React.FC<TripContainerProps> = (props) => {
                         <Typography variant="body2">+{props.trip.participants.length - max_participants_displayed}</Typography>
                     </Paper>
                 )}
-                <Button variant="contained" sx={{ marginLeft: "auto" }}>
-                    Acessar
+                <Button variant="contained" sx={{ marginLeft: "auto" }} onClick={onAccessClick}>
+                    {props.onAcceptInvite ? "Aceitar e acessar" : "Acessar"}
                 </Button>
             </Box>
         </Paper>

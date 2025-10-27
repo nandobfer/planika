@@ -4,18 +4,20 @@ import { SignupForm } from "../components/SignupForm"
 import { LoginFormMenu } from "../components/LoginFormMenu"
 import { Title } from "../components/Title"
 
-interface SignupProps {}
+interface SignupProps {
+    onSuccess?: () => void
+}
 
 const containerWidth = 400
 export const GetStarted: React.FC<SignupProps> = (props) => {
     return (
         <Box sx={{ flexDirection: "row", justifyContent: "center", padding: 10, gap: 10, position: "relative" }}>
-            <Box sx={{flexDirection: 'column'}}>
+            <Box sx={{ flexDirection: "column" }}>
                 <Title name="Entrar" />
-                <LoginFormMenu width={containerWidth} loadingPosition="top" />
+                <LoginFormMenu width={containerWidth} loadingPosition="top" onSuccess={props.onSuccess} />
             </Box>
             <Divider orientation="vertical" />
-            <SignupForm width={containerWidth} />
+            <SignupForm width={containerWidth} onSuccess={props.onSuccess} />
         </Box>
     )
 }

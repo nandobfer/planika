@@ -33,7 +33,7 @@ export const Account: React.FC<AccountProps> = (props) => {
                 </Box>
 
                 <Divider orientation={isMobile ? "horizontal" : "vertical"} />
-                <SettingDescription flex={0.3} tab={settings.currentTab} />
+                <SettingDescription flex={0.3}>{settings.currentTab.description}</SettingDescription>
             </Box>
         </Box>
     )

@@ -21,18 +21,22 @@ export const useUser = () => {
         })
     }
 
-    const handleLogin = (token: string) => {
+    const handleLogin = (token: string, onSuccess?: () => void) => {
         const decryped = jwtDecode<{ user: User; exp: number; iat: number }>(token)
         context.setUser(decryped.user)
         console.log(decryped.user)
         context.setAccessToken({ ...decryped, value: token })
-        navigate("/trips")
+        if (onSuccess) {
+            onSuccess()
+        } else {
+            navigate("/trips")
+        }
     }
 
-    const handleGoogleSuccess = async (data: GoogleAuthResponse) => {
+    const handleGoogleSuccess = async (data: GoogleAuthResponse, onSuccess?: () => void) => {
         const response = await api.post<string>("/login/google", data)
         console.log(response.data)
-        handleLogin(response.data)
+        handleLogin(response.data, onSuccess)
 
         // const decoded = jwtDecode(data.credential)
         // console.log(decoded)
@@ -65,9 +69,9 @@ export const useUser = () => {
         await authenticatedApi.post("/user/change-password", { current_password, new_password })
     }
 
-    const trySignup = async (data: UserForm) => {
+    const trySignup = async (data: UserForm, onSuccess?: () => void) => {
         const response = await api.post<string>("/user", data)
-        handleLogin(response.data)
+        handleLogin(response.data, onSuccess)
     }
 
     const searchUser = async (query: string) => {
