@@ -1,9 +1,13 @@
 import { Prisma } from "@prisma/client";
-import { TripParticipant } from "./TripParticipant";
+import { TripParticipant, TripParticipantForm } from "./TripParticipant";
 import { Node } from "./Node";
 import { WithoutFunctions } from "../helpers";
 export declare const trip_includes: {
-    participants: true;
+    participants: {
+        include: {
+            user: true;
+        };
+    };
 };
 type PrismaTrip = Prisma.TripGetPayload<{
     include: typeof trip_includes;
@@ -28,5 +32,6 @@ export declare class Trip {
     load(data: PrismaTrip): void;
     getStatus(): TripStatus;
     update(data: Partial<TripForm>): Promise<void>;
+    inviteParticipant(data: TripParticipantForm): Promise<TripParticipant>;
 }
 export {};

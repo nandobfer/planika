@@ -71,7 +71,6 @@ export const useUser = () => {
 
     const searchUser = async (query: string) => {
         const response = await api.get<User[]>("/user/search", { params: { query } })
-        console.log(response.data)
         return response.data
     }
 

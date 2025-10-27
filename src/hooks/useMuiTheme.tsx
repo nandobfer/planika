@@ -66,6 +66,7 @@ export const useMuiTheme = () => {
                         // MuiButton: { styleOverrides: { contained: { color: colors[mode].secondary } } },
                         MuiCircularProgress: { defaultProps: { size: "1.5rem", color: "inherit" } },
                         MuiTooltip: { defaultProps: { arrow: true } },
+                        MuiAvatar: { defaultProps: { style: { backgroundColor: colors[mode].primary } } },
                     },
                 },
                 ptBR

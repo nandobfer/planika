@@ -51,6 +51,7 @@ export declare class User {
     static findByEmail(email: string): Promise<User | null>;
     static delete(user_id: string): Promise<User>;
     static googleLogin(data: GoogleAuthResponse): Promise<User | undefined>;
+    static search(query: string): Promise<User[]>;
     static tryChangePassword(user_id: string, current_password: string, new_password: string): Promise<void>;
     constructor(data: UserPrisma);
     load(data: UserPrisma): void;
@@ -58,6 +59,6 @@ export declare class User {
     updateImage(file: UploadedFile): Promise<string>;
     delete(): Promise<this>;
     getToken(): string;
-    getParticipatingTrips(): Promise<any>;
+    getParticipatingTrips(): Promise<Trip[]>;
     newTrip(data: TripForm): Promise<Trip>;
 }

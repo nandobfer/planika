@@ -3,7 +3,7 @@ import type { Trip, TripForm } from "../types/server/class/Trip/Trip"
 import { useState } from "react"
 import { useUser } from "./useUser"
 import { EventBus } from "../tools/EventBus"
-import type { TripParticipant } from "../types/server/class/Trip/TripParticipant"
+import type { TripParticipant, TripParticipantForm } from "../types/server/class/Trip/TripParticipant"
 
 export const useTripForm = () => {
     const [step, setStep] = useState(0)
@@ -59,13 +59,13 @@ export const useTripForm = () => {
         setStep((prevStep) => prevStep - 1)
     }
 
-    const inviteUser = async (userId: string) => {
+    const inviteParticipant = async (data: TripParticipantForm) => {
         EventBus.emit("trip-loading", true)
         try {
             if (!currentTrip) return
 
-            const response = await authenticatedApi.post<TripParticipant>(`/trip/invite`, null, {
-                params: { trip_id: currentTrip.id, user_id: userId },
+            const response = await authenticatedApi.post<TripParticipant>(`/trip/participant`, data, {
+                params: { trip_id: currentTrip.id },
             })
 
             const newParticipant = response.data
@@ -77,5 +77,5 @@ export const useTripForm = () => {
         }
     }
 
-    return { formik, step, setStep, handleNext, handleBack, isStepSkipped, participants, inviteUser }
+    return { formik, step, setStep, handleNext, handleBack, isStepSkipped, participants, inviteParticipant, currentTrip }
 }

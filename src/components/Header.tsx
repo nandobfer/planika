@@ -72,11 +72,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
                         </Box>
                     )}
                     <IconButton onClick={handleAccountMenuClick}>
-                        {user ? (
-                            <Avatar src={user.picture || undefined} sx={{ color: "inherit", bgcolor: "primary.main" }} />
-                        ) : (
-                            <AccountCircle fontSize="large" sx={{}} />
-                        )}
+                        {user ? <Avatar src={user.picture || undefined} /> : <AccountCircle fontSize="large" sx={{}} />}
                     </IconButton>
                 </Box>
             </Toolbar>

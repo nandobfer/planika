@@ -6,6 +6,7 @@ import type { User } from "../../../types/server/class/User"
 import { useUser } from "../../../hooks/useUser"
 import { useQuery } from "@tanstack/react-query"
 import * as yup from "yup"
+import { ParticipantInviteModal } from "./ParticipantInviteModal"
 
 interface ParticipantsFormProps {
     tripForm: ReturnType<typeof useTripForm>
@@ -18,6 +19,7 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
 
     const [inputValue, setInputValue] = useState("")
     const [debouncedInput, setDebouncedInput] = useState("")
+    const [inviteTarget, setInviteTarget] = useState<string | null | User>(null)
 
     // Create debounced function using MUI's debounce
     const debouncedSetInput = useMemo(
@@ -55,18 +57,20 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
     const handleUserSelect = (option: UserOption | null) => {
         if (!option) return
 
+        console.log("Selected option:", option)
+
         if ("type" in option && option.type === "invite") {
             // TODO: Implement invite by email functionality
-            console.log("Invite by email:", option.email)
-            // You can add your logic here later
+            setInviteTarget(option.email)
         } else {
             // TODO: Implement add user functionality
             console.log("Add user:", option)
-            // You can add your logic here later
+            setInviteTarget(option as User)
         }
 
         // Clear the input after selection
         setInputValue("")
+        setDebouncedInput("")
     }
 
     const onSubmit = (e: React.FormEvent) => {
@@ -87,19 +91,20 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
                     onChange={(_, newValue) => {
                         handleUserSelect(newValue)
                     }}
-                    renderInput={(params) => <TextField {...params} label="Adicionar participante" />}
+                    renderInput={(params) => <TextField {...params} label="Adicionar participante" placeholder="fulano@exemplo.com" />}
                     getOptionLabel={(option) => {
                         if ("type" in option && option.type === "invite") {
-                            return `Convidar ${option.email} por e-mail`
+                            return `Convidar ${option.email}`
                         }
                         const user = option as User
                         return user.name
                     }}
+                    filterOptions={(options) => options}
                     renderOption={(_props, option) => {
                         if ("type" in option && option.type === "invite") {
                             return (
                                 <MenuItem {..._props} disabled={!isValidEmail}>
-                                    <Typography>Convidar {option.email} por e-mail</Typography>
+                                    <Typography>Convidar {option.email}</Typography>
                                 </MenuItem>
                             )
                         }
@@ -107,31 +112,35 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
                         // TypeScript now knows option is User here
                         const user = option as User
                         return (
-                            <MenuItem {..._props} sx={{gap: 1}} disabled={props.tripForm.participants.some(participant => participant.userId === user.id)}>
+                            <MenuItem
+                                {..._props}
+                                sx={{ gap: 1 }}
+                                disabled={props.tripForm.participants.some((participant) => participant.userId === user.id)}
+                            >
                                 <Avatar src={user.picture} sx={{}} />
-                                <Box sx={{flexDirection: 'column'}}>
-                                    <Typography>
-                                    {user.name}
-                                </Typography>
-                                <Typography variant="body2">{user.email}</Typography>
+                                <Box sx={{ flexDirection: "column" }}>
+                                    <Typography>{user.name}</Typography>
+                                    <Typography variant="body2">{user.email}</Typography>
                                 </Box>
                             </MenuItem>
                         )
                     }}
                     loading={isLoading}
-                    noOptionsText={inputValue ? "Nenhum usuário encontrado" : "Digite para buscar"}
+                    noOptionsText={inputValue ? "Nenhum usuário encontrado" : "Digite para buscar ou convidar por e-mail"}
                     freeSolo={false}
                 />
                 {props.tripForm.participants.map((participant) => (
                     <ParticipantContainer key={participant.id} participant={participant} />
                 ))}
-                <Box sx={{ width: 1, gap: 2 }}>
+                <Box sx={{ width: 1, gap: 2, justifyContent: "flex-end" }}>
                     <Button onClick={props.tripForm.handleBack}>Voltar</Button>
                     <Button variant="contained" onClick={props.tripForm.handleNext}>
                         Continuar
                     </Button>
                 </Box>
             </form>
+
+            <ParticipantInviteModal target={inviteTarget} onClose={() => setInviteTarget(null)} tripForm={props.tripForm} />
         </Box>
     )
 }
