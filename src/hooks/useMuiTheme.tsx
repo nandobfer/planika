@@ -88,5 +88,7 @@ export const useMuiTheme = () => {
     const gradientStyle = { background: `linear-gradient(0deg,${theme.palette.background.default} 50%, ${gradientTo} 100%)` }
     const invertedGradientStyle = { background: `linear-gradient(0deg, ${gradientTo} 50%, ${theme.palette.background.default} 100%)` }
 
-    return { theme, mode, setMode, autofillStyle, gradientStyle, invertedGradientStyle }
+    const disabledStyle = { filter: "grayscale(100%) blur(1px)", pointerEvents: "none" }
+
+    return { theme, mode, setMode, autofillStyle, gradientStyle, invertedGradientStyle, disabledStyle }
 }

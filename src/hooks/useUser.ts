@@ -6,6 +6,7 @@ import axios from "axios"
 import { api, api_url } from "../backend/api"
 import { useNavigate } from "react-router-dom"
 import { useFilesDialogModal } from "./useFilesDialogModal"
+import type { Recovery } from "../types/server/class/Recovery"
 
 export const useUser = () => {
     const context = useContext(UserContext)
@@ -79,6 +80,20 @@ export const useUser = () => {
         return response.data
     }
 
+    const sendPasswordRecoveryEmail = async (email: string) => {
+        await api.post("/recovery", { email })
+    }
+
+    const sendCodeVerification = async (email: string, code: string) => {
+        const response = await api.post<Recovery>("/recovery/verify-code", { target: email, code: code.split("").map((item) => Number(item)) })
+        return response.data
+    }
+
+    const sendRecoveryNewPassword = async (recovery: Recovery, password: string) => {
+        const response = await api.post<string>("/recovery/reset-password", { target: recovery.target, password })
+        return response.data
+    }
+
     return {
         ...context,
         logout,
@@ -91,5 +106,8 @@ export const useUser = () => {
         trySignup,
         searchUser,
         fetchAllUsers,
+        sendPasswordRecoveryEmail,
+        sendCodeVerification,
+        sendRecoveryNewPassword,
     }
 }

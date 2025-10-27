@@ -94,7 +94,11 @@ export const Header: React.FC<HeaderProps> = (props) => {
                 }}
             >
                 <Box sx={{ flexDirection: "column", gap: 1 }}>
-                    {user ? <AccountMenu user={user} handleAccountMenuClose={handleAccountMenuClose} /> : <LoginFormMenu />}
+                    {user ? (
+                        <AccountMenu user={user} handleAccountMenuClose={handleAccountMenuClose} />
+                    ) : (
+                        <LoginFormMenu handleAccountMenuClose={handleAccountMenuClose} />
+                    )}
                     <Divider />
                     <Box sx={{ justifyContent: "center", alignItems: "center" }}>
                         <ThemeModeSwitch />

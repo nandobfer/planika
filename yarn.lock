@@ -2247,6 +2247,11 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
+react-verification-input@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/react-verification-input/-/react-verification-input-4.2.2.tgz#8d0e54705ed38b23adced59bd41a06ee6aa52a75"
+  integrity sha512-GqcsiZ5iwcXD4V0cKbZv1pbknqAZRszPoXzSKc5LLlfSdo3iOnxLxEbmDi+BWN1LfhCx2iXhEDGke9Bdk3q+4A==
+
 react@^19.1.0:
   version "19.1.0"
   resolved "https://registry.yarnpkg.com/react/-/react-19.1.0.tgz#926864b6c48da7627f004795d6cce50e90793b75"

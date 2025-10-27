@@ -11,10 +11,8 @@ interface AccountProps {}
 
 export const Account: React.FC<AccountProps> = (props) => {
     const settings = useAccountSettings()
-    const { theme } = useMuiTheme()
+    const { theme, disabledStyle } = useMuiTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-
-    const disabledStyle = settings.loading ? { filter: "grayscale(100%) blur(1px)", pointerEvents: "none" } : {}
 
     return (
         <Box sx={{ flexDirection: "column", padding: 5, gap: { xs: 2, md: 5 }, height: 1, position: "relative" }}>
@@ -26,7 +24,7 @@ export const Account: React.FC<AccountProps> = (props) => {
 
                 <Divider orientation={isMobile ? "horizontal" : "vertical"} />
 
-                <Box sx={{ flex: 0.5, flexDirection: "column", ...disabledStyle }}>
+                <Box sx={{ flex: 0.5, flexDirection: "column", ...(settings.loading ? disabledStyle : {}) }}>
                     <Routes>
                         {settings.tabs.map((tab) => (
                             <Route key={tab.route} path={tab.route} element={tab.component} index={tab.index} />

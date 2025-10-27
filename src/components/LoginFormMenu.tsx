@@ -9,17 +9,19 @@ import type { AxiosError } from "axios"
 import type { GoogleAuthResponse, LoginForm } from "../types/server/class/User"
 import { GoogleLogin } from "@react-oauth/google"
 import { useMuiTheme } from "../hooks/useMuiTheme"
+import { useNavigate } from "react-router-dom"
 
 interface LoginFormMenuProps {
     width?: number
     loadingPosition?: "top" | "bottom"
+    handleAccountMenuClose: () => void
 }
-
 
 export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
     const loadingPosition = props.loadingPosition || "bottom"
     const containerWidth = props.width || 270
     const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
 
     const { autofillStyle } = useMuiTheme()
     const { handleLogin, handleGoogleSuccess } = useUser()
@@ -68,6 +70,11 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
         console.log("Login Failed")
     }
 
+    const onForgotPassword = () => {
+        navigate("/recovery", { state: formik.values.login })
+        props.handleAccountMenuClose()
+    }
+
     return (
         <Box
             sx={{
@@ -114,7 +121,11 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
                     disabled={loading}
                     required
                     error={!!formik.errors.password}
-                    helperText={<Button size="small">Esqueci minha senha</Button>}
+                    helperText={
+                        <Button size="small" onClick={onForgotPassword}>
+                            Esqueci minha senha
+                        </Button>
+                    }
                     autoComplete="off"
                 />
                 <Button variant="contained" type="submit" fullWidth disabled={loading}>
