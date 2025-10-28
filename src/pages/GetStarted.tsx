@@ -16,7 +16,7 @@ export const GetStarted: React.FC<SignupProps> = (props) => {
                 <Title name="Entrar" />
                 <LoginFormMenu width={containerWidth} loadingPosition="top" onSuccess={props.onSuccess} />
             </Box>
-            <Divider orientation="vertical" />
+            <Divider orientation="vertical" flexItem />
             <SignupForm width={containerWidth} onSuccess={props.onSuccess} />
         </Box>
     )
