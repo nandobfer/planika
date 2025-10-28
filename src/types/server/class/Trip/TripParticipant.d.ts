@@ -24,7 +24,10 @@ export declare class TripParticipant {
     status: ParticipantStatus;
     user?: User;
     userId?: string;
-    static new(data: TripParticipantForm): Promise<TripParticipant>;
+    static new(data: TripParticipantForm, email?: string): Promise<TripParticipant>;
+    static findById(id: string): Promise<TripParticipant | null>;
     constructor(data: ParticipantPrisma);
+    load(data: ParticipantPrisma): void;
+    update(data: Partial<TripParticipant>): Promise<void>;
 }
 export {};

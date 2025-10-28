@@ -5,7 +5,8 @@ import type { Trip } from "../types/server/class/Trip/Trip"
 import { api } from "../backend/api"
 import { useUser } from "./useUser"
 
-export const useTrip = (tripId: string) => {
+export const useTrip = (_tripId: string) => {
+    const tripId = _tripId
     const [loading, setLoading] = useState(false)
 
     const { authenticatedApi } = useUser()
@@ -49,5 +50,5 @@ export const useTrip = (tripId: string) => {
         }
     }, [])
 
-    return { trip, loading, acceptInvitation, refetch }
+    return { trip, loading, acceptInvitation, refetch, tripId }
 }

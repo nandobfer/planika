@@ -12,7 +12,8 @@ interface TripPageProps {}
 
 export const TripPage: React.FC<TripPageProps> = (props) => {
     const tripId = useParams<{ id: string }>().id || ""
-    const { trip, loading } = useTrip(tripId)
+    const tripHook = useTrip(tripId)
+    const { trip, loading } = tripHook
     const { disabledStyle } = useMuiTheme()
     const navigate = useNavigate()
 
@@ -35,7 +36,7 @@ export const TripPage: React.FC<TripPageProps> = (props) => {
                 />
 
                 <Routes>
-                    <Route path="" index element={<ExpensesPage loading={loading} />} />
+                    <Route path="" index element={<ExpensesPage loading={loading} tripHook={tripHook} />} />
                     <Route path="settings/*" element={<TripSettings loading={loading} />} />
                 </Routes>
             </Box>

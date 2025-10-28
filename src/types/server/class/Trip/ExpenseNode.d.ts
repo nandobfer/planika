@@ -16,7 +16,7 @@ export declare class ExpenseNode {
     datetime?: number;
     notes: string[];
     parentId?: string;
-    children?: ExpenseNode[];
+    children: ExpenseNode[];
     totalExpenses: number;
     totalLocations: string[];
     constructor(data: WithoutFunctions<ExpenseNode>);

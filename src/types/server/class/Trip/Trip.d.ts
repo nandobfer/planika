@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { TripParticipant, TripParticipantForm } from "./TripParticipant";
-import { Node } from "./Node";
+import { ExpenseNode } from "./ExpenseNode";
 import { WithoutFunctions } from "../helpers";
 export declare const trip_includes: {
     participants: {
@@ -23,7 +23,7 @@ export declare class Trip {
     startDate?: number;
     endDate?: number;
     participants: TripParticipant[];
-    nodes: Node[];
+    nodes: ExpenseNode[];
     totalExpenses: number;
     status: TripStatus;
     static new(data: TripForm, userId: string): Promise<Trip>;
@@ -33,5 +33,6 @@ export declare class Trip {
     getStatus(): TripStatus;
     update(data: Partial<TripForm>): Promise<void>;
     inviteParticipant(data: TripParticipantForm): Promise<TripParticipant>;
+    acceptInvitation(email: string): Promise<TripParticipant>;
 }
 export {};

@@ -10,6 +10,6 @@ export interface MailOptions {
 export declare class Mailer {
     private from;
     private transporter;
-    sendMail(options: MailOptions): Promise<import("nodemailer/lib/smtp-transport").SentMessageInfo | undefined>;
+    sendMail(options: MailOptions): Promise<import("nodemailer/lib/smtp-transport").SentMessageInfo>;
 }
 export declare const mailer: Mailer;

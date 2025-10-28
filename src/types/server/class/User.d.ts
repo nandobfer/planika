@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { WithoutFunctions } from "./helpers";
 import { UploadedFile } from "express-fileupload";
+import { TripParticipant } from "./Trip/TripParticipant";
 import { Trip, TripForm } from "./Trip/Trip";
 export type UserPrisma = Prisma.UserGetPayload<{}>;
 export type UserForm = Omit<WithoutFunctions<User>, "id" | "createdAt"> & {
@@ -61,4 +62,5 @@ export declare class User {
     getToken(): string;
     getParticipatingTrips(): Promise<Trip[]>;
     newTrip(data: TripForm): Promise<Trip>;
+    getPendingInvitation(): Promise<TripParticipant[]>;
 }
