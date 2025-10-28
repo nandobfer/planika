@@ -22,7 +22,7 @@ export const Account: React.FC<AccountProps> = (props) => {
             <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, height: 1, paddingBottom: { md: 8 } }}>
                 <AccountNavigation settings={settings} flex={0.2} />
 
-                <Divider orientation={isMobile ? "horizontal" : "vertical"} />
+                <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
 
                 <Box sx={{ flex: 0.5, flexDirection: "column", ...(settings.loading ? disabledStyle : {}) }}>
                     <Routes>
@@ -32,7 +32,7 @@ export const Account: React.FC<AccountProps> = (props) => {
                     </Routes>
                 </Box>
 
-                <Divider orientation={isMobile ? "horizontal" : "vertical"} />
+                <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
                 <SettingDescription flex={0.3}>{settings.currentTab.description}</SettingDescription>
             </Box>
         </Box>

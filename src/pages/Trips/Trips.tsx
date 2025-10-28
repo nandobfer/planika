@@ -20,7 +20,7 @@ export const Trips: React.FC<TripsProps> = (props) => {
             <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, height: 1, paddingBottom: { md: 8 } }}>
                 <TripsNavigation settings={trips} flex={0.2} />
 
-                <Divider orientation={isMobile ? "horizontal" : "vertical"} />
+                <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
 
                 <Box sx={{ flex: 0.9, flexDirection: "column", ...disabledStyle }}>
                     <Routes>
