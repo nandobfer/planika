@@ -91,7 +91,7 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
                     onChange={(_, newValue) => {
                         handleUserSelect(newValue)
                     }}
-                    renderInput={(params) => <TextField {...params} label="Adicionar participante" placeholder="fulano@exemplo.com" />}
+                    renderInput={(params) => <TextField {...params} label="Convidar participante" placeholder="fulano@exemplo.com" />}
                     getOptionLabel={(option) => {
                         if ("type" in option && option.type === "invite") {
                             return `Convidar ${option.email}`

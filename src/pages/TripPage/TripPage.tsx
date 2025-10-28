@@ -21,10 +21,10 @@ export const TripPage: React.FC<TripPageProps> = (props) => {
     }
 
     return (
-        <Box sx={{ flexDirection: "column", padding: 5, position: "relative" }}>
+        <Box sx={{ flexDirection: "column", padding: 5, position: "relative", flex: 1 }}>
             {loading && <LinearProgress variant="indeterminate" sx={{ width: 1, position: "absolute", top: 0, left: 0 }} />}
 
-            <Box sx={{ flexDirection: "column", gap: 3, ...(loading ? disabledStyle : {}) }}>
+            <Box sx={{ flexDirection: "column", height: 1, gap: 3, ...(loading ? disabledStyle : {}) }}>
                 <Title
                     name={trip?.name || "Carregando..."}
                     right={

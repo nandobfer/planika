@@ -52,7 +52,11 @@ export const useTripSettings = (_trip: Trip) => {
     }
 
     useEffect(() => {
-        reactNavigate(`/trips/${trip!.id}/settings/${currentTab.route}`)
+        if (trip) {
+            reactNavigate(`/trips/${trip.id}/settings/${currentTab.route}`)
+        } else {
+            reactNavigate(`/my-trips`)
+        }
     }, [currentTab])
 
     return { currentTab, navigate, tabs, trip: trip! }
