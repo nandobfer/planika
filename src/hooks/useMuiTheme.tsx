@@ -67,6 +67,7 @@ export const useMuiTheme = () => {
                         MuiCircularProgress: { defaultProps: { size: "1.5rem", color: "inherit" } },
                         MuiTooltip: { defaultProps: { arrow: true } },
                         MuiAvatar: { defaultProps: { style: { backgroundColor: colors[mode].primary } } },
+                        MuiSkeleton: { defaultProps: { animation: "wave" } },
                     },
                 },
                 ptBR

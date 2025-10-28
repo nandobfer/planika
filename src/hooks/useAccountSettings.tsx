@@ -47,7 +47,7 @@ const tabs: AccountSetting[] = [
     },
     {
         label: "Convites",
-        description: "Envie convites por email para novos colaboradores e acompanhe convites pendentes",
+        description: "Visualize e gerencie convites pendentes para colaborar em orçamentos",
         route: "invitations",
         component: <Invitations />,
     },
@@ -79,4 +79,3 @@ export const useAccountSettings = () => {
 
     return { currentTab, navigate, tabs, loading }
 }
-

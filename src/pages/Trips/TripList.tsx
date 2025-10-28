@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Grid, useMediaQuery } from "@mui/material"
+import { Box, Grid, Typography, useMediaQuery } from "@mui/material"
 import type { Trip } from "../../types/server/class/Trip/Trip"
 import { TripContainer } from "./TripContainer/TripContainer"
 
@@ -12,11 +12,11 @@ export const TripList: React.FC<TripListProps> = (props) => {
 
     return (
         <Box sx={{ flexDirection: "column", gap: 5 }}>
-            {props.trips
-                .sort((a, b) => b.updatedAt - a.updatedAt)
-                .map((trip) => (
-                    <TripContainer key={trip.id} trip={trip} />
-                ))}
+            {props.trips.length > 0 ? (
+                props.trips.sort((a, b) => b.updatedAt - a.updatedAt).map((trip) => <TripContainer key={trip.id} trip={trip} />)
+            ) : (
+                <Typography variant="body2">Nenhuma viagem para exibir</Typography>
+            )}
         </Box>
     )
 }

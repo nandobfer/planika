@@ -7,6 +7,7 @@ import { api, api_url } from "../backend/api"
 import { useNavigate } from "react-router-dom"
 import { useFilesDialogModal } from "./useFilesDialogModal"
 import type { Recovery } from "../types/server/class/Recovery"
+import type { TripParticipant } from "../types/server/class/Trip/TripParticipant"
 
 export const useUser = () => {
     const context = useContext(UserContext)
@@ -98,6 +99,13 @@ export const useUser = () => {
         return response.data
     }
 
+    const getPendingInvitations = async () => {
+        if (!context.accessToken) throw new Error("No access token")
+
+        const response = await authenticatedApi.get<TripParticipant[]>("/user/pending-invitations")
+        return response.data
+    }
+
     return {
         ...context,
         logout,
@@ -113,5 +121,6 @@ export const useUser = () => {
         sendPasswordRecoveryEmail,
         sendCodeVerification,
         sendRecoveryNewPassword,
+        getPendingInvitations,
     }
 }
