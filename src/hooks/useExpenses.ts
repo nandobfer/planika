@@ -105,7 +105,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 type: ConnectionLineType.SmoothStep,
                 animated: true,
                 style: {
-                    stroke: theme.palette.primary.main,
+                    stroke: theme.palette.info.main,
                 },
             })
         }
@@ -137,7 +137,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 type: ConnectionLineType.SmoothStep,
                 animated: true,
                 style: {
-                    stroke: theme.palette.primary.main,
+                    stroke: theme.palette.info.main,
                     strokeDasharray: "5,5",
                 },
             })
