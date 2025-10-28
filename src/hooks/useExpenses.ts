@@ -119,27 +119,29 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             })
         }
 
-        // Add placeholder node as last child
-        const placeholderId = `placeholder_${expenseNode.id}`
-        nodes.push({
-            id: placeholderId,
-            type: "placeholder",
-            position: { x: 0, y: 0 }, // Will be positioned by dagre layout
-            data: { parentId: expenseNode.id } as ExpenseNodeData,
-        })
+        // Add placeholder node as last child (only if canEdit)
+        if (canEdit) {
+            const placeholderId = `placeholder_${expenseNode.id}`
+            nodes.push({
+                id: placeholderId,
+                type: "placeholder",
+                position: { x: 0, y: 0 }, // Will be positioned by dagre layout
+                data: { parentId: expenseNode.id } as ExpenseNodeData,
+            })
 
-        // Add edge from expense node to its placeholder
-        edges.push({
-            id: `edge_${expenseNode.id}-${placeholderId}`,
-            source: expenseNode.id,
-            target: placeholderId,
-            type: ConnectionLineType.SmoothStep,
-            animated: true,
-            style: {
-                stroke: theme.palette.primary.main,
-                strokeDasharray: "5,5",
-            },
-        })
+            // Add edge from expense node to its placeholder
+            edges.push({
+                id: `edge_${expenseNode.id}-${placeholderId}`,
+                source: expenseNode.id,
+                target: placeholderId,
+                type: ConnectionLineType.SmoothStep,
+                animated: true,
+                style: {
+                    stroke: theme.palette.primary.main,
+                    strokeDasharray: "5,5",
+                },
+            })
+        }
 
         return { nodes, edges }
     }
@@ -151,14 +153,16 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         const allNodes: Node[] = []
         const allEdges: Edge[] = []
 
-        // Add root placeholder (for adding top-level nodes)
-        const rootPlaceholderId = "placeholder_root"
-        allNodes.push({
-            id: rootPlaceholderId,
-            type: "placeholder",
-            position: { x: 0, y: 0 },
-            data: { parentId: null },
-        })
+        // Add root placeholder (for adding top-level nodes) - only if canEdit
+        if (canEdit) {
+            const rootPlaceholderId = "placeholder_root"
+            allNodes.push({
+                id: rootPlaceholderId,
+                type: "placeholder",
+                position: { x: 0, y: 0 },
+                data: { parentId: null },
+            })
+        }
 
         // Build tree for each root node
         trip.nodes.forEach((rootNode) => {
@@ -171,7 +175,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         const layouted = updateLayout(allNodes, allEdges)
         setNodes(layouted.nodes)
         setEdges(layouted.edges)
-    }, [trip, theme])
+    }, [trip, theme, canEdit])
 
     // Add a new node (to be called when clicking placeholder)
     const addNodeAndEdge = useCallback(
