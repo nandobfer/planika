@@ -18,7 +18,7 @@ export const TripSettings: React.FC<TripSettingsProps> = (props) => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"))
 
     return (
-        <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, flex: 1, paddingBottom: { md: 8 } }}>
+        <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, flex: 1 }}>
             <TripsSettingsNavigation flex={0.2} settings={settings} />
             <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
             <Box sx={{ flex: 0.5, flexDirection: "column", ...(props.loading ? disabledStyle : {}) }}>

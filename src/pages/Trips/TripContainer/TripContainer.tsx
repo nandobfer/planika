@@ -10,7 +10,7 @@ interface TripContainerProps {
     onAcceptInvite?: () => Promise<void>
 }
 
-const max_participants_displayed = 2
+const max_participants_displayed = 5
 
 export const TripContainer: React.FC<TripContainerProps> = (props) => {
     const navigate = useNavigate()

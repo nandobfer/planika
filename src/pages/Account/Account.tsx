@@ -19,7 +19,7 @@ export const Account: React.FC<AccountProps> = (props) => {
             <Title name="Minha conta" />
 
             {settings.loading && <LinearProgress sx={{ width: 1, position: "absolute", top: 0, right: 0, left: 0 }} variant="indeterminate" />}
-            <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, height: 1, paddingBottom: { md: 8 } }}>
+            <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", md: "row" }, height: 1 }}>
                 <AccountNavigation settings={settings} flex={0.2} />
 
                 <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />

@@ -76,6 +76,7 @@ export const ParticipantContainer: React.FC<ParticipantContainerProps> = (props)
                         size="small"
                         label="e-mail"
                         value={participantUser?.email || props.participant.email}
+                        defaultValue={participantUser?.email || props.participant.email}
                         onChange={(e) => props.onChangeEmail?.(e.target.value)}
                         slotProps={{ input: { sx: { fontSize: 12 } } }}
                         fullWidth

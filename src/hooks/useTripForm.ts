@@ -12,7 +12,7 @@ export const useTripForm = (initialTrip?: Trip) => {
     const [participants, setParticipants] = useState<TripParticipant[]>(currentTrip?.participants || [])
 
     const { user, authenticatedApi } = useUser()
-    const isAdmin = participants.find((p) => p.userId === user?.id)?.role === "administrator"
+    const isAdmin = participants.length > 0 ? participants.find((p) => p.userId === user?.id)?.role === "administrator" : true
 
     const formik = useFormik<TripForm>({
         initialValues: {
