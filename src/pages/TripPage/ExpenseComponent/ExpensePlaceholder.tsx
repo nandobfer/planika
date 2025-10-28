@@ -17,9 +17,17 @@ export const ExpensePlaceholder: React.FC<ExpensePlaceholderProps> = (props) => 
     }
 
     return (
-        <Box sx={{ width: helper.nodeWidth, height: helper.nodeHeight, justifyContent: "center", alignItems: "center", border: "1px solid red" }}>
-            {!isRoot && <Handle type="target" position={Position.Left} />}
+        <Box
+            sx={{
+                width: helper.nodeWidth,
+                height: helper.nodeHeight,
+                justifyContent: isRoot ? "center" : undefined,
+                alignItems: "center",
+                // border: "1px solid red",
+            }}
+        >
             <Button onClick={onClick} variant="outlined" sx={{ borderStyle: "dashed" }} startIcon={<Add />}>
+                {!isRoot && <Handle type="target" position={Position.Left} />}
                 Nova despesa
             </Button>
         </Box>

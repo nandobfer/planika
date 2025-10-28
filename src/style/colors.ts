@@ -8,6 +8,7 @@ const dark = {
     secondary: "#ebebd3",
     background: "#141519",
     paper: "rgba(66,66,66,0.15)",
+    success: "#34A853",
 }
 const light = {
     // primary: "#A390E4",
@@ -16,6 +17,7 @@ const light = {
     secondary: "#ebebd3",
     background: "#f9f9f9",
     paper: "#ffffff",
+    success: "",
 }
 
 export const colors = { dark, light }

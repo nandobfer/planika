@@ -16,7 +16,7 @@ import type { WithoutFunctions } from "../types/server/class/helpers"
 import { useMuiTheme } from "./useMuiTheme"
 import { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
 
-export type ExpenseNodeData = Record<keyof WithoutFunctions<ExpenseNode>, unknown>
+export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
 
 const nodeWidth = 300
 const nodeHeight = 150
@@ -57,13 +57,15 @@ const updateLayout = (nodes: Node[], edges: Edge[]): { nodes: Node[]; edges: Edg
 }
 
 export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
-    const { trip } = tripHelper
+    const { trip, authenticatedApi, user } = tripHelper
     const instance = useRef<ReactFlowInstance<Node, Edge> | null>(null)
     const { theme } = useMuiTheme()
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges)
+
+    const canEdit = trip?.participants?.some((p) => p.userId === user?.id && (p.role === "administrator" || p.role === "collaborator"))
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge({ ...params, type: ConnectionLineType.SmoothStep, animated: true }, eds)),
@@ -155,7 +157,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             id: rootPlaceholderId,
             type: "placeholder",
             position: { x: 0, y: 0 },
-            data: { parentId: null } as ExpenseNodeData,
+            data: { parentId: null },
         })
 
         // Build tree for each root node
@@ -194,10 +196,10 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
             // TODO: Add this node to your trip data structure
             // tripHelper.addNode(newExpenseData)
-            
+
             // For now, just add to the visual tree
             const result = buildTreeNodes(newExpenseData as unknown as ExpenseNode, parentId)
-            
+
             const layouted = updateLayout([...nodes, ...result.nodes], [...edges, ...result.edges])
             setNodes(layouted.nodes)
             setEdges(layouted.edges)
@@ -209,6 +211,48 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             }
         },
         [nodes, edges, tripHelper]
+    )
+
+    const updateNode = useCallback(
+        (updatedData: ExpenseNodeData) => {
+            setNodes((nds) => nds.map((node) => (node.id === updatedData.id ? { ...node, data: updatedData } : node)))
+        },
+        [setNodes]
+    )
+
+    // Get all ancestor nodes (parents) of a given node, tracing back to root
+    const getAncestors = useCallback(
+        (nodeId?: string): ExpenseNode[] => {
+            if (!nodeId) return []
+
+            const ancestors: ExpenseNode[] = []
+
+            // Find the node with the given ID
+            const findNode = (id: string): Node | undefined => {
+                return nodes.find((node) => node.id === id && node.type === "expense")
+            }
+
+            let currentNode = findNode(nodeId)
+
+            // Trace back through parents until we reach a root node
+            while (currentNode) {
+                const nodeData = currentNode.data as ExpenseNodeData
+                const parentId = nodeData.parentId as string | undefined
+
+                if (!parentId) break
+
+                const parentNode = findNode(parentId)
+                if (parentNode) {
+                    ancestors.push(parentNode.data as unknown as ExpenseNode)
+                    currentNode = parentNode
+                } else {
+                    break
+                }
+            }
+
+            return ancestors
+        },
+        [nodes]
     )
 
     // Initialize tree when trip changes
@@ -227,5 +271,11 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         nodeWidth,
         nodeHeight,
         viewport_duration,
+        updateNode,
+        getAncestors,
+        trip,
+        authenticatedApi,
+        user,
+        canEdit
     }
 }

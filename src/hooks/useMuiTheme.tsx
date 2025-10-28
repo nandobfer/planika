@@ -30,6 +30,7 @@ export const useMuiTheme = () => {
                             // paper: colors[mode].paper,
                         },
                         // text: {primary: colors[mode].primary}
+                        // success: { main: colors[mode].success },
                     },
                     components: {
                         MuiMenuList: { defaultProps: { sx: { backgroundColor: colors[mode].background } } },
