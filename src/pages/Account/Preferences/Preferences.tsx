@@ -11,7 +11,7 @@ import { SaveButton } from "../SaveButton"
 
 interface PreferencesProps {}
 
-const formatCurrencyOption = (currency: CurrencyRate) => `${currency.code} - ${currency.symbol} - ${currency.name}`
+export const formatCurrencyOption = (currency: CurrencyRate) => `${currency.code} - ${currency.symbol} - ${currency.name}`
 
 export const Preferences: React.FC<PreferencesProps> = () => {
     const { user, patch } = useUser()

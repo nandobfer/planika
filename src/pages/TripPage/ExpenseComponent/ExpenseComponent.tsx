@@ -1,16 +1,19 @@
-import React, { useCallback, useContext } from "react"
-import { Box, Button, debounce, IconButton, Paper, TextField } from "@mui/material"
+import React, { useCallback, useContext, useState } from "react"
+import { Autocomplete, Box, Button, debounce, IconButton, Paper, TextField } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
 import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
 import { AttachMoney, CalendarMonth, Circle, LocationPin } from "@mui/icons-material"
-import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker"
 import dayjs from "dayjs"
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
+import type { CurrencyRate } from "../../../types/server/api/exchangerate"
 
 interface ExpenseComponentProps {
     data: ExpenseNode
 }
+
+const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol} - ${currency.code}`
 
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
@@ -19,6 +22,8 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
     const zoom = helper.zoom
+
+    const [expenseValue, setExpenseValue] = useState(expense.expense?.currency.toString() || "")
 
     const toggleActive = () => {
         helper.updateNode({ ...expense, active: !expense.active })
@@ -31,6 +36,17 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
         },
         [expense]
     )
+
+    const onExpenseValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = handleCurrencyInput(event.target.value)
+        console.log(value)
+
+        setExpenseValue(value)
+        const amount = Number(value.replace(",", "."))
+        updateNode({
+            expense: { amount: isNaN(amount) ? 0 : amount, currency: expense.expense?.currency || "BRL" },
+        })
+    }
 
     const debouncedUpdateNode = debounce(updateNode, 500)
 
@@ -53,12 +69,13 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
         >
             {props.data.parentId && <Handle type="target" position={Position.Left} />}
 
-            <Box sx={{ flexDirection: "column", flex: 1, gap: 1 }}>
+            <Box sx={{ flexDirection: "column", flex: 1, justifyContent: "space-between", height: 1 }}>
                 <Box sx={{ gap: 1 }}>
                     <TextField
                         placeholder="Descrição da despesa"
                         variant="standard"
                         onChange={helper.canEdit ? (e) => debouncedUpdateNode({ description: e.target.value }) : undefined}
+                        slotProps={{ input: { sx: { fontWeight: "bold" } } }}
                     />
                     <IconButton size="small" onClick={helper.canEdit ? toggleActive : undefined}>
                         <Circle fontSize="small" color={active ? "success" : "disabled"} />
@@ -70,6 +87,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         <TextField
                             placeholder="Localização"
                             variant="standard"
+                            autoFocus
                             onChange={helper.canEdit ? (e) => debouncedUpdateNode({ location: e.target.value }) : undefined}
                             slotProps={{
                                 input: {
@@ -94,9 +112,10 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         </Button>
                     )}
                     {expense.datetime !== undefined ? (
-                        <MobileDateTimePicker
+                        <MobileDatePicker
                             slotProps={{
                                 textField: {
+                                    autoFocus: true,
                                     fullWidth: true,
                                     size: "small",
                                     variant: "standard",
@@ -122,30 +141,44 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         </Button>
                     )}
                     {expense.expense ? (
-                        <Box>
+                        <Box sx={{ gap: 1 }}>
+                            <Autocomplete
+                                options={helper.currency.data}
+                                getOptionLabel={(option) => formatCurrencyOption(option)}
+                                size="small"
+                                sx={{ flex: 0.4 }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        placeholder="Moeda Preferida"
+                                        size="small"
+                                        variant="standard"
+                                        slotProps={{
+                                            input: {
+                                                ...params.InputProps,
+                                                sx: { fontSize: 10, marginBottom: 1, paddingLeft: 1 },
+                                            },
+                                        }}
+                                    />
+                                )}
+                                loading={helper.currency.isFetching}
+                                loadingText="Carregando moedas..."
+                                value={helper.currency.data.find((c) => c.code === expense.expense?.currency) || null}
+                                onChange={(_, value) =>
+                                    debouncedUpdateNode({
+                                        expense: { amount: expense.expense!.amount, currency: value?.code || helper.user?.defaultCurrency || "BRL" },
+                                    })
+                                }
+                            />
                             <TextField
                                 placeholder="Valor da despesa"
                                 variant="standard"
-                                onChange={
-                                    helper.canEdit
-                                        ? (e) =>
-                                              debouncedUpdateNode({
-                                                  expense: {
-                                                      amount: Number(handleCurrencyInput(e.target.value)),
-                                                      currency: expense.expense!.currency,
-                                                  },
-                                              })
-                                        : undefined
-                                }
+                                autoFocus
+                                sx={{ flex: 0.6 }}
+                                value={expenseValue}
+                                onChange={helper.canEdit ? onExpenseValueChange : undefined}
                                 slotProps={{
-                                    input: {
-                                        startAdornment: (
-                                            <IconButton size="small" disableRipple>
-                                                <AttachMoney fontSize="small" />
-                                            </IconButton>
-                                        ),
-                                        sx: { fontSize: 10, marginBottom: 1 },
-                                    },
+                                    input: { sx: { fontSize: 10, marginBottom: 1 } },
                                 }}
                                 size="small"
                             />

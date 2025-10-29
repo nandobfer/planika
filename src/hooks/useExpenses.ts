@@ -17,6 +17,7 @@ import type { WithoutFunctions } from "../types/server/class/helpers"
 import { useMuiTheme } from "./useMuiTheme"
 import { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
 import { debounce } from "@mui/material"
+import { useCurrency } from "./useCurrency"
 
 export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
 
@@ -62,6 +63,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const { trip, authenticatedApi, user } = tripHelper
     const instance = useRef<ReactFlowInstance<Node, Edge> | null>(null)
     const { theme } = useMuiTheme()
+    const currency = useCurrency()
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
@@ -352,5 +354,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         user,
         canEdit,
         zoom,
+        currency,
     }
 }
