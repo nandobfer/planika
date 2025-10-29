@@ -46,7 +46,6 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
             <Box sx={{ flexDirection: "column", flex: 1, height: 1, gap: 1 }}>
                 <Box sx={{ gap: 1 }}>
                     <TextField
-                        key={`description-${expense.description}`}
                         placeholder="Descrição da despesa"
                         variant="standard"
                         defaultValue={expense.description}

@@ -10,7 +10,9 @@ export const useTrip = (_tripId: string) => {
     const [loading, setLoading] = useState(false)
 
     const { authenticatedApi, user } = useUser()
-    const { data: trip, refetch } = useQuery({ queryKey: ["trip", tripId], queryFn: () => fetchTrip(), initialData: null })
+    const { data, refetch } = useQuery({ queryKey: ["trip", tripId], queryFn: () => fetchTrip(), initialData: null })
+
+    const [trip, setTrip] = useState(data)
 
     const handleTripsLoading = (value: boolean) => {
         setLoading(value)
@@ -50,5 +52,9 @@ export const useTrip = (_tripId: string) => {
         }
     }, [])
 
-    return { trip, loading, acceptInvitation, refetch, tripId, authenticatedApi, user }
+    useEffect(() => {
+        setTrip(data)
+    }, [data])
+
+    return { trip, loading, acceptInvitation, refetch, tripId, authenticatedApi, user, setTrip }
 }

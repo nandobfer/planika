@@ -20,6 +20,9 @@ import { debounce } from "@mui/material"
 import { useCurrency } from "./useCurrency"
 import { io, Socket } from "socket.io-client"
 import { api_url } from "../backend/api"
+import type { Trip } from "../types/server/class/Trip/Trip"
+import * as Y from "yjs"
+import { HocuspocusProvider } from "@hocuspocus/provider"
 
 export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
 
@@ -62,11 +65,11 @@ const updateLayout = (nodes: Node[], edges: Edge[]): { nodes: Node[]; edges: Edg
 }
 
 export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
-    const { trip, authenticatedApi, user } = tripHelper
+    const { trip, authenticatedApi, user, setTrip } = tripHelper
     const instance = useRef<ReactFlowInstance<Node, Edge> | null>(null)
     const { theme } = useMuiTheme()
     const currency = useCurrency()
-    const socket = useRef<Socket | null>(null)
+    const provider = useRef<HocuspocusProvider | null>(null)
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
@@ -209,6 +212,8 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const rebuildTree = useCallback(() => {
         if (!trip) return
 
+        console.log("rebuilding trip", trip)
+
         const allNodes: Node[] = []
         const allEdges: Edge[] = []
 
@@ -260,7 +265,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
             // Update trip data via API
             if (!data) {
-                socket.current?.emit("trip:node", newExpenseData)
+                // socket.current?.emit("trip:node", newExpenseData)
             }
 
             const result = buildTreeNodes(newExpenseData as unknown as ExpenseNode, parentId)
@@ -297,7 +302,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 return updatedNodes
             })
             if (!silent) {
-                socket.current?.emit("trip:node", updatedData)
+                // socket.current?.emit("trip:node", updatedData)
             }
         },
         [setNodes, setEdges, updateEdgeColors]
@@ -394,7 +399,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             setEdges(edgesWithColors)
 
             if (!silent) {
-                socket.current?.emit("trip:node:delete", trip?.id, nodeId)
+                // socket.current?.emit("trip:node:delete", trip?.id, nodeId)
             }
         },
         [nodes, edges, trip?.id, updateEdgeColors]
@@ -408,23 +413,40 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [handleNodeDelete]
     )
 
+    const updateTrip = (trip: Trip) => {
+        console.log("Incoming trip update:", trip)
+        setTrip({ ...trip } as Trip)
+    }
+
+    useEffect(() => {
+        console.log({ trip })
+    }, [trip])
+
     // Setup socket connection separately to avoid recreation on every trip change
     useEffect(() => {
         if (trip) {
-            socket.current = io(api_url)
-            socket.current.emit("join", trip.id)
-            socket.current.on("trip:node", handleIncomingNodeUpdate)
-            socket.current.on("trip:node:delete", handleIncomingNodeDelete)
+            provider.current = new HocuspocusProvider({
+                url: api_url,
+                name: trip.id,
+            })
+            // socket.current = io(api_url)
+            // socket.current.emit("join", trip.id)
+            // socket.current.on("trip:node", handleIncomingNodeUpdate)
+            // socket.current.on("trip:update", updateTrip)
+            // socket.current.on("trip:node:delete", handleIncomingNodeDelete)
 
             return () => {
-                socket.current?.emit("leave", trip.id)
-                socket.current?.off("trip:node", handleIncomingNodeUpdate)
-                socket.current?.off("trip:node:delete", handleIncomingNodeDelete)
-                socket.current?.disconnect()
-                socket.current = null
+                provider.current?.destroy()
+                provider.current = null
+                // socket.current?.emit("leave", trip.id)
+                // socket.current?.off("trip:node", handleIncomingNodeUpdate)
+                // socket.current?.off("trip:update", updateTrip)
+                // socket.current?.off("trip:node:delete", handleIncomingNodeDelete)
+                // socket.current?.disconnect()
+                // socket.current = null
             }
         }
-    }, [trip?.id, handleIncomingNodeUpdate, handleIncomingNodeDelete])
+    }, [trip?.id])
 
     useEffect(() => {
         rebuildTree()
