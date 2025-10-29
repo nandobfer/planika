@@ -1,13 +1,13 @@
-import React, { useCallback, useContext, useState } from "react"
-import { Autocomplete, Box, Button, debounce, IconButton, Paper, TextField } from "@mui/material"
+import React, { useContext } from "react"
+import { Autocomplete, Box, Button, IconButton, Paper, TextField } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
-import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
 import { AttachMoney, CalendarMonth, Circle, LocationPin } from "@mui/icons-material"
 import dayjs from "dayjs"
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import type { CurrencyRate } from "../../../types/server/api/exchangerate"
+import { useExpenseNode } from "../../../hooks/useExpenseNode"
 
 interface ExpenseComponentProps {
     data: ExpenseNode
@@ -17,38 +17,11 @@ const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol} - $
 
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
-    const expense = props.data
+    const { expense, expenseValue, toggleActive, onExpenseValueChange, debouncedUpdateNode, updateNode } = useExpenseNode(props.data, helper)
     const ancestors = helper.getAncestors(expense.id)
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
     const zoom = helper.zoom
-
-    const [expenseValue, setExpenseValue] = useState(expense.expense?.currency.toString() || "")
-
-    const toggleActive = () => {
-        helper.updateNode({ ...expense, active: !expense.active })
-    }
-
-    const updateNode = useCallback(
-        (value: Partial<ExpenseNode>) => {
-            helper.updateNode({ ...expense, ...value })
-            console.log(value)
-        },
-        [expense]
-    )
-
-    const onExpenseValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = handleCurrencyInput(event.target.value)
-        console.log(value)
-
-        setExpenseValue(value)
-        const amount = Number(value.replace(",", "."))
-        updateNode({
-            expense: { amount: isNaN(amount) ? 0 : amount, currency: expense.expense?.currency || "BRL" },
-        })
-    }
-
-    const debouncedUpdateNode = debounce(updateNode, 500)
 
     return (
         <Paper
@@ -74,8 +47,9 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     <TextField
                         placeholder="Descrição da despesa"
                         variant="standard"
+                        defaultValue={expense.description}
                         onChange={helper.canEdit ? (e) => debouncedUpdateNode({ description: e.target.value }) : undefined}
-                        slotProps={{ input: { sx: { fontWeight: "bold" } } }}
+                        slotProps={{ input: { sx: { fontWeight: "bold" }, readOnly: !helper.canEdit } }}
                     />
                     <IconButton size="small" onClick={helper.canEdit ? toggleActive : undefined}>
                         <Circle fontSize="small" color={active ? "success" : "disabled"} />
@@ -88,6 +62,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             placeholder="Localização"
                             variant="standard"
                             autoFocus
+                            defaultValue={expense.location}
                             onChange={helper.canEdit ? (e) => debouncedUpdateNode({ location: e.target.value }) : undefined}
                             slotProps={{
                                 input: {
@@ -97,6 +72,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                         </IconButton>
                                     ),
                                     sx: { fontSize: 10, marginBottom: 1 },
+                                    readOnly: !helper.canEdit,
                                 },
                             }}
                             size="small"
@@ -107,12 +83,14 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             size="small"
                             sx={{ alignSelf: "flex-start" }}
                             onClick={() => updateNode({ location: "" })}
+                            disabled={!helper.canEdit}
                         >
                             Adicionar localização
                         </Button>
                     )}
                     {expense.datetime !== undefined ? (
                         <MobileDatePicker
+                            readOnly={!helper.canEdit}
                             slotProps={{
                                 textField: {
                                     autoFocus: true,
@@ -136,6 +114,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             size="small"
                             sx={{ alignSelf: "flex-start" }}
                             onClick={() => updateNode({ datetime: 0 })}
+                            disabled={!helper.canEdit}
                         >
                             Adicionar data e hora
                         </Button>
@@ -147,6 +126,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 getOptionLabel={(option) => formatCurrencyOption(option)}
                                 size="small"
                                 sx={{ flex: 0.4 }}
+                                readOnly={!helper.canEdit}
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
@@ -178,7 +158,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 value={expenseValue}
                                 onChange={helper.canEdit ? onExpenseValueChange : undefined}
                                 slotProps={{
-                                    input: { sx: { fontSize: 10, marginBottom: 1 } },
+                                    input: { sx: { fontSize: 10, marginBottom: 1 }, readOnly: !helper.canEdit },
                                 }}
                                 size="small"
                             />
@@ -189,6 +169,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             size="small"
                             sx={{ alignSelf: "flex-start" }}
                             onClick={() => updateNode({ expense: { amount: 0, currency: "BRL" } })}
+                            disabled={!helper.canEdit}
                         >
                             Adicionar custo
                         </Button>

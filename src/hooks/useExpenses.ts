@@ -18,6 +18,8 @@ import { useMuiTheme } from "./useMuiTheme"
 import { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
 import { debounce } from "@mui/material"
 import { useCurrency } from "./useCurrency"
+import { io, Socket } from "socket.io-client"
+import { api_url } from "../backend/api"
 
 export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
 
@@ -64,6 +66,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const instance = useRef<ReactFlowInstance<Node, Edge> | null>(null)
     const { theme } = useMuiTheme()
     const currency = useCurrency()
+    const socket = useRef<Socket | null>(null)
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
@@ -81,7 +84,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         setZoom(newViewport.zoom)
     }, [])
 
-    const debouncedOnMove = debounce(onMove, 100)
+    const debouncedOnMove = debounce(onMove, 200)
 
     const fitNodeView = (node: Node | string) => {
         const nodeItem = typeof node === "string" ? nodes.find((item) => item.id === node) : node
@@ -146,8 +149,8 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             })
         }
 
-        // Process children recursively
-        if (expenseNode.children && expenseNode.children.length > 0) {
+        // Process children recursively (only if they exist and are an array)
+        if (Array.isArray(expenseNode.children) && expenseNode.children.length > 0) {
             expenseNode.children.forEach((child) => {
                 const childResult = buildTreeNodes(child, expenseNode.id)
                 nodes.push(...childResult.nodes)
@@ -202,45 +205,13 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [theme, isNodeActive]
     )
 
-    // Build complete tree from trip data
-    const rebuildTree = useCallback(() => {
-        if (!trip) return
-
-        const allNodes: Node[] = []
-        const allEdges: Edge[] = []
-
-        // Add root placeholder (for adding top-level nodes) - only if canEdit
-        if (canEdit) {
-            const rootPlaceholderId = "placeholder_root"
-            allNodes.push({
-                id: rootPlaceholderId,
-                type: "placeholder",
-                position: { x: 0, y: 0 },
-                data: { parentId: null },
-            })
-        }
-
-        // Build tree for each root node
-        trip.nodes.forEach((rootNode) => {
-            const result = buildTreeNodes(rootNode)
-            allNodes.push(...result.nodes)
-            allEdges.push(...result.edges)
-        })
-
-        // Apply layout and update state
-        const layouted = updateLayout(allNodes, allEdges)
-        const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
-        setNodes(layouted.nodes)
-        setEdges(edgesWithColors)
-    }, [trip, theme, canEdit, updateEdgeColors])
-
     // Add a new node (to be called when clicking placeholder)
     const addNodeAndEdge = useCallback(
-        (parentId?: string) => {
+        (parentId?: string, data?: ExpenseNodeData) => {
             // Create new expense node data
             const now = Date.now()
-            const newNodeId = uid()
-            const newExpenseData = {
+            const newNodeId = data?.id || uid()
+            const newExpenseData: ExpenseNodeData = data || {
                 id: newNodeId,
                 tripId: tripHelper.tripId,
                 description: "",
@@ -255,20 +226,28 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 parentId,
             }
 
-            // TODO: Add this node to your trip data structure
-            // tripHelper.addNode(newExpenseData)
+            // Update trip data via API
+            if (!data) {
+                socket.current?.emit("trip:node", newExpenseData)
+            }
 
-            // For now, just add to the visual tree
             const result = buildTreeNodes(newExpenseData as unknown as ExpenseNode, parentId)
 
-            const layouted = updateLayout([...nodes, ...result.nodes], [...edges, ...result.edges])
+            // Filter out nodes and edges that already exist
+            const existingNodeIds = new Set(nodes.map((n) => n.id))
+            const existingEdgeIds = new Set(edges.map((e) => e.id))
+
+            const newNodes = result.nodes.filter((n) => !existingNodeIds.has(n.id))
+            const newEdges = result.edges.filter((e) => !existingEdgeIds.has(e.id))
+
+            const layouted = updateLayout([...nodes, ...newNodes], [...edges, ...newEdges])
             const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
             setNodes(layouted.nodes)
             setEdges(edgesWithColors)
 
             // Focus on the new node
             const addedNode = layouted.nodes.find((n) => n.id === newNodeId)
-            if (addedNode) {
+            if (addedNode && !data) {
                 fitNodeView(addedNode)
             }
         },
@@ -276,7 +255,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     )
 
     const updateNode = useCallback(
-        (updatedData: ExpenseNodeData) => {
+        (updatedData: ExpenseNodeData, silent = false) => {
             setNodes((nds) => {
                 const updatedNodes = nds.map((node) => (node.id === updatedData.id ? { ...node, data: updatedData } : node))
 
@@ -285,6 +264,9 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
                 return updatedNodes
             })
+            if (!silent) {
+                socket.current?.emit("trip:node", updatedData)
+            }
         },
         [setNodes, setEdges, updateEdgeColors]
     )
@@ -324,15 +306,82 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [nodes]
     )
 
-    // Initialize tree when trip changes
-    useEffect(() => {
-        rebuildTree()
-    }, [trip])
+    const handleIncomingNodeUpdate = useCallback(
+        (node: ExpenseNodeData) => {
+            const existingNode = nodes.find((n) => n.id === node.id)
 
-    // Update edge colors when theme changes
+            if (existingNode) {
+                // Node exists, update it
+                console.log("Incoming node update:", node)
+                updateNode(node, true)
+            } else {
+                console.log("Incoming new node:", node)
+                // New node, add it
+                addNodeAndEdge(node.parentId, node)
+            }
+        },
+        [nodes, updateNode, addNodeAndEdge]
+    )
+
+    // Initialize tree when trip data changes
     useEffect(() => {
-        setEdges((eds) => updateEdgeColors(nodes, eds))
-    }, [theme, updateEdgeColors])
+        if (!trip) {
+            setNodes([])
+            setEdges([])
+            return
+        }
+
+        const allNodes: Node[] = []
+        const allEdges: Edge[] = []
+
+        // Add root placeholder (for adding top-level nodes) - only if canEdit
+        if (canEdit) {
+            const rootPlaceholderId = "placeholder_root"
+            allNodes.push({
+                id: rootPlaceholderId,
+                type: "placeholder",
+                position: { x: 0, y: 0 },
+                data: { parentId: null },
+            })
+        }
+
+        // Build tree for each root node (nodes without parentId)
+        const rootNodes = trip.nodes.filter((node) => !node.parentId)
+        rootNodes.forEach((rootNode) => {
+            const result = buildTreeNodes(rootNode)
+            allNodes.push(...result.nodes)
+            allEdges.push(...result.edges)
+        })
+
+        // Apply layout and update state
+        const layouted = updateLayout(allNodes, allEdges)
+        const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
+        setNodes(layouted.nodes)
+        setEdges(edgesWithColors)
+    }, [trip, canEdit])
+
+    // Setup socket connection separately to avoid recreation on every trip change
+    useEffect(() => {
+        if (trip) {
+            socket.current = io(api_url)
+            socket.current.emit("join", trip.id)
+            socket.current.on("trip:node", handleIncomingNodeUpdate)
+
+            return () => {
+                socket.current?.emit("leave", trip.id)
+                socket.current?.off("trip:node", handleIncomingNodeUpdate)
+                socket.current?.disconnect()
+                socket.current = null
+            }
+        }
+    }, [trip?.id, handleIncomingNodeUpdate])
+
+    // Update edge colors when theme changes or nodes change
+    useEffect(() => {
+        if (nodes.length > 0) {
+            setEdges((eds) => updateEdgeColors(nodes, eds))
+        }
+    }, [theme.palette.success.main, theme.palette.action.disabled])
 
     return {
         nodes,
