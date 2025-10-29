@@ -4,6 +4,7 @@ import type { Trip } from "../../../types/server/class/Trip/Trip"
 import { CalendarMonth, EventAvailable } from "@mui/icons-material"
 import { ParticipantContainer } from "../TripForm/ParticipantContainer"
 import { useNavigate } from "react-router-dom"
+import { currencyMask } from "../../../tools/numberMask"
 
 interface TripContainerProps {
     trip?: Trip | null
@@ -62,6 +63,11 @@ export const TripContainer: React.FC<TripContainerProps> = (props) => {
                         <EventAvailable fontSize="small" />
                         <Typography variant="body2">Fim: {new Date(props.trip.endDate).toLocaleDateString()}</Typography>
                     </Box>
+                )}
+                {props.trip && (
+                    <Typography variant="caption" sx={{ marginLeft: "auto" }} color={"success"}>
+                        {currencyMask(props.trip.totalExpenses, { affix: "R$" })}
+                    </Typography>
                 )}
             </Box>
 

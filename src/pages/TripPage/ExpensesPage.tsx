@@ -26,7 +26,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
-                    onMove={debouncedOnMove}
+                    // onMove={debouncedOnMove}
                     connectionLineType={ConnectionLineType.SmoothStep}
                     fitView
                     nodeTypes={{ expense: ExpenseComponent, placeholder: ExpensePlaceholder }}

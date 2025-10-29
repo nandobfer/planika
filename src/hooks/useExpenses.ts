@@ -23,8 +23,8 @@ import { api_url } from "../backend/api"
 
 export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
 
-const nodeWidth = 300
-const nodeHeight = 150
+const nodeWidth = 330
+const nodeHeight = 180
 const viewport_duration = 800
 
 const updateLayout = (nodes: Node[], edges: Edge[]): { nodes: Node[]; edges: Edge[] } => {
@@ -205,6 +205,38 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [theme, isNodeActive]
     )
 
+    // Build complete tree from trip data
+    const rebuildTree = useCallback(() => {
+        if (!trip) return
+
+        const allNodes: Node[] = []
+        const allEdges: Edge[] = []
+
+        // Add root placeholder (for adding top-level nodes) - only if canEdit
+        if (canEdit) {
+            const rootPlaceholderId = "placeholder_root"
+            allNodes.push({
+                id: rootPlaceholderId,
+                type: "placeholder",
+                position: { x: 0, y: 0 },
+                data: { parentId: null },
+            })
+        }
+
+        // Build tree for each root node
+        trip.nodes.forEach((rootNode) => {
+            const result = buildTreeNodes(rootNode)
+            allNodes.push(...result.nodes)
+            allEdges.push(...result.edges)
+        })
+
+        // Apply layout and update state
+        const layouted = updateLayout(allNodes, allEdges)
+        const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
+        setNodes(layouted.nodes)
+        setEdges(edgesWithColors)
+    }, [trip, theme, canEdit, updateEdgeColors])
+
     // Add a new node (to be called when clicking placeholder)
     const addNodeAndEdge = useCallback(
         (parentId?: string, data?: ExpenseNodeData) => {
@@ -257,7 +289,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const updateNode = useCallback(
         (updatedData: ExpenseNodeData, silent = false) => {
             setNodes((nds) => {
-                const updatedNodes = nds.map((node) => (node.id === updatedData.id ? { ...node, data: updatedData } : node))
+                const updatedNodes = nds.map((node) => (node.id === updatedData.id ? { ...node, data: { ...updatedData } } : node))
 
                 // Update edge colors if active state changed
                 setEdges((eds) => updateEdgeColors(updatedNodes, eds))
@@ -376,43 +408,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [handleNodeDelete]
     )
 
-    // Initialize tree when trip data changes
-    useEffect(() => {
-        if (!trip) {
-            setNodes([])
-            setEdges([])
-            return
-        }
-
-        const allNodes: Node[] = []
-        const allEdges: Edge[] = []
-
-        // Add root placeholder (for adding top-level nodes) - only if canEdit
-        if (canEdit) {
-            const rootPlaceholderId = "placeholder_root"
-            allNodes.push({
-                id: rootPlaceholderId,
-                type: "placeholder",
-                position: { x: 0, y: 0 },
-                data: { parentId: null },
-            })
-        }
-
-        // Build tree for each root node (nodes without parentId)
-        const rootNodes = trip.nodes.filter((node) => !node.parentId)
-        rootNodes.forEach((rootNode) => {
-            const result = buildTreeNodes(rootNode)
-            allNodes.push(...result.nodes)
-            allEdges.push(...result.edges)
-        })
-
-        // Apply layout and update state
-        const layouted = updateLayout(allNodes, allEdges)
-        const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
-        setNodes(layouted.nodes)
-        setEdges(edgesWithColors)
-    }, [trip, canEdit])
-
     // Setup socket connection separately to avoid recreation on every trip change
     useEffect(() => {
         if (trip) {
@@ -431,12 +426,14 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         }
     }, [trip?.id, handleIncomingNodeUpdate, handleIncomingNodeDelete])
 
-    // Update edge colors when theme changes or nodes change
     useEffect(() => {
-        if (nodes.length > 0) {
-            setEdges((eds) => updateEdgeColors(nodes, eds))
-        }
-    }, [theme.palette.success.main, theme.palette.action.disabled])
+        rebuildTree()
+    }, [trip])
+
+    // Update edge colors when theme changes
+    useEffect(() => {
+        setEdges((eds) => updateEdgeColors(nodes, eds))
+    }, [theme, updateEdgeColors])
 
     return {
         nodes,

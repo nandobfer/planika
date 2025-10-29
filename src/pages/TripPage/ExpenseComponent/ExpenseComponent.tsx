@@ -1,13 +1,14 @@
 import React, { useContext } from "react"
-import { Autocomplete, Box, Button, IconButton, Paper, TextField, Tooltip } from "@mui/material"
+import { Autocomplete, Box, Button, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
-import { AttachMoney, CalendarMonth, Circle, Delete, LocationPin } from "@mui/icons-material"
+import { Add, AttachMoney, CalendarMonth, Circle, Close, Delete, LocationPin, TimesOneMobiledata } from "@mui/icons-material"
 import dayjs from "dayjs"
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import type { CurrencyRate } from "../../../types/server/api/exchangerate"
 import { useExpenseNode } from "../../../hooks/useExpenseNode"
+import { currencyMask } from "../../../tools/numberMask"
 
 interface ExpenseComponentProps {
     data: ExpenseNode
@@ -17,10 +18,7 @@ const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol} - $
 
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
-    const { expense, expenseValue, toggleActive, onExpenseValueChange, debouncedUpdateNode, updateNode, deleteNode } = useExpenseNode(
-        props.data,
-        helper
-    )
+    const { expense, toggleActive, debouncedUpdateNode, updateNode, deleteNode } = useExpenseNode(props.data, helper)
     const ancestors = helper.getAncestors(expense.id)
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
@@ -39,15 +37,16 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 outlineColor: active ? "success.main" : "action.disabled",
                 transition: "0.3s",
                 borderWidth: 0,
-                outlineWidth: 1 / zoom,
+                outlineWidth: 2 / zoom,
                 outlineStyle: "solid",
             }}
         >
             {props.data.parentId && <Handle type="target" position={Position.Left} />}
 
-            <Box sx={{ flexDirection: "column", flex: 1, justifyContent: "space-between", height: 1 }}>
+            <Box sx={{ flexDirection: "column", flex: 1, height: 1, gap: 1 }}>
                 <Box sx={{ gap: 1 }}>
                     <TextField
+                        key={`description-${expense.description}`}
                         placeholder="Descrição da despesa"
                         variant="standard"
                         defaultValue={expense.description}
@@ -76,6 +75,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 <Box sx={{ flexDirection: "column" }}>
                     {expense.location !== undefined ? (
                         <TextField
+                            key={`location-${expense.location}`}
                             placeholder="Localização"
                             variant="standard"
                             autoFocus
@@ -139,6 +139,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     {expense.expense ? (
                         <Box sx={{ gap: 1 }}>
                             <Autocomplete
+                                key={`currency-${expense.expense.currency}`}
                                 options={helper.currency.data}
                                 getOptionLabel={(option) => formatCurrencyOption(option)}
                                 size="small"
@@ -160,37 +161,106 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 )}
                                 loading={helper.currency.isFetching}
                                 loadingText="Carregando moedas..."
-                                value={helper.currency.data.find((c) => c.code === expense.expense?.currency) || null}
+                                value={helper.currency.data.find((c) => c.symbol === expense.expense?.currency) || null}
                                 onChange={(_, value) =>
                                     debouncedUpdateNode({
-                                        expense: { amount: expense.expense!.amount, currency: value?.code || helper.user?.defaultCurrency || "BRL" },
+                                        expense: {
+                                            amount: expense.expense!.amount,
+                                            currency: value?.symbol || "R$",
+                                            quantity: expense.expense!.quantity,
+                                        },
                                     })
                                 }
                             />
                             <TextField
+                                key={`amount-${expense.expense.amount}`}
                                 placeholder="Valor da despesa"
                                 variant="standard"
                                 autoFocus
                                 sx={{ flex: 0.6 }}
-                                value={expenseValue}
-                                onChange={helper.canEdit ? onExpenseValueChange : undefined}
+                                defaultValue={expense.expense.amount}
+                                // value={expenseValue}
+                                onChange={
+                                    helper.canEdit
+                                        ? (e) =>
+                                              debouncedUpdateNode({
+                                                  expense: {
+                                                      amount: Number(e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")),
+                                                      currency: expense.expense!.currency,
+                                                      quantity: expense.expense!.quantity,
+                                                  },
+                                              })
+                                        : undefined
+                                }
                                 slotProps={{
-                                    input: { sx: { fontSize: 10, marginBottom: 1 }, readOnly: !helper.canEdit },
+                                    input: {
+                                        sx: { fontSize: 10, marginBottom: 1 },
+                                        readOnly: !helper.canEdit,
+                                    },
                                 }}
                                 size="small"
                             />
+                            {expense.expense.quantity ? (
+                                <TextField
+                                    key={`quantity-${expense.expense.quantity}`}
+                                    placeholder="Quantidade"
+                                    variant="standard"
+                                    autoFocus
+                                    sx={{ flex: 0.1 }}
+                                    defaultValue={expense.expense.quantity}
+                                    // value={expenseValue}
+                                    onChange={
+                                        helper.canEdit
+                                            ? (e) =>
+                                                  debouncedUpdateNode({
+                                                      expense: {
+                                                          amount: expense.expense!.amount,
+                                                          quantity: Number(e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")),
+                                                          currency: expense.expense!.currency,
+                                                      },
+                                                  })
+                                            : undefined
+                                    }
+                                    slotProps={{
+                                        input: {
+                                            sx: { fontSize: 10, marginBottom: 1 },
+                                            readOnly: !helper.canEdit,
+                                            startAdornment: <Close sx={{ width: 10, height: 10 }} />,
+                                        },
+                                    }}
+                                    size="small"
+                                />
+                            ) : (
+                                <IconButton
+                                    size="small"
+                                    disabled={!helper.canEdit}
+                                    onClick={() =>
+                                        updateNode({ expense: { amount: expense.expense!.amount, currency: expense.expense!.currency, quantity: 1 } })
+                                    }
+                                >
+                                    <TimesOneMobiledata fontSize="small" />
+                                </IconButton>
+                            )}
                         </Box>
                     ) : (
                         <Button
                             startIcon={<AttachMoney />}
                             size="small"
                             sx={{ alignSelf: "flex-start" }}
-                            onClick={() => updateNode({ expense: { amount: 0, currency: "BRL" } })}
+                            onClick={() => updateNode({ expense: { amount: 0, currency: "R$" } })}
                             disabled={!helper.canEdit}
                         >
                             Adicionar custo
                         </Button>
                     )}
+                    <Typography
+                        key={`total-${expense.totalExpenses}`}
+                        variant="caption"
+                        sx={{ alignSelf: "flex-end" }}
+                        color={active ? "success" : "textDisabled"}
+                    >
+                        {currencyMask(expense.totalExpenses, { affix: expense.expense?.currency || "R$" })}
+                    </Typography>
                 </Box>
             </Box>
 

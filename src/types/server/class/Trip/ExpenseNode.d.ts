@@ -2,6 +2,7 @@ import { WithoutFunctions } from "../helpers";
 interface Expense {
     amount: number;
     currency: string;
+    quantity?: number;
 }
 export declare class ExpenseNode {
     id: string;
@@ -22,5 +23,7 @@ export declare class ExpenseNode {
     constructor(data: WithoutFunctions<ExpenseNode>);
     getTotalExpenses(): number;
     getTotalLocations(): string[];
+    findChild(id: string): ExpenseNode | null;
+    update(data: Partial<WithoutFunctions<ExpenseNode>>): void;
 }
 export {};
