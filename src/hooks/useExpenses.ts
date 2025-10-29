@@ -83,6 +83,34 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         })
     }
 
+    // Helper to check if a node is active (including its ancestors)
+    const isNodeActive = useCallback((nodeId: string, allNodes: Node[]): boolean => {
+        const node = allNodes.find((n) => n.id === nodeId && n.type === "expense")
+        if (!node) return true // placeholders are always considered "active" for edge styling
+
+        const nodeData = node.data as ExpenseNodeData
+        if (!nodeData.active) return false
+
+        // Check all ancestors
+        const getAncestorsForNode = (id: string): boolean => {
+            const currentNode = allNodes.find((n) => n.id === id && n.type === "expense")
+            if (!currentNode) return true
+
+            const data = currentNode.data as ExpenseNodeData
+            const parentId = data.parentId as string | undefined
+
+            if (!parentId) return true
+
+            const parentNode = allNodes.find((n) => n.id === parentId && n.type === "expense")
+            if (!parentNode) return true
+
+            const parentData = parentNode.data as ExpenseNodeData
+            return parentData.active && getAncestorsForNode(parentId)
+        }
+
+        return getAncestorsForNode(nodeId)
+    }, [])
+
     // Recursive function to build tree nodes with placeholders
     const buildTreeNodes = (expenseNode: ExpenseNode, parentId?: string): { nodes: Node[]; edges: Edge[] } => {
         const nodes: Node[] = []
@@ -104,9 +132,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 target: expenseNode.id,
                 type: ConnectionLineType.SmoothStep,
                 animated: true,
-                style: {
-                    stroke: theme.palette.info.main,
-                },
             })
         }
 
@@ -137,7 +162,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 type: ConnectionLineType.SmoothStep,
                 animated: true,
                 style: {
-                    stroke: theme.palette.info.main,
                     strokeDasharray: "5,5",
                 },
             })
@@ -145,6 +169,26 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
         return { nodes, edges }
     }
+
+    // Update edge colors based on node active states
+    const updateEdgeColors = useCallback(
+        (allNodes: Node[], allEdges: Edge[]): Edge[] => {
+            return allEdges.map((edge) => {
+                const sourceActive = isNodeActive(edge.source, allNodes)
+                const targetActive = isNodeActive(edge.target, allNodes)
+                const bothActive = sourceActive && targetActive
+
+                return {
+                    ...edge,
+                    style: {
+                        ...edge.style,
+                        stroke: bothActive ? theme.palette.success.main : theme.palette.action.disabled,
+                    },
+                }
+            })
+        },
+        [theme, isNodeActive]
+    )
 
     // Build complete tree from trip data
     const rebuildTree = useCallback(() => {
@@ -173,9 +217,10 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
         // Apply layout and update state
         const layouted = updateLayout(allNodes, allEdges)
+        const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
         setNodes(layouted.nodes)
-        setEdges(layouted.edges)
-    }, [trip, theme, canEdit])
+        setEdges(edgesWithColors)
+    }, [trip, theme, canEdit, updateEdgeColors])
 
     // Add a new node (to be called when clicking placeholder)
     const addNodeAndEdge = useCallback(
@@ -205,8 +250,9 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             const result = buildTreeNodes(newExpenseData as unknown as ExpenseNode, parentId)
 
             const layouted = updateLayout([...nodes, ...result.nodes], [...edges, ...result.edges])
+            const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
             setNodes(layouted.nodes)
-            setEdges(layouted.edges)
+            setEdges(edgesWithColors)
 
             // Focus on the new node
             const addedNode = layouted.nodes.find((n) => n.id === newNodeId)
@@ -214,14 +260,21 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 fitNodeView(addedNode)
             }
         },
-        [nodes, edges, tripHelper]
+        [nodes, edges, tripHelper, updateEdgeColors]
     )
 
     const updateNode = useCallback(
         (updatedData: ExpenseNodeData) => {
-            setNodes((nds) => nds.map((node) => (node.id === updatedData.id ? { ...node, data: updatedData } : node)))
+            setNodes((nds) => {
+                const updatedNodes = nds.map((node) => (node.id === updatedData.id ? { ...node, data: updatedData } : node))
+
+                // Update edge colors if active state changed
+                setEdges((eds) => updateEdgeColors(updatedNodes, eds))
+
+                return updatedNodes
+            })
         },
-        [setNodes]
+        [setNodes, setEdges, updateEdgeColors]
     )
 
     // Get all ancestor nodes (parents) of a given node, tracing back to root
@@ -264,6 +317,11 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         rebuildTree()
     }, [trip])
 
+    // Update edge colors when theme changes
+    useEffect(() => {
+        setEdges((eds) => updateEdgeColors(nodes, eds))
+    }, [theme, updateEdgeColors])
+
     return {
         nodes,
         edges,
@@ -280,6 +338,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         trip,
         authenticatedApi,
         user,
-        canEdit
+        canEdit,
     }
 }
