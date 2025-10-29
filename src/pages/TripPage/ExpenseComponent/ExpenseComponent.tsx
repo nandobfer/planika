@@ -1,9 +1,9 @@
 import React, { useContext } from "react"
-import { Autocomplete, Box, Button, IconButton, Paper, TextField } from "@mui/material"
+import { Autocomplete, Box, Button, IconButton, Paper, TextField, Tooltip } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
-import { AttachMoney, CalendarMonth, Circle, LocationPin } from "@mui/icons-material"
+import { AttachMoney, CalendarMonth, Circle, Delete, LocationPin } from "@mui/icons-material"
 import dayjs from "dayjs"
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import type { CurrencyRate } from "../../../types/server/api/exchangerate"
@@ -17,7 +17,10 @@ const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol} - $
 
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
-    const { expense, expenseValue, toggleActive, onExpenseValueChange, debouncedUpdateNode, updateNode } = useExpenseNode(props.data, helper)
+    const { expense, expenseValue, toggleActive, onExpenseValueChange, debouncedUpdateNode, updateNode, deleteNode } = useExpenseNode(
+        props.data,
+        helper
+    )
     const ancestors = helper.getAncestors(expense.id)
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
@@ -49,11 +52,25 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         variant="standard"
                         defaultValue={expense.description}
                         onChange={helper.canEdit ? (e) => debouncedUpdateNode({ description: e.target.value }) : undefined}
-                        slotProps={{ input: { sx: { fontWeight: "bold" }, readOnly: !helper.canEdit } }}
+                        slotProps={{
+                            input: {
+                                sx: { fontWeight: "bold" },
+                                readOnly: !helper.canEdit,
+                                endAdornment: helper.canEdit && (
+                                    <Tooltip title="Excluir despesa">
+                                        <IconButton size="small" onClick={deleteNode}>
+                                            <Delete fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                ),
+                            },
+                        }}
                     />
-                    <IconButton size="small" onClick={helper.canEdit ? toggleActive : undefined}>
-                        <Circle fontSize="small" color={active ? "success" : "disabled"} />
-                    </IconButton>
+                    <Tooltip title={active ? "Desativar grupo" : "Ativar grupo"}>
+                        <IconButton size="small" onClick={helper.canEdit ? toggleActive : undefined}>
+                            <Circle fontSize="small" color={active ? "success" : "disabled"} />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
 
                 <Box sx={{ flexDirection: "column" }}>

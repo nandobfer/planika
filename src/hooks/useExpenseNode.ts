@@ -3,9 +3,11 @@ import type { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
 import { debounce } from "@mui/material"
 import { handleCurrencyInput } from "../tools/handleCurrencyInput"
 import type { useExpenses } from "./useExpenses"
+import { useConfirmDialog } from "burgos-confirm"
 
 export const useExpenseNode = (data: ExpenseNode, helper: ReturnType<typeof useExpenses>) => {
     const expense = data
+    const { confirm } = useConfirmDialog()
 
     const [expenseValue, setExpenseValue] = useState(expense.expense?.currency.toString() || "")
 
@@ -34,9 +36,19 @@ export const useExpenseNode = (data: ExpenseNode, helper: ReturnType<typeof useE
 
     const debouncedUpdateNode = debounce(updateNode, 500)
 
+    const deleteNode = () => {
+        confirm({
+            title: "Tem certeza que deseja excluir?",
+            content: "Essa ação não pode ser desfeita",
+            onConfirm: () => {
+                helper.handleNodeDelete(expense.id)
+            },
+        })
+    }
+
     useEffect(() => {
         setExpenseValue(expense.expense?.amount.toString() || "")
     }, [expense.expense?.amount])
 
-    return { expense, expenseValue, setExpenseValue, toggleActive, onExpenseValueChange, debouncedUpdateNode, updateNode }
+    return { expense, expenseValue, setExpenseValue, toggleActive, onExpenseValueChange, debouncedUpdateNode, updateNode, deleteNode }
 }

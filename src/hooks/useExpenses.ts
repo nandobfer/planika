@@ -323,6 +323,59 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [nodes, updateNode, addNodeAndEdge]
     )
 
+    const handleNodeDelete = useCallback(
+        (nodeId: string, silent = false) => {
+            // Recursively collect all descendant node IDs
+            const collectDescendants = (id: string): string[] => {
+                const descendants: string[] = [id]
+
+                nodes.forEach((node) => {
+                    if (node.type === "expense") {
+                        const data = node.data as ExpenseNodeData
+                        if (data.parentId === id) {
+                            // Add this child and all its descendants
+                            descendants.push(...collectDescendants(node.id))
+                        }
+                    } else if (node.type === "placeholder" && node.id === `placeholder_${id}`) {
+                        // Also collect placeholder nodes
+                        descendants.push(node.id)
+                    }
+                })
+
+                return descendants
+            }
+
+            const nodesToDelete = new Set(collectDescendants(nodeId))
+
+            // Filter out deleted nodes
+            const remainingNodes = nodes.filter((node) => !nodesToDelete.has(node.id))
+            const remainingNodeIds = new Set(remainingNodes.map((n) => n.id))
+
+            // Clean up edges: remove any edge that references deleted nodes
+            const remainingEdges = edges.filter((edge) => remainingNodeIds.has(edge.source) && remainingNodeIds.has(edge.target))
+
+            // Re-layout the tree with remaining nodes and edges
+            const layouted = updateLayout(remainingNodes, remainingEdges)
+            const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
+
+            setNodes(layouted.nodes)
+            setEdges(edgesWithColors)
+
+            if (!silent) {
+                socket.current?.emit("trip:node:delete", trip?.id, nodeId)
+            }
+        },
+        [nodes, edges, trip?.id, updateEdgeColors]
+    )
+
+    const handleIncomingNodeDelete = useCallback(
+        (nodeId: string) => {
+            console.log("Incoming node delete:", nodeId)
+            handleNodeDelete(nodeId, true)
+        },
+        [handleNodeDelete]
+    )
+
     // Initialize tree when trip data changes
     useEffect(() => {
         if (!trip) {
@@ -366,15 +419,17 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             socket.current = io(api_url)
             socket.current.emit("join", trip.id)
             socket.current.on("trip:node", handleIncomingNodeUpdate)
+            socket.current.on("trip:node:delete", handleIncomingNodeDelete)
 
             return () => {
                 socket.current?.emit("leave", trip.id)
                 socket.current?.off("trip:node", handleIncomingNodeUpdate)
+                socket.current?.off("trip:node:delete", handleIncomingNodeDelete)
                 socket.current?.disconnect()
                 socket.current = null
             }
         }
-    }, [trip?.id, handleIncomingNodeUpdate])
+    }, [trip?.id, handleIncomingNodeUpdate, handleIncomingNodeDelete])
 
     // Update edge colors when theme changes or nodes change
     useEffect(() => {
@@ -404,5 +459,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         canEdit,
         zoom,
         currency,
+        handleNodeDelete,
     }
 }
