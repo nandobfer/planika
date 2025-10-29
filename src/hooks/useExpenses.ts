@@ -184,6 +184,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                         ...edge.style,
                         stroke: bothActive ? theme.palette.success.main : theme.palette.action.disabled,
                     },
+                    animated: bothActive,
                 }
             })
         },
