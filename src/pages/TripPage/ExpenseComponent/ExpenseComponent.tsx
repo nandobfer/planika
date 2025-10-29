@@ -43,8 +43,11 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 alignItems: "flex-start",
                 padding: 1,
                 whiteSpace: "normal",
-                borderColor: active ? "success.main" : undefined,
+                outlineColor: active ? "success.main" : "action.disabled",
                 transition: "0.3s",
+                borderWidth: 0,
+                outlineWidth: 5,
+                outlineStyle: "solid",
             }}
         >
             {props.data.parentId && <Handle type="target" position={Position.Left} />}

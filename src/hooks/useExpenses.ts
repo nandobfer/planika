@@ -27,7 +27,7 @@ const updateLayout = (nodes: Node[], edges: Edge[]): { nodes: Node[]; edges: Edg
     dagreGraph.setGraph({
         rankdir: "LR",
         ranksep: 100,
-        nodesep: 100,
+        nodesep: 50,
         // align: "UL",
     })
 
