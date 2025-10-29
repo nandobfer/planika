@@ -15,7 +15,7 @@ interface ExpensesPageProps {
 
 export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
     const expensesHook = useExpenses(props.tripHook)
-    const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit } = expensesHook
+    const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit, debouncedOnMove } = expensesHook
 
     return (
         <Box sx={{ height: "calc(100vh - 200px)", margin: -5, marginTop: -3 }}>
@@ -26,6 +26,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     onNodesChange={onNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
+                    onMove={debouncedOnMove}
                     connectionLineType={ConnectionLineType.SmoothStep}
                     fitView
                     nodeTypes={{ expense: ExpenseComponent, placeholder: ExpensePlaceholder }}

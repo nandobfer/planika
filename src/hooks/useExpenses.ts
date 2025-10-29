@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type { useTrip } from "./useTrip"
 import {
     addEdge,
@@ -9,12 +9,14 @@ import {
     type Edge,
     type Node,
     type ReactFlowInstance,
+    type Viewport,
 } from "@xyflow/react"
 import dagre from "@dagrejs/dagre"
 import { uid } from "uid"
 import type { WithoutFunctions } from "../types/server/class/helpers"
 import { useMuiTheme } from "./useMuiTheme"
 import { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
+import { debounce } from "@mui/material"
 
 export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
 
@@ -64,6 +66,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges)
+    const [zoom, setZoom] = useState(1)
 
     const canEdit = trip?.participants?.some((p) => p.userId === user?.id && (p.role === "administrator" || p.role === "collaborator"))
 
@@ -71,6 +74,12 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         (params: Connection) => setEdges((eds) => addEdge({ ...params, type: ConnectionLineType.SmoothStep, animated: true }, eds)),
         []
     )
+
+    const onMove = useCallback((_: any, newViewport: Viewport) => {
+        setZoom(newViewport.zoom)
+    }, [])
+
+    const debouncedOnMove = debounce(onMove, 100)
 
     const fitNodeView = (node: Node | string) => {
         const nodeItem = typeof node === "string" ? nodes.find((item) => item.id === node) : node
@@ -329,6 +338,8 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         onNodesChange,
         onEdgesChange,
         onConnect,
+        onMove,
+        debouncedOnMove,
         addNodeAndEdge,
         onInit: (flowInstance: ReactFlowInstance<Node, Edge>) => (instance.current = flowInstance),
         nodeWidth,
@@ -340,5 +351,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         authenticatedApi,
         user,
         canEdit,
+        zoom,
     }
 }

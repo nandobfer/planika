@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo } from "react"
+import React, { useCallback, useContext } from "react"
 import { Box, Button, debounce, IconButton, Paper, TextField } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
@@ -18,6 +18,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const ancestors = helper.getAncestors(expense.id)
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
+    const zoom = helper.zoom
 
     const toggleActive = () => {
         helper.updateNode({ ...expense, active: !expense.active })
@@ -46,7 +47,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 outlineColor: active ? "success.main" : "action.disabled",
                 transition: "0.3s",
                 borderWidth: 0,
-                outlineWidth: 5,
+                outlineWidth: 1 / zoom,
                 outlineStyle: "solid",
             }}
         >
