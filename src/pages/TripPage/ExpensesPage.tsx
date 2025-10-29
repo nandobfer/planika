@@ -18,7 +18,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
     const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit } = expensesHook
 
     return (
-        <Box sx={{ height: "calc(100vh - 200px)", width: "100%" }}>
+        <Box sx={{ height: "calc(100vh - 200px)", margin: -5, marginTop: -3 }}>
             <TripProvider expensesHook={expensesHook}>
                 <ReactFlow
                     nodes={nodes}
