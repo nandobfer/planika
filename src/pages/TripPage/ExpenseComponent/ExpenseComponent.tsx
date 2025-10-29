@@ -177,7 +177,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 placeholder="Valor da despesa"
                                 variant="standard"
                                 autoFocus
-                                sx={{ flex: 0.6 }}
+                                sx={{ flex: 0.4 }}
                                 defaultValue={expense.expense.amount}
                                 // value={expenseValue}
                                 onChange={
@@ -206,7 +206,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                     placeholder="Quantidade"
                                     variant="standard"
                                     autoFocus
-                                    sx={{ flex: 0.1 }}
+                                    sx={{ flex: 0.2 }}
                                     defaultValue={expense.expense.quantity}
                                     // value={expenseValue}
                                     onChange={
