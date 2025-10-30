@@ -137,6 +137,11 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
                             key={participant.id}
                             participant={participant}
                             onChangeRole={canEdit ? (role) => props.tripForm.updateParticipantRole(participant.id, role) : undefined}
+                            onDelete={
+                                props.tripForm.isAdmin && participant.userId !== user?.id
+                                    ? () => props.tripForm.deleteParticipant(participant.id)
+                                    : undefined
+                            }
                         />
                     )
                 })}

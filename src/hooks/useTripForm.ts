@@ -103,6 +103,30 @@ export const useTripForm = (initialTrip?: Trip) => {
         }
     }
 
+    const deleteParticipant = async (participantId: string) => {
+        confirm({
+            title: "Remover participante",
+            content: "Tem certeza que deseja remover esse participante da viagem?",
+            async onConfirm() {
+                EventBus.emit("trip-loading", true)
+                try {
+                    await authenticatedApi.delete(`/trip/participant`, { params: { participant_id: participantId } })
+                    setParticipants((prev) => prev.filter((p) => p.id !== participantId))
+                    setCurrentTrip((current) => {
+                        if (!current) return current
+
+                        current.participants = current.participants.filter((p) => p.id !== participantId)
+                        return current
+                    })
+                } catch (error) {
+                    console.log(error)
+                } finally {
+                    EventBus.emit("trip-loading", false)
+                }
+            },
+        })
+    }
+
     const deleteTrip = async () => {
         if (!currentTrip) return
 
@@ -137,5 +161,6 @@ export const useTripForm = (initialTrip?: Trip) => {
         updateParticipantRole,
         isAdmin,
         deleteTrip,
+        deleteParticipant,
     }
 }

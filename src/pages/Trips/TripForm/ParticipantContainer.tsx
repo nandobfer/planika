@@ -1,6 +1,6 @@
 import React, { useState } from "react"
-import { Avatar, Box, Chip, Menu, MenuItem, Paper, TextField, Typography } from "@mui/material"
-import { ArrowDropDown, Email } from "@mui/icons-material"
+import { Avatar, Box, Chip, IconButton, Menu, MenuItem, Paper, TextField, Typography } from "@mui/material"
+import { ArrowDropDown, Delete, Email } from "@mui/icons-material"
 import type { ParticipantRole, TripParticipant } from "../../../types/server/class/Trip/TripParticipant"
 import { useQuery } from "@tanstack/react-query"
 import { api } from "../../../backend/api"
@@ -11,6 +11,7 @@ interface ParticipantContainerProps {
     participant: TripParticipant
     onChangeRole?: (role: ParticipantRole) => void
     onChangeEmail?: (email: string) => void
+    onDelete?: () => void
 }
 
 const roles: ParticipantRole[] = ["administrator", "collaborator", "viewer"]
@@ -100,6 +101,12 @@ export const ParticipantContainer: React.FC<ParticipantContainerProps> = (props)
                     {props.participant.status === "pending" && <Chip variant="outlined" size="small" color="warning" label="Convite enviado" />}
                 </Box>
             </Box>
+
+            {props.onDelete && (
+                <IconButton onClick={props.onDelete}>
+                    <Delete />
+                </IconButton>
+            )}
 
             {props.onChangeRole && (
                 <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
