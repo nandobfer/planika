@@ -255,13 +255,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
         console.log(`Yjs arrays: nodes=${yNodes.length}, edges=${yEdges.length}`)
 
-        if (yNodes.length === 0) {
-            console.log("No nodes in Yjs yet, waiting for data...")
-            setNodes([])
-            setEdges([])
-            return
-        }
-
         // Get the data nodes from Yjs - they're stored directly in the array
         const dataNodes = yNodes.toArray() as Node[]
         const dataEdges = yEdges.toArray() as Edge[]
@@ -276,7 +269,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         const allNodes = [...dataNodes]
         const allEdges = [...dataEdges]
 
-        // Add root placeholder if canEdit
+        // Add root placeholder if canEdit (even if there are no expense nodes yet)
         if (canEdit) {
             allNodes.push({
                 id: "placeholder_root",
