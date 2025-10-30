@@ -23,6 +23,13 @@ import * as Y from "yjs"
 import { HocuspocusProvider } from "@hocuspocus/provider"
 
 export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
+export interface CursorAwareness {
+    id: string
+    name: string
+    picture: string
+    mouseX: number
+    mouseY: number
+}
 
 const nodeWidth = 330
 const nodeHeight = 180
@@ -649,6 +656,52 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 },
             })
 
+            // Throttle awareness updates to reduce network traffic and improve performance
+            let lastUpdate = 0
+            const throttleMs = 50 // Update at most every 50ms (20 times per second)
+            let rafId: number | null = null
+
+            const updateAwareness = (event: MouseEvent) => {
+                if (!instance.current) return
+
+                const now = Date.now()
+                if (now - lastUpdate < throttleMs) {
+                    return
+                }
+
+                // Use requestAnimationFrame for smooth updates
+                if (rafId) {
+                    cancelAnimationFrame(rafId)
+                }
+
+                rafId = requestAnimationFrame(() => {
+                    if (!instance.current || !provider.current) return
+
+                    const position = instance.current.screenToFlowPosition({
+                        x: event.clientX,
+                        y: event.clientY,
+                    })
+
+                    // Share cursor information in ReactFlow coordinates
+                    const data: CursorAwareness = {
+                        id: user?.id || uid(),
+                        name: user?.name || "Anonymous",
+                        picture: user?.picture || "",
+                        mouseX: Math.round(position.x * 100) / 100, // Round to 2 decimal places for precision
+                        mouseY: Math.round(position.y * 100) / 100,
+                    }
+                    provider.current?.setAwarenessField("user", data)
+                    lastUpdate = now
+                    rafId = null
+                })
+            }
+
+            // Use the ReactFlow wrapper element for mouse tracking
+            const reactFlowElement = document.querySelector(".react-flow")
+            if (reactFlowElement) {
+                reactFlowElement.addEventListener("mousemove", updateAwareness as EventListener)
+            }
+
             const observer = (event: any) => {
                 const origin = event.transaction.origin
 
@@ -677,6 +730,16 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 provider.current?.destroy()
                 provider.current = null
                 ydocRef.current = null
+
+                // Cancel any pending animation frame
+                if (rafId) {
+                    cancelAnimationFrame(rafId)
+                }
+
+                const reactFlowElement = document.querySelector(".react-flow")
+                if (reactFlowElement) {
+                    reactFlowElement.removeEventListener("mousemove", updateAwareness as EventListener)
+                }
 
                 // Clear any pending rebuild timeout
                 if (rebuildTimeoutRef.current) {
@@ -719,5 +782,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         handleUpdateExpense,
         handleDeleteExpense,
         fitNodeView,
+        hocuspocusProvider: provider.current,
     }
 }
