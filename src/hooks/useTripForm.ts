@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useUser } from "./useUser"
 import { EventBus } from "../tools/EventBus"
 import type { ParticipantRole, TripParticipant, TripParticipantForm } from "../types/server/class/Trip/TripParticipant"
+import { useNavigate } from "react-router-dom"
+import { useConfirmDialog } from "burgos-confirm"
 
 export const useTripForm = (initialTrip?: Trip) => {
     const [step, setStep] = useState(0)
@@ -11,6 +13,8 @@ export const useTripForm = (initialTrip?: Trip) => {
     const [currentTrip, setCurrentTrip] = useState<Trip | null>(initialTrip || null)
     const [participants, setParticipants] = useState<TripParticipant[]>(currentTrip?.participants || [])
 
+    const navigate = useNavigate()
+    const { confirm } = useConfirmDialog()
     const { user, authenticatedApi } = useUser()
     const isAdmin = participants.length > 0 ? participants.find((p) => p.userId === user?.id)?.role === "administrator" : true
 
@@ -99,6 +103,27 @@ export const useTripForm = (initialTrip?: Trip) => {
         }
     }
 
+    const deleteTrip = async () => {
+        if (!currentTrip) return
+
+        confirm({
+            title: "Deletar viagem",
+            content: "Tem certeza que deseja deletar essa viagem? Essa ação não pode ser desfeita.",
+            async onConfirm() {
+                EventBus.emit("trip-loading", true)
+                try {
+                    await authenticatedApi.delete(`/trip`, { params: { trip_id: currentTrip.id } })
+                    setCurrentTrip(null)
+                    navigate("/my-trips")
+                } catch (error) {
+                    console.log(error)
+                } finally {
+                    EventBus.emit("trip-loading", false)
+                }
+            },
+        })
+    }
+
     return {
         formik,
         step,
@@ -111,5 +136,6 @@ export const useTripForm = (initialTrip?: Trip) => {
         currentTrip,
         updateParticipantRole,
         isAdmin,
+        deleteTrip,
     }
 }

@@ -1,7 +1,6 @@
 import React from "react"
-import { Box, TextField } from "@mui/material"
+import { Box, Button, TextField } from "@mui/material"
 import type { useTripForm } from "../../../hooks/useTripForm"
-import { SaveButton } from "../../Account/SaveButton"
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import dayjs from "dayjs"
 
@@ -57,7 +56,16 @@ export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
                     />
                 </Box>
 
-                <SaveButton disabled={!props.tripForm.isAdmin}>{props.fromSettings ? "Salvar" : "Continuar"}</SaveButton>
+                <Box sx={{ alignSelf: "flex-end", gap: 2 }}>
+                    {props.fromSettings && (
+                        <Button color="error" onClick={props.tripForm.deleteTrip}>
+                            Deletar
+                        </Button>
+                    )}
+                    <Button type="submit" variant="contained" disabled={!props.tripForm.isAdmin}>
+                        {props.fromSettings ? "Salvar" : "Continuar"}
+                    </Button>
+                </Box>
             </form>
         </Box>
     )
