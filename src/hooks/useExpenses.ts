@@ -207,39 +207,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [theme, isNodeActive]
     )
 
-    // Build complete tree from trip data
-    const rebuildTree = useCallback(() => {
-        if (!trip) return
-
-        console.log("rebuilding trip", trip)
-
-        const allNodes: Node[] = []
-        const allEdges: Edge[] = []
-
-        // Add root placeholder (for adding top-level nodes) - only if canEdit
-        if (canEdit) {
-            const rootPlaceholderId = "placeholder_root"
-            allNodes.push({
-                id: rootPlaceholderId,
-                type: "placeholder",
-                position: { x: 0, y: 0 },
-                data: { parentId: null },
-            })
-        }
-
-        // Build tree for each root node
-        trip.nodes.forEach((rootNode) => {
-            const result = buildTreeNodes(rootNode)
-            allNodes.push(...result.nodes)
-            allEdges.push(...result.edges)
-        })
-
-        // Apply layout and update state
-        const layouted = updateLayout(allNodes, allEdges)
-        const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
-        setNodes(layouted.nodes)
-        setEdges(edgesWithColors)
-    }, [trip, theme, canEdit, updateEdgeColors])
 
     // Get all ancestor nodes (parents) of a given node, tracing back to root
     const getAncestors = useCallback(
