@@ -378,15 +378,30 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const handleUpdateExpense = useCallback((nodeId: string, updates: Partial<ExpenseNode>) => {
         if (!ydocRef.current) return
 
-        const yNodes = ydocRef.current.getArray("nodes")
+        // FIRST: Update local React state immediately for instant UI feedback
+        setNodes((currentNodes) => {
+            return currentNodes.map((node) => {
+                if (node.id === nodeId && node.type === "expense") {
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            ...updates,
+                        },
+                    }
+                }
+                return node
+            })
+        })
 
-        // Find and update the node
+        // THEN: Update Yjs for sync (this will trigger observer on OTHER clients only)
+        const yNodes = ydocRef.current.getArray("nodes")
         const nodeIndex = yNodes.toArray().findIndex((node: any) => node.id === nodeId)
 
         if (nodeIndex !== -1) {
             const currentNode = yNodes.get(nodeIndex) as Node
 
-            // Check if the update actually changes anything to avoid unnecessary syncs
+            // Check if the update actually changes anything
             const currentData = currentNode.data as any
             let hasChanges = false
 
@@ -398,7 +413,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             }
 
             if (!hasChanges) {
-                console.log(`No changes detected for node ${nodeId}, skipping update`)
                 return
             }
 
@@ -407,15 +421,14 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 data: {
                     ...currentNode.data,
                     ...updates,
-                    updatedAt: Date.now(), // Track when it was updated
                 },
             }
 
-            // Update Yjs
+            // Update Yjs without triggering local observer
             ydocRef.current.transact(() => {
                 yNodes.delete(nodeIndex, 1)
                 yNodes.insert(nodeIndex, [updatedNode])
-            })
+            }, "local") // Mark as local origin
         }
     }, [])
 
@@ -498,7 +511,13 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 },
             })
 
-            const observer = () => {
+            const observer = (event: any) => {
+                // Ignore local changes (from this client)
+                if (event.transaction.origin === "local") {
+                    console.log("Local change detected, skipping rebuild")
+                    return
+                }
+
                 console.log("Changes detected from other clients or sync")
                 console.log(`yNodes length: ${yNodes.length}, yEdges length: ${yEdges.length}`)
                 rebuildTreeFromYjs()
