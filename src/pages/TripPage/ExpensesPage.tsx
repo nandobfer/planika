@@ -78,7 +78,13 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
     }, [hocuspocusProvider])
 
     return (
-        <Box sx={{ height: "calc(100vh - 200px)", margin: -5, marginTop: -3 }}>
+        <Box
+            sx={{
+                height: "calc(100vh - 200px)",
+                margin: -5,
+                marginTop: -3,
+            }}
+        >
             <TripProvider expensesHook={expensesHook}>
                 <ReactFlow
                     nodes={nodes}

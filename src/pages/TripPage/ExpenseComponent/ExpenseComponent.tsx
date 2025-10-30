@@ -8,7 +8,7 @@ import dayjs from "dayjs"
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import type { CurrencyRate } from "../../../types/server/api/exchangerate"
 import { useExpenseNode } from "../../../hooks/useExpenseNode"
-import { currencyMask, numberMask } from "../../../tools/numberMask"
+import { currencyMask } from "../../../tools/numberMask"
 import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
 
 interface ExpenseComponentProps {
@@ -23,7 +23,6 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const ancestors = helper.getAncestors(expense.id)
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
-    const zoom = helper.zoom
 
     // Refs for uncontrolled inputs
     const descriptionRef = useRef<HTMLInputElement>(null)
@@ -66,8 +65,10 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 outlineColor: active ? "success.main" : "action.disabled",
                 transition: "0.3s",
                 borderWidth: 0,
-                outlineWidth: 2 / zoom,
+                outlineWidth: 2,
                 outlineStyle: "solid",
+                // ...(mode === "light" ? { bgcolor: "background.default" } : {}),
+                color: active ? "success.main" : "action.disabled",
             }}
         >
             {props.data.parentId && <Handle type="target" position={Position.Left} />}
@@ -95,8 +96,8 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         }}
                     />
                     <Tooltip title={active ? "Desativar grupo" : "Ativar grupo"}>
-                        <IconButton size="small" onClick={helper.canEdit ? toggleActive : undefined}>
-                            <Circle fontSize="small" color={active ? "success" : "disabled"} />
+                        <IconButton size="small" onClick={helper.canEdit ? toggleActive : undefined} color="inherit">
+                            <Circle fontSize="small" />
                         </IconButton>
                     </Tooltip>
                 </Box>
@@ -127,6 +128,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         <Button
                             startIcon={<LocationPin />}
                             size="small"
+                            color="inherit"
                             sx={{ alignSelf: "flex-start" }}
                             onClick={() => updateNode({ location: "" })}
                             disabled={!helper.canEdit}
@@ -157,6 +159,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     ) : (
                         <Button
                             startIcon={<CalendarMonth />}
+                            color="inherit"
                             size="small"
                             sx={{ alignSelf: "flex-start" }}
                             onClick={() => updateNode({ datetime: 0 })}
@@ -272,6 +275,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     ) : (
                         <Button
                             startIcon={<AttachMoney />}
+                            color="inherit"
                             size="small"
                             sx={{ alignSelf: "flex-start" }}
                             onClick={() => updateNode({ expense: { amount: "", currency: "R$" } })}
@@ -280,7 +284,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             Adicionar custo
                         </Button>
                     )}
-                    <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }} color={active ? "success" : "textDisabled"}>
+                    <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }}>
                         {currencyMask(total, { affix: expense.expense?.currency || "R$" })}
                     </Typography>
                 </Box>
