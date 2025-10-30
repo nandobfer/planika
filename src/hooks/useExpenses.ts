@@ -270,8 +270,55 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             sampleNode: dataNodes[0],
         })
 
+        // Calculate total expenses for each node (recursive based on parentId)
+        const calculateTotalExpenses = (nodeId: string): number => {
+            const node = dataNodes.find((n) => n.id === nodeId)
+            if (!node || node.type !== "expense") return 0
+
+            const nodeData = node.data as ExpenseNodeData
+            if (!nodeData.active) return 0
+
+            let total = 0
+
+            // Add this node's own expense
+            if (nodeData.expense) {
+                const amount = Number(nodeData.expense.amount) || 0
+                const quantity = Number(nodeData.expense.quantity?.toString().replace(/[^0-9.-]+/g, "")) || 1
+                total += amount * quantity
+            }
+
+            // Find all children (nodes whose parentId matches this node's id)
+            const children = dataNodes.filter((n) => {
+                if (n.type !== "expense") return false
+                const childData = n.data as ExpenseNodeData
+                return childData.parentId === nodeId
+            })
+
+            // Add all children's totals recursively
+            for (const child of children) {
+                total += calculateTotalExpenses(child.id)
+            }
+
+            return total
+        }
+
+        // Update all nodes with their calculated total expenses
+        const nodesWithTotals = dataNodes.map((node) => {
+            if (node.type === "expense") {
+                const totalExpenses = calculateTotalExpenses(node.id)
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        totalExpenses,
+                    },
+                }
+            }
+            return node
+        })
+
         // Add UI-specific elements (placeholders, etc.)
-        const allNodes = [...dataNodes]
+        const allNodes = [...nodesWithTotals]
         const allEdges = [...dataEdges]
 
         // Add root placeholder if canEdit (even if there are no expense nodes yet)
@@ -286,7 +333,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
         // Add placeholder nodes for each expense node (if canEdit)
         if (canEdit) {
-            dataNodes.forEach((node) => {
+            nodesWithTotals.forEach((node) => {
                 if (node.type === "expense") {
                     const placeholderId = `placeholder_${node.id}`
                     allNodes.push({
@@ -403,15 +450,81 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const handleUpdateExpense = useCallback((nodeId: string, updates: Partial<ExpenseNode>) => {
         if (!ydocRef.current) return
 
+        // Helper to calculate total expenses for a node based on current state
+        const calculateTotalExpenses = (targetNodeId: string, allNodes: Node[]): number => {
+            const node = allNodes.find((n) => n.id === targetNodeId)
+            if (!node || node.type !== "expense") return 0
+
+            const nodeData = node.data as ExpenseNodeData
+            if (!nodeData.active) return 0
+
+            let total = 0
+
+            // Add this node's own expense
+            if (nodeData.expense) {
+                const amount = Number(nodeData.expense.amount) || 0
+                const quantity = Number(nodeData.expense.quantity?.toString().replace(/[^0-9.-]+/g, "")) || 1
+                total += amount * quantity
+            }
+
+            // Find all children (nodes whose parentId matches this node's id)
+            const children = allNodes.filter((n) => {
+                if (n.type !== "expense") return false
+                const childData = n.data as ExpenseNodeData
+                return childData.parentId === targetNodeId
+            })
+
+            // Add all children's totals recursively
+            for (const child of children) {
+                total += calculateTotalExpenses(child.id, allNodes)
+            }
+
+            return total
+        }
+
         // FIRST: Update local React state immediately for instant UI feedback
         setNodes((currentNodes) => {
-            return currentNodes.map((node) => {
+            // Update the node itself
+            const updatedNodes = currentNodes.map((node) => {
                 if (node.id === nodeId && node.type === "expense") {
                     return {
                         ...node,
                         data: {
                             ...node.data,
                             ...updates,
+                        },
+                    }
+                }
+                return node
+            })
+
+            // Recalculate totals for the updated node and all its ancestors
+            const nodesToRecalculate = new Set<string>([nodeId])
+
+            // Find all ancestors
+            let currentId: string | undefined = nodeId
+            while (currentId) {
+                const currentNode = updatedNodes.find((n) => n.id === currentId && n.type === "expense")
+                if (!currentNode) break
+
+                const parentId = (currentNode.data as ExpenseNodeData).parentId as string | undefined
+                if (parentId) {
+                    nodesToRecalculate.add(parentId)
+                    currentId = parentId
+                } else {
+                    break
+                }
+            }
+
+            // Update totals for all affected nodes
+            return updatedNodes.map((node) => {
+                if (nodesToRecalculate.has(node.id) && node.type === "expense") {
+                    const newTotal = calculateTotalExpenses(node.id, updatedNodes)
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            totalExpenses: newTotal,
                         },
                     }
                 }

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useEffect } from "react"
+import React, { useContext, useRef, useEffect, useMemo } from "react"
 import { Autocomplete, Box, Button, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
@@ -28,6 +28,11 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     // Refs for uncontrolled inputs
     const descriptionRef = useRef<HTMLInputElement>(null)
     const locationRef = useRef<HTMLInputElement>(null)
+    const expenseQuantityRef = useRef<HTMLInputElement>(null)
+
+    const total = useMemo(() => {
+        return expense.totalExpenses
+    }, [expense.totalExpenses, expense.expense?.amount])
 
     // Sync refs with external changes (from other users)
     useEffect(() => {
@@ -41,6 +46,12 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
             locationRef.current.value = expense.location
         }
     }, [expense.location])
+
+    useEffect(() => {
+        if (expense.expense?.quantity !== undefined && expenseQuantityRef.current && expenseQuantityRef.current.value !== expense.expense.quantity) {
+            expenseQuantityRef.current.value = expense.expense.quantity
+        }
+    }, [expense.expense?.quantity])
 
     return (
         <Paper
@@ -218,14 +229,15 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             {expense.expense.quantity !== undefined ? (
                                 <TextField
                                     placeholder="Quantidade"
+                                    inputRef={expenseQuantityRef}
                                     variant="standard"
                                     autoFocus
                                     sx={{ flex: 0.3 }}
-                                    value={expense.expense.quantity}
+                                    defaultValue={expense.expense.quantity}
                                     onChange={
                                         helper.canEdit
                                             ? (e) =>
-                                                  updateNode({
+                                                  debouncedUpdateNode({
                                                       expense: {
                                                           amount: expense.expense!.amount,
                                                           quantity: e.target.value,
@@ -268,8 +280,8 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             Adicionar custo
                         </Button>
                     )}
-                    <Typography variant="caption" sx={{ alignSelf: "flex-end" }} color={active ? "success" : "textDisabled"}>
-                        {currencyMask(expense.totalExpenses, { affix: expense.expense?.currency || "R$" })}
+                    <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }} color={active ? "success" : "textDisabled"}>
+                        {currencyMask(total, { affix: expense.expense?.currency || "R$" })}
                     </Typography>
                 </Box>
             </Box>
