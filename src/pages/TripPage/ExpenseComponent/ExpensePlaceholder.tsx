@@ -13,7 +13,7 @@ export const ExpensePlaceholder: React.FC<ExpensePlaceholderProps> = (props) => 
     const isRoot = parentId === "root"
 
     const onClick = () => {
-        helper.addNodeAndEdge(!isRoot ? parentId : undefined)
+        helper.handleAddExpense(!isRoot ? parentId : undefined)
     }
 
     return (

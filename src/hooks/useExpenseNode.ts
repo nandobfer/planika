@@ -9,12 +9,12 @@ export const useExpenseNode = (data: ExpenseNode, helper: ReturnType<typeof useE
     const { confirm } = useConfirmDialog()
 
     const toggleActive = () => {
-        helper.updateNode({ ...expense, active: !expense.active })
+        helper.handleUpdateExpense(expense.id, { active: !expense.active })
     }
 
     const updateNode = useCallback(
         (value: Partial<ExpenseNode>) => {
-            helper.updateNode({ ...expense, ...value })
+            helper.handleUpdateExpense(expense.id, { ...value })
         },
         [expense, helper]
     )
@@ -26,7 +26,7 @@ export const useExpenseNode = (data: ExpenseNode, helper: ReturnType<typeof useE
             title: "Tem certeza que deseja excluir?",
             content: "Essa ação não pode ser desfeita",
             onConfirm: () => {
-                helper.handleNodeDelete(expense.id)
+                helper.handleDeleteExpense(expense.id)
             },
         })
     }

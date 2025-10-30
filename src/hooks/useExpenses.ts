@@ -18,9 +18,7 @@ import { useMuiTheme } from "./useMuiTheme"
 import { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
 import { debounce } from "@mui/material"
 import { useCurrency } from "./useCurrency"
-import { io, Socket } from "socket.io-client"
 import { api_url } from "../backend/api"
-import type { Trip } from "../types/server/class/Trip/Trip"
 import * as Y from "yjs"
 import { HocuspocusProvider } from "@hocuspocus/provider"
 
@@ -65,10 +63,11 @@ const updateLayout = (nodes: Node[], edges: Edge[]): { nodes: Node[]; edges: Edg
 }
 
 export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
-    const { trip, authenticatedApi, user, setTrip } = tripHelper
+    const { trip, authenticatedApi, user } = tripHelper
     const instance = useRef<ReactFlowInstance<Node, Edge> | null>(null)
     const { theme } = useMuiTheme()
     const currency = useCurrency()
+    const ydocRef = useRef<Y.Doc | null>(null)
     const provider = useRef<HocuspocusProvider | null>(null)
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
@@ -242,72 +241,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         setEdges(edgesWithColors)
     }, [trip, theme, canEdit, updateEdgeColors])
 
-    // Add a new node (to be called when clicking placeholder)
-    const addNodeAndEdge = useCallback(
-        (parentId?: string, data?: ExpenseNodeData) => {
-            // Create new expense node data
-            const now = Date.now()
-            const newNodeId = data?.id || uid()
-            const newExpenseData: ExpenseNodeData = data || {
-                id: newNodeId,
-                tripId: tripHelper.tripId,
-                description: "",
-                active: true,
-                locked: false,
-                createdAt: now,
-                updatedAt: now,
-                notes: [],
-                totalExpenses: 0,
-                totalLocations: [],
-                children: [],
-                parentId,
-            }
-
-            // Update trip data via API
-            if (!data) {
-                // socket.current?.emit("trip:node", newExpenseData)
-            }
-
-            const result = buildTreeNodes(newExpenseData as unknown as ExpenseNode, parentId)
-
-            // Filter out nodes and edges that already exist
-            const existingNodeIds = new Set(nodes.map((n) => n.id))
-            const existingEdgeIds = new Set(edges.map((e) => e.id))
-
-            const newNodes = result.nodes.filter((n) => !existingNodeIds.has(n.id))
-            const newEdges = result.edges.filter((e) => !existingEdgeIds.has(e.id))
-
-            const layouted = updateLayout([...nodes, ...newNodes], [...edges, ...newEdges])
-            const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
-            setNodes(layouted.nodes)
-            setEdges(edgesWithColors)
-
-            // Focus on the new node
-            const addedNode = layouted.nodes.find((n) => n.id === newNodeId)
-            if (addedNode && !data) {
-                fitNodeView(addedNode)
-            }
-        },
-        [nodes, edges, tripHelper, updateEdgeColors]
-    )
-
-    const updateNode = useCallback(
-        (updatedData: ExpenseNodeData, silent = false) => {
-            setNodes((nds) => {
-                const updatedNodes = nds.map((node) => (node.id === updatedData.id ? { ...node, data: { ...updatedData } } : node))
-
-                // Update edge colors if active state changed
-                setEdges((eds) => updateEdgeColors(updatedNodes, eds))
-
-                return updatedNodes
-            })
-            if (!silent) {
-                // socket.current?.emit("trip:node", updatedData)
-            }
-        },
-        [setNodes, setEdges, updateEdgeColors]
-    )
-
     // Get all ancestor nodes (parents) of a given node, tracing back to root
     const getAncestors = useCallback(
         (nodeId?: string): ExpenseNode[] => {
@@ -343,80 +276,217 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [nodes]
     )
 
-    const handleIncomingNodeUpdate = useCallback(
-        (node: ExpenseNodeData) => {
-            const existingNode = nodes.find((n) => n.id === node.id)
+    // New function: Rebuild tree from Yjs (adds UI elements to backend data)
+    const rebuildTreeFromYjs = useCallback(() => {
+        if (!ydocRef.current) {
+            console.log("No ydoc ref")
+            return
+        }
 
-            if (existingNode) {
-                // Node exists, update it
-                console.log("Incoming node update:", node)
-                updateNode(node, true)
-            } else {
-                console.log("Incoming new node:", node)
-                // New node, add it
-                addNodeAndEdge(node.parentId, node)
+        const yNodes = ydocRef.current.getArray("nodes")
+        const yEdges = ydocRef.current.getArray("edges")
+
+        console.log(`Yjs arrays: nodes=${yNodes.length}, edges=${yEdges.length}`)
+
+        if (yNodes.length === 0) {
+            console.log("No nodes in Yjs yet, waiting for data...")
+            setNodes([])
+            setEdges([])
+            return
+        }
+
+        // Get the data nodes from Yjs - they're stored directly in the array
+        const dataNodes = yNodes.toArray() as Node[]
+        const dataEdges = yEdges.toArray() as Edge[]
+
+        console.log("Rebuilding from Yjs:", {
+            nodeCount: dataNodes.length,
+            edgeCount: dataEdges.length,
+            sampleNode: dataNodes[0],
+        })
+
+        // Add UI-specific elements (placeholders, etc.)
+        const allNodes = [...dataNodes]
+        const allEdges = [...dataEdges]
+
+        // Add root placeholder if canEdit
+        if (canEdit) {
+            allNodes.push({
+                id: "placeholder_root",
+                type: "placeholder",
+                position: { x: 0, y: 0 },
+                data: { parentId: null },
+            })
+        }
+
+        // Add placeholder nodes for each expense node (if canEdit)
+        if (canEdit) {
+            dataNodes.forEach((node) => {
+                if (node.type === "expense") {
+                    const placeholderId = `placeholder_${node.id}`
+                    allNodes.push({
+                        id: placeholderId,
+                        type: "placeholder",
+                        position: { x: 0, y: 0 },
+                        data: { parentId: node.id },
+                    })
+
+                    allEdges.push({
+                        id: `edge_${node.id}-${placeholderId}`,
+                        source: node.id,
+                        target: placeholderId,
+                        type: ConnectionLineType.SmoothStep,
+                        animated: true,
+                        style: {
+                            strokeDasharray: "5,5",
+                        },
+                    })
+                }
+            })
+        }
+
+        // Add UI styling to edges (animations, colors, etc.)
+        const styledEdges = allEdges.map((edge) => ({
+            ...edge,
+            type: edge.type || ConnectionLineType.SmoothStep,
+            animated: edge.animated !== undefined ? edge.animated : true,
+        }))
+
+        console.log(`Total nodes with UI: ${allNodes.length}, Total edges: ${styledEdges.length}`)
+
+        // Apply layout
+        const layouted = updateLayout(allNodes, styledEdges)
+        const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
+
+        console.log("Setting nodes and edges to state")
+        setNodes(layouted.nodes)
+        setEdges(edgesWithColors)
+    }, [canEdit, theme, updateEdgeColors])
+
+    const handleAddExpense = useCallback(
+        (parentId?: string) => {
+            if (!ydocRef.current || !trip) return
+
+            const yNodes = ydocRef.current.getArray("nodes")
+            const yEdges = ydocRef.current.getArray("edges")
+
+            // Create new expense node
+            const newNodeId = uid()
+            const newNode: Node = {
+                id: newNodeId,
+                type: "expense",
+                position: { x: 0, y: 0 }, // Will be positioned by layout
+                data: {
+                    id: newNodeId,
+                    tripId: trip.id,
+                    description: "",
+                    active: true,
+                    locked: false,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                    notes: [],
+                    totalExpenses: 0,
+                    totalLocations: [],
+                    children: [],
+                    parentId,
+                } as ExpenseNodeData,
             }
+
+            // Create edge if there's a parent
+            let newEdge: Edge | null = null
+            if (parentId) {
+                newEdge = {
+                    id: `edge_${parentId}-${newNodeId}`,
+                    source: parentId,
+                    target: newNodeId,
+                }
+            }
+
+            // Update Yjs (this syncs to all clients and backend)
+            ydocRef.current.transact(() => {
+                yNodes.push([newNode])
+                if (newEdge) {
+                    yEdges.push([newEdge])
+                }
+            })
+
+            // UI will update via the observer
         },
-        [nodes, updateNode, addNodeAndEdge]
+        [trip?.id]
     )
 
-    const handleNodeDelete = useCallback(
-        (nodeId: string, silent = false) => {
-            // Recursively collect all descendant node IDs
-            const collectDescendants = (id: string): string[] => {
-                const descendants: string[] = [id]
+    const handleUpdateExpense = useCallback((nodeId: string, updates: Partial<ExpenseNode>) => {
+        if (!ydocRef.current) return
 
-                nodes.forEach((node) => {
-                    if (node.type === "expense") {
-                        const data = node.data as ExpenseNodeData
-                        if (data.parentId === id) {
-                            // Add this child and all its descendants
-                            descendants.push(...collectDescendants(node.id))
-                        }
-                    } else if (node.type === "placeholder" && node.id === `placeholder_${id}`) {
-                        // Also collect placeholder nodes
-                        descendants.push(node.id)
+        const yNodes = ydocRef.current.getArray("nodes")
+
+        // Find and update the node
+        const nodeIndex = yNodes.toArray().findIndex((node: any) => node.id === nodeId)
+
+        if (nodeIndex !== -1) {
+            const currentNode = yNodes.get(nodeIndex) as Node
+            const updatedNode = {
+                ...currentNode,
+                data: {
+                    ...currentNode.data,
+                    ...updates,
+                },
+            }
+
+            // Update Yjs
+            ydocRef.current.transact(() => {
+                yNodes.delete(nodeIndex, 1)
+                yNodes.insert(nodeIndex, [updatedNode])
+            })
+        }
+    }, [])
+
+    const handleDeleteExpense = useCallback((nodeId: string) => {
+        if (!ydocRef.current) return
+
+        const yNodes = ydocRef.current.getArray("nodes")
+        const yEdges = ydocRef.current.getArray("edges")
+
+        const currentNodes = yNodes.toArray() as Node[]
+        const currentEdges = yEdges.toArray() as Edge[]
+
+        // Remove node and all its descendants
+        const nodesToRemove = new Set<string>()
+
+        const collectDescendants = (id: string) => {
+            nodesToRemove.add(id)
+            currentEdges.forEach((edge) => {
+                if (edge.source === id) {
+                    collectDescendants(edge.target)
+                }
+            })
+        }
+
+        collectDescendants(nodeId)
+
+        // Update Yjs by removing nodes and edges
+        ydocRef.current.transact(() => {
+            // Remove nodes in reverse order to maintain indices
+            currentNodes.forEach((node) => {
+                if (nodesToRemove.has(node.id)) {
+                    const actualIndex = yNodes.toArray().findIndex((n: any) => n.id === node.id)
+                    if (actualIndex !== -1) {
+                        yNodes.delete(actualIndex, 1)
                     }
-                })
+                }
+            })
 
-                return descendants
-            }
-
-            const nodesToDelete = new Set(collectDescendants(nodeId))
-
-            // Filter out deleted nodes
-            const remainingNodes = nodes.filter((node) => !nodesToDelete.has(node.id))
-            const remainingNodeIds = new Set(remainingNodes.map((n) => n.id))
-
-            // Clean up edges: remove any edge that references deleted nodes
-            const remainingEdges = edges.filter((edge) => remainingNodeIds.has(edge.source) && remainingNodeIds.has(edge.target))
-
-            // Re-layout the tree with remaining nodes and edges
-            const layouted = updateLayout(remainingNodes, remainingEdges)
-            const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
-
-            setNodes(layouted.nodes)
-            setEdges(edgesWithColors)
-
-            if (!silent) {
-                // socket.current?.emit("trip:node:delete", trip?.id, nodeId)
-            }
-        },
-        [nodes, edges, trip?.id, updateEdgeColors]
-    )
-
-    const handleIncomingNodeDelete = useCallback(
-        (nodeId: string) => {
-            console.log("Incoming node delete:", nodeId)
-            handleNodeDelete(nodeId, true)
-        },
-        [handleNodeDelete]
-    )
-
-    const updateTrip = (trip: Trip) => {
-        console.log("Incoming trip update:", trip)
-        setTrip({ ...trip } as Trip)
-    }
+            // Remove edges in reverse order
+            currentEdges.forEach((edge) => {
+                if (nodesToRemove.has(edge.source) || nodesToRemove.has(edge.target)) {
+                    const actualIndex = yEdges.toArray().findIndex((e: any) => e.id === edge.id)
+                    if (actualIndex !== -1) {
+                        yEdges.delete(actualIndex, 1)
+                    }
+                }
+            })
+        })
+    }, [])
 
     useEffect(() => {
         console.log({ trip })
@@ -425,32 +495,54 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     // Setup socket connection separately to avoid recreation on every trip change
     useEffect(() => {
         if (trip) {
+            console.log(`Setting up Hocuspocus connection for trip: ${trip.id}`)
+            ydocRef.current = new Y.Doc()
+
+            const yNodes = ydocRef.current.getArray("nodes")
+            const yEdges = ydocRef.current.getArray("edges")
+
             provider.current = new HocuspocusProvider({
                 url: `${api_url}/hocuspocus`,
                 name: trip.id,
+                document: ydocRef.current,
+
+                onSynced: ({ state }) => {
+                    if (state) {
+                        console.log("Initial sync complete, checking data...")
+                        console.log(`yNodes length: ${yNodes.length}, yEdges length: ${yEdges.length}`)
+
+                        // Add a small delay to ensure data is fully loaded
+                        setTimeout(() => {
+                            console.log(`After delay - yNodes length: ${yNodes.length}, yEdges length: ${yEdges.length}`)
+                            rebuildTreeFromYjs()
+                        }, 100)
+                    }
+                },
             })
-            // socket.current = io(api_url)
-            // socket.current.emit("join", trip.id)
-            // socket.current.on("trip:node", handleIncomingNodeUpdate)
-            // socket.current.on("trip:update", updateTrip)
-            // socket.current.on("trip:node:delete", handleIncomingNodeDelete)
+
+            const observer = () => {
+                console.log("Changes detected from other clients or sync")
+                console.log(`yNodes length: ${yNodes.length}, yEdges length: ${yEdges.length}`)
+                rebuildTreeFromYjs()
+            }
+
+            yNodes.observe(observer)
+            yEdges.observe(observer)
 
             return () => {
+                console.log(`Cleaning up Hocuspocus connection for trip: ${trip.id}`)
+                yNodes.unobserve(observer)
+                yEdges.unobserve(observer)
                 provider.current?.destroy()
                 provider.current = null
-                // socket.current?.emit("leave", trip.id)
-                // socket.current?.off("trip:node", handleIncomingNodeUpdate)
-                // socket.current?.off("trip:update", updateTrip)
-                // socket.current?.off("trip:node:delete", handleIncomingNodeDelete)
-                // socket.current?.disconnect()
-                // socket.current = null
+                ydocRef.current = null
             }
         }
-    }, [trip?.id])
+    }, [trip?.id, rebuildTreeFromYjs])
 
-    useEffect(() => {
-        rebuildTree()
-    }, [trip])
+    // useEffect(() => {
+    //     rebuildTree()
+    // }, [trip])
 
     // Update edge colors when theme changes
     useEffect(() => {
@@ -465,12 +557,10 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         onConnect,
         onMove,
         debouncedOnMove,
-        addNodeAndEdge,
         onInit: (flowInstance: ReactFlowInstance<Node, Edge>) => (instance.current = flowInstance),
         nodeWidth,
         nodeHeight,
         viewport_duration,
-        updateNode,
         getAncestors,
         trip,
         authenticatedApi,
@@ -478,6 +568,9 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         canEdit,
         zoom,
         currency,
-        handleNodeDelete,
+        handleAddExpense,
+        handleUpdateExpense,
+        handleDeleteExpense,
+        fitNodeView,
     }
 }

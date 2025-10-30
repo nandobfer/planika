@@ -74,7 +74,6 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 <Box sx={{ flexDirection: "column" }}>
                     {expense.location !== undefined ? (
                         <TextField
-                            key={`location-${expense.location}`}
                             placeholder="Localização"
                             variant="standard"
                             autoFocus
@@ -138,7 +137,6 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     {expense.expense ? (
                         <Box sx={{ gap: 1 }}>
                             <Autocomplete
-                                key={`currency-${expense.expense.currency}`}
                                 options={helper.currency.data}
                                 getOptionLabel={(option) => formatCurrencyOption(option)}
                                 size="small"
@@ -172,7 +170,6 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 }
                             />
                             <TextField
-                                key={`amount-${expense.expense.amount}`}
                                 placeholder="Valor da despesa"
                                 variant="standard"
                                 autoFocus
@@ -201,7 +198,6 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             />
                             {expense.expense.quantity ? (
                                 <TextField
-                                    key={`quantity-${expense.expense.quantity}`}
                                     placeholder="Quantidade"
                                     variant="standard"
                                     autoFocus
@@ -252,12 +248,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             Adicionar custo
                         </Button>
                     )}
-                    <Typography
-                        key={`total-${expense.totalExpenses}`}
-                        variant="caption"
-                        sx={{ alignSelf: "flex-end" }}
-                        color={active ? "success" : "textDisabled"}
-                    >
+                    <Typography variant="caption" sx={{ alignSelf: "flex-end" }} color={active ? "success" : "textDisabled"}>
                         {currencyMask(expense.totalExpenses, { affix: expense.expense?.currency || "R$" })}
                     </Typography>
                 </Box>
