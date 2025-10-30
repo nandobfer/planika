@@ -2,7 +2,7 @@ import { WithoutFunctions } from "../helpers";
 interface Expense {
     amount: string;
     currency: string;
-    quantity?: number;
+    quantity?: string;
 }
 export declare class ExpenseNode {
     id: string;

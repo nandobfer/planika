@@ -1,14 +1,14 @@
-import React, { useContext } from "react"
+import React, { useContext, useRef, useEffect } from "react"
 import { Autocomplete, Box, Button, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
-import { Add, AttachMoney, CalendarMonth, Circle, Close, Delete, LocationPin, TimesOneMobiledata } from "@mui/icons-material"
+import { AttachMoney, CalendarMonth, Circle, Close, Delete, LocationPin, TimesOneMobiledata } from "@mui/icons-material"
 import dayjs from "dayjs"
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import type { CurrencyRate } from "../../../types/server/api/exchangerate"
 import { useExpenseNode } from "../../../hooks/useExpenseNode"
-import { currencyMask } from "../../../tools/numberMask"
+import { currencyMask, numberMask } from "../../../tools/numberMask"
 import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
 
 interface ExpenseComponentProps {
@@ -19,11 +19,28 @@ const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol}`
 
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
-    const { expense, toggleActive, updateNode, deleteNode } = useExpenseNode(props.data, helper)
+    const { expense, toggleActive, updateNode, deleteNode, debouncedUpdateNode } = useExpenseNode(props.data, helper)
     const ancestors = helper.getAncestors(expense.id)
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
     const zoom = helper.zoom
+
+    // Refs for uncontrolled inputs
+    const descriptionRef = useRef<HTMLInputElement>(null)
+    const locationRef = useRef<HTMLInputElement>(null)
+
+    // Sync refs with external changes (from other users)
+    useEffect(() => {
+        if (descriptionRef.current && descriptionRef.current.value !== expense.description) {
+            descriptionRef.current.value = expense.description || ""
+        }
+    }, [expense.description])
+
+    useEffect(() => {
+        if (locationRef.current && expense.location !== undefined && locationRef.current.value !== expense.location) {
+            locationRef.current.value = expense.location
+        }
+    }, [expense.location])
 
     return (
         <Paper
@@ -49,8 +66,9 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     <TextField
                         placeholder="Descrição da despesa"
                         variant="standard"
-                        value={expense.description}
-                        onChange={helper.canEdit ? (e) => updateNode({ description: e.target.value }) : undefined}
+                        defaultValue={expense.description}
+                        inputRef={descriptionRef}
+                        onChange={helper.canEdit ? (e) => debouncedUpdateNode({ description: e.target.value }) : undefined}
                         slotProps={{
                             input: {
                                 sx: { fontWeight: "bold" },
@@ -78,8 +96,9 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             placeholder="Localização"
                             variant="standard"
                             autoFocus
-                            value={expense.location}
-                            onChange={helper.canEdit ? (e) => updateNode({ location: e.target.value }) : undefined}
+                            defaultValue={expense.location}
+                            inputRef={locationRef}
+                            onChange={helper.canEdit ? (e) => debouncedUpdateNode({ location: e.target.value }) : undefined}
                             slotProps={{
                                 input: {
                                     startAdornment: (
@@ -174,9 +193,8 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 placeholder="Valor da despesa"
                                 variant="standard"
                                 autoFocus
-                                sx={{ flex: 0.5 }}
+                                sx={{ flex: 0.4 }}
                                 value={expense.expense.amount}
-                                // value={expenseValue}
                                 onChange={
                                     helper.canEdit
                                         ? (e) =>
@@ -197,21 +215,20 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 }}
                                 size="small"
                             />
-                            {expense.expense.quantity ? (
+                            {expense.expense.quantity !== undefined ? (
                                 <TextField
                                     placeholder="Quantidade"
                                     variant="standard"
                                     autoFocus
-                                    sx={{ flex: 0.2 }}
+                                    sx={{ flex: 0.3 }}
                                     value={expense.expense.quantity}
-                                    // value={expenseValue}
                                     onChange={
                                         helper.canEdit
                                             ? (e) =>
                                                   updateNode({
                                                       expense: {
                                                           amount: expense.expense!.amount,
-                                                          quantity: Number(e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")),
+                                                          quantity: e.target.value,
                                                           currency: expense.expense!.currency,
                                                       },
                                                   })
@@ -231,7 +248,9 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                     size="small"
                                     disabled={!helper.canEdit}
                                     onClick={() =>
-                                        updateNode({ expense: { amount: expense.expense!.amount, currency: expense.expense!.currency, quantity: 1 } })
+                                        updateNode({
+                                            expense: { amount: expense.expense!.amount, currency: expense.expense!.currency, quantity: "" },
+                                        })
                                     }
                                 >
                                     <TimesOneMobiledata fontSize="small" />
