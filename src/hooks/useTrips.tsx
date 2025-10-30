@@ -5,8 +5,9 @@ import { TripList } from "../pages/Trips/TripList"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { TripFormPage } from "../pages/Trips/TripForm/TripFormPage"
+import { Invitations } from "../pages/Account/Invitations/Invitations"
 
-export type TripsPageRoute = "new-trip" | "ongoing-trips" | "completed-trips"
+export type TripsPageRoute = "new-trip" | "ongoing-trips" | "completed-trips" | "invitations"
 
 export interface TabSetting {
     label: string
@@ -54,6 +55,12 @@ export const useTrips = () => {
             description: "Revise suas viagens passadas e seus detalhes",
             route: "completed-trips",
             component: <TripList trips={completedTrips} />,
+        },
+        {
+            label: "Convites Pendentes",
+            description: "Gerencie os convites que você recebeu para planos de viagens",
+            route: "invitations",
+            component: <Invitations />,
         },
     ]
 
