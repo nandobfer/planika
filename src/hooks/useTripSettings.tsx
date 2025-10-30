@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { type Trip } from "../types/server/class/Trip/Trip"
 import { BasicInfoForm } from "../pages/Trips/TripForm/BasicInfoForm"
 import { useTripForm } from "./useTripForm"
 import { ParticipantsForm } from "../pages/Trips/TripForm/ParticipantsForm"
+import type { Trip } from "../types/server/class/Trip/Trip"
 
 export type TripSettingRoute = "info" | "participants" | "back"
 

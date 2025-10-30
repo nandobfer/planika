@@ -15,12 +15,12 @@ import dagre from "@dagrejs/dagre"
 import { uid } from "uid"
 import type { WithoutFunctions } from "../types/server/class/helpers"
 import { useMuiTheme } from "./useMuiTheme"
-import { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
 import { debounce } from "@mui/material"
 import { useCurrency } from "./useCurrency"
 import { api_url } from "../backend/api"
 import * as Y from "yjs"
 import { HocuspocusProvider } from "@hocuspocus/provider"
+import type { ExpenseNode } from "../types/server/class/Trip/ExpenseNode"
 
 export type ExpenseNodeData = WithoutFunctions<ExpenseNode>
 export interface CursorAwareness {

@@ -4,8 +4,8 @@ import { ArrowDropDown, Delete, Email } from "@mui/icons-material"
 import type { ParticipantRole, TripParticipant } from "../../../types/server/class/Trip/TripParticipant"
 import { useQuery } from "@tanstack/react-query"
 import { api } from "../../../backend/api"
-import { User } from "../../../types/server/class/User"
 import * as yup from "yup"
+import type { User } from "../../../types/server/class/User"
 
 interface ParticipantContainerProps {
     participant: TripParticipant

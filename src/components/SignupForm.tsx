@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { Box, Button, IconButton, LinearProgress, TextField } from "@mui/material"
 import { GoogleLogin } from "@react-oauth/google"
-import { type GoogleAuthResponse, type UserForm } from "../types/server/class/User"
 import { useUser } from "../hooks/useUser"
 import { useFormik } from "formik"
 import { Title } from "./Title"
@@ -11,6 +10,7 @@ import { AxiosError } from "axios"
 import type { HandledPrismaError } from "../types/server/class/HandledError"
 import { useMuiTheme } from "../hooks/useMuiTheme"
 import { yup_validations } from "../tools/yup_validations"
+import type { GoogleAuthResponse, UserForm } from "../types/server/class/User"
 
 interface SignupFormProps {
     width?: number
