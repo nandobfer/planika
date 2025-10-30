@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
             <Toolbar sx={{ justifyContent: "space-between" }}>
                 <Box sx={{ gap: 0.5, alignItems: "center" }}>
                     <Button color="inherit" onClick={() => navigate("/")} sx={{ gap: 1 }}>
-                        {/* <Avatar src="/logo.png" variant="square" /> */}
+                        {/* <Avatar src="/logo.png" variant="square" sx={{ bgcolor: "transparent!important" }} /> */}
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
                             Planika
                         </Typography>
