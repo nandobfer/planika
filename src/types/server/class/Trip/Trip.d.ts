@@ -40,5 +40,6 @@ export declare class Trip {
     findNode(id: string): ExpenseNode | undefined;
     saveNodes(): Promise<void>;
     deleteNode(nodeId: string): void;
+    delete(): Promise<void>;
 }
 export {};

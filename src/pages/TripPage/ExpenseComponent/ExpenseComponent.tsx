@@ -9,16 +9,17 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import type { CurrencyRate } from "../../../types/server/api/exchangerate"
 import { useExpenseNode } from "../../../hooks/useExpenseNode"
 import { currencyMask } from "../../../tools/numberMask"
+import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
 
 interface ExpenseComponentProps {
     data: ExpenseNode
 }
 
-const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol} - ${currency.code}`
+const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol}`
 
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
-    const { expense, toggleActive, debouncedUpdateNode, updateNode, deleteNode } = useExpenseNode(props.data, helper)
+    const { expense, toggleActive, updateNode, deleteNode } = useExpenseNode(props.data, helper)
     const ancestors = helper.getAncestors(expense.id)
     const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
     const active = expense.active && ancestorsActive
@@ -48,8 +49,8 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     <TextField
                         placeholder="Descrição da despesa"
                         variant="standard"
-                        defaultValue={expense.description}
-                        onChange={helper.canEdit ? (e) => debouncedUpdateNode({ description: e.target.value }) : undefined}
+                        value={expense.description}
+                        onChange={helper.canEdit ? (e) => updateNode({ description: e.target.value }) : undefined}
                         slotProps={{
                             input: {
                                 sx: { fontWeight: "bold" },
@@ -77,8 +78,8 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             placeholder="Localização"
                             variant="standard"
                             autoFocus
-                            defaultValue={expense.location}
-                            onChange={helper.canEdit ? (e) => debouncedUpdateNode({ location: e.target.value }) : undefined}
+                            value={expense.location}
+                            onChange={helper.canEdit ? (e) => updateNode({ location: e.target.value }) : undefined}
                             slotProps={{
                                 input: {
                                     startAdornment: (
@@ -118,7 +119,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 openPickerButton: { size: "small" },
                             }}
                             value={expense.datetime ? dayjs(expense.datetime) : null}
-                            onChange={(value) => debouncedUpdateNode({ datetime: value?.toDate().getTime() })}
+                            onChange={(value) => updateNode({ datetime: value?.toDate().getTime() })}
                             // disablePast
                             orientation="portrait"
                             sx={{ "& .MuiInputAdornment-root": { marginLeft: 0 } }}
@@ -140,7 +141,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 options={helper.currency.data}
                                 getOptionLabel={(option) => formatCurrencyOption(option)}
                                 size="small"
-                                sx={{ flex: 0.4 }}
+                                sx={{ flex: 0.3 }}
                                 readOnly={!helper.canEdit}
                                 renderInput={(params) => (
                                     <TextField
@@ -160,7 +161,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 loadingText="Carregando moedas..."
                                 value={helper.currency.data.find((c) => c.symbol === expense.expense?.currency) || null}
                                 onChange={(_, value) =>
-                                    debouncedUpdateNode({
+                                    updateNode({
                                         expense: {
                                             amount: expense.expense!.amount,
                                             currency: value?.symbol || "R$",
@@ -173,15 +174,15 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 placeholder="Valor da despesa"
                                 variant="standard"
                                 autoFocus
-                                sx={{ flex: 0.4 }}
-                                defaultValue={expense.expense.amount}
+                                sx={{ flex: 0.5 }}
+                                value={expense.expense.amount}
                                 // value={expenseValue}
                                 onChange={
                                     helper.canEdit
                                         ? (e) =>
-                                              debouncedUpdateNode({
+                                              updateNode({
                                                   expense: {
-                                                      amount: Number(e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")),
+                                                      amount: handleCurrencyInput(e.target.value),
                                                       currency: expense.expense!.currency,
                                                       quantity: expense.expense!.quantity,
                                                   },
@@ -202,12 +203,12 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                     variant="standard"
                                     autoFocus
                                     sx={{ flex: 0.2 }}
-                                    defaultValue={expense.expense.quantity}
+                                    value={expense.expense.quantity}
                                     // value={expenseValue}
                                     onChange={
                                         helper.canEdit
                                             ? (e) =>
-                                                  debouncedUpdateNode({
+                                                  updateNode({
                                                       expense: {
                                                           amount: expense.expense!.amount,
                                                           quantity: Number(e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")),
@@ -242,7 +243,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             startIcon={<AttachMoney />}
                             size="small"
                             sx={{ alignSelf: "flex-start" }}
-                            onClick={() => updateNode({ expense: { amount: 0, currency: "R$" } })}
+                            onClick={() => updateNode({ expense: { amount: "", currency: "R$" } })}
                             disabled={!helper.canEdit}
                         >
                             Adicionar custo

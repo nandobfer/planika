@@ -1,6 +1,6 @@
 import { WithoutFunctions } from "../helpers";
 interface Expense {
-    amount: number;
+    amount: string;
     currency: string;
     quantity?: number;
 }
