@@ -19,23 +19,25 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
     const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit, hocuspocusProvider } = expensesHook
     const [cursors, setCursors] = useState<CursorAwareness[]>([])
 
-    // Listen to awareness changes and trigger re-renders (throttled)
+    // Listen to awareness changes and trigger re-renders (heavily throttled)
     useEffect(() => {
         if (!hocuspocusProvider?.awareness) return
 
-        let rafId: number | null = null
+        let timeoutId: ReturnType<typeof setTimeout> | null = null
         let lastUpdate = 0
-        const throttleMs = 50 // Update at most every 50ms
+        const throttleMs = 50 // Update at most every 200ms (5 times per second)
 
         const updateCursors = () => {
             const now = Date.now()
-            if (now - lastUpdate < throttleMs && rafId === null) {
-                // Schedule an update after the throttle period
-                if (!rafId) {
-                    rafId = requestAnimationFrame(() => {
-                        rafId = null
+            const timeSinceLastUpdate = now - lastUpdate
+
+            if (timeSinceLastUpdate < throttleMs) {
+                // Schedule an update after the remaining time
+                if (!timeoutId) {
+                    timeoutId = setTimeout(() => {
+                        timeoutId = null
                         updateCursors()
-                    })
+                    }, throttleMs - timeSinceLastUpdate)
                 }
                 return
             }
@@ -49,7 +51,15 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     cursorsArray.push(value.user as CursorAwareness)
                 }
             })
-            setCursors(cursorsArray)
+
+            // Only update state if cursors actually changed
+            setCursors((prev) => {
+                if (JSON.stringify(prev) === JSON.stringify(cursorsArray)) {
+                    return prev
+                }
+                return cursorsArray
+            })
+
             lastUpdate = now
         }
 
@@ -61,8 +71,8 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
 
         return () => {
             hocuspocusProvider.awareness.off("change", updateCursors)
-            if (rafId) {
-                cancelAnimationFrame(rafId)
+            if (timeoutId) {
+                clearTimeout(timeoutId)
             }
         }
     }, [hocuspocusProvider])

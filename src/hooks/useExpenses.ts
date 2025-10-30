@@ -658,7 +658,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
             // Throttle awareness updates to reduce network traffic and improve performance
             let lastUpdate = 0
-            const throttleMs = 50 // Update at most every 50ms (20 times per second)
+            const throttleMs = 100 // Update at most every 100ms (10 times per second)
             let rafId: number | null = null
 
             const updateAwareness = (event: MouseEvent) => {
@@ -687,8 +687,8 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                         id: user?.id || uid(),
                         name: user?.name || "Anonymous",
                         picture: user?.picture || "",
-                        mouseX: Math.round(position.x * 100) / 100, // Round to 2 decimal places for precision
-                        mouseY: Math.round(position.y * 100) / 100,
+                        mouseX: Math.round(position.x * 10) / 10, // Round to 1 decimal place for less precision but better performance
+                        mouseY: Math.round(position.y * 10) / 10,
                     }
                     provider.current?.setAwarenessField("user", data)
                     lastUpdate = now
