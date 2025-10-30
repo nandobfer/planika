@@ -75,6 +75,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges)
     const [zoom, setZoom] = useState(1)
+    const [fittingViewNode, setFittingViewNode] = useState<Node | null>(null)
 
     const canEdit = trip?.participants?.some((p) => p.userId === user?.id && (p.role === "administrator" || p.role === "collaborator"))
 
@@ -90,14 +91,18 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const debouncedOnMove = debounce(onMove, 200)
 
     const fitNodeView = (node: Node | string) => {
-        const nodeItem = typeof node === "string" ? nodes.find((item) => item.id === node) : node
-        if (!nodeItem) return
+        console.log("a")
+        const targetNode = typeof node === "string" ? nodes.find((n) => n.id === node) : node
+        if (!targetNode) return
+        console.log("ab")
 
-        const { x, y } = nodeItem.position
+        const { x, y } = targetNode.position
         instance.current?.setCenter(x + nodeWidth / 2, y + nodeHeight / 2, {
             zoom: 0.9,
             duration: viewport_duration,
         })
+
+        setFittingViewNode(null)
     }
 
     // Helper to check if a node is active (including its ancestors)
@@ -323,6 +328,24 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         setEdges(edgesWithColors)
     }, [canEdit, theme, updateEdgeColors])
 
+    // Effect to fit view after nodes are updated with layout
+    useEffect(() => {
+        if (fittingViewNode && nodes.length > 0) {
+            const nodeToFit = nodes.find((n) => n.id === fittingViewNode.id)
+            console.log("useEffect checking node:", nodeToFit?.id, "position:", nodeToFit?.position)
+            if (nodeToFit) {
+                console.log("Fitting view to node:", nodeToFit.id, "at position:", nodeToFit.position)
+                // Node has been laid out, fit the view
+                const timeoutId = setTimeout(() => {
+                    fitNodeView(nodeToFit.id)
+                }, 100)
+
+                return () => clearTimeout(timeoutId)
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nodes, fittingViewNode])
+
     const handleAddExpense = useCallback(
         (parentId?: string) => {
             if (!ydocRef.current || !trip) return
@@ -362,13 +385,15 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 }
             }
 
+            setFittingViewNode(newNode)
+
             // Update Yjs (this syncs to all clients and backend)
             ydocRef.current.transact(() => {
                 yNodes.push([newNode])
                 if (newEdge) {
                     yEdges.push([newEdge])
                 }
-            })
+            }, "insertion")
 
             // UI will update via the observer
         },
@@ -476,7 +501,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                     }
                 }
             })
-        })
+        }, "deletion")
     }, [])
 
     useEffect(() => {
@@ -512,8 +537,10 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             })
 
             const observer = (event: any) => {
-                // Ignore local changes (from this client)
-                if (event.transaction.origin === "local") {
+                const origin = event.transaction.origin
+
+                // Ignore local changes (from this client) EXCEPT placeholder_add
+                if (origin === "local") {
                     console.log("Local change detected, skipping rebuild")
                     return
                 }
@@ -521,6 +548,10 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 console.log("Changes detected from other clients or sync")
                 console.log(`yNodes length: ${yNodes.length}, yEdges length: ${yEdges.length}`)
                 rebuildTreeFromYjs()
+
+                if (origin === "deletion") {
+                    instance.current?.fitView({ duration: viewport_duration })
+                }
             }
 
             yNodes.observe(observer)
