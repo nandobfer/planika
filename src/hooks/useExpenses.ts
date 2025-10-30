@@ -426,7 +426,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     useEffect(() => {
         if (trip) {
             provider.current = new HocuspocusProvider({
-                url: api_url,
+                url: `${api_url}/hocuspocus`,
                 name: trip.id,
             })
             // socket.current = io(api_url)
