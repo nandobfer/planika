@@ -11,7 +11,7 @@ export const currencyMask = (value: number | string, options?: Options) => {
     return numericFormatter(value.toString(), {
         decimalSeparator: ",",
         thousandSeparator: ".",
-        prefix: options?.withoutAffix ? "" : `${options?.affix} ` || "R$ ",
+        prefix: options?.withoutAffix ? "" : `${options?.affix || "R$"} `,
         suffix: options?.percent ? " %" : undefined,
         fixedDecimalScale: true,
         decimalScale: options?.scaleDecimal ? options.scaleDecimal : 2,

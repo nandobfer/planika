@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { Box } from "@mui/material"
+import React, { useEffect, useMemo, useState } from "react"
+import { Box, Button } from "@mui/material"
 import type { useTrip } from "../../hooks/useTrip"
 import { useExpenses, type CursorAwareness } from "../../hooks/useExpenses"
 import { Background, ConnectionLineType, ReactFlow } from "@xyflow/react"
@@ -8,6 +8,8 @@ import "@xyflow/react/dist/style.css"
 import { ExpenseComponent } from "./ExpenseComponent/ExpenseComponent"
 import { ExpensePlaceholder } from "./ExpenseComponent/ExpensePlaceholder"
 import { CursorComponent } from "./CursorComponent/CursorComponent"
+import { currencyMask } from "../../tools/numberMask"
+import type { ExpenseNode } from "../../types/server/class/Trip/ExpenseNode"
 
 interface ExpensesPageProps {
     loading: boolean
@@ -18,6 +20,13 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
     const expensesHook = useExpenses(props.tripHook)
     const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit, hocuspocusProvider } = expensesHook
     const [cursors, setCursors] = useState<CursorAwareness[]>([])
+
+    const totalValue = useMemo(() => {
+        const value = expensesHook.nodes
+            .filter((node) => !node.data.parentId && node.data.totalExpenses)
+            .reduce((sum, node) => sum + (node.data as unknown as ExpenseNode).totalExpenses, 0)
+        return currencyMask(value)
+    }, [expensesHook.nodes])
 
     // Listen to awareness changes and trigger re-renders (heavily throttled)
     useEffect(() => {
@@ -109,6 +118,9 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     ))}
                 </ReactFlow>
             </TripProvider>
+            <Button color="success" sx={{ position: "absolute", bottom: 16, right: 16, pointerEvents: "none" }} variant="outlined">
+                {totalValue}
+            </Button>
         </Box>
     )
 }
