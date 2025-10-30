@@ -4,6 +4,10 @@ import * as Y from "yjs"
 import { Node, Edge } from "@xyflow/react"
 import { ExpenseNode } from "./class/Trip/ExpenseNode"
 
+// Debounce map to prevent too frequent saves
+const saveTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
+const SAVE_DEBOUNCE_MS = 2000 // Wait 2 seconds after last change before saving
+
 export const hocuspocus = new Hocuspocus({
     /**
      * The name here is the "document name" which corresponds to trip.id in your case
@@ -14,6 +18,13 @@ export const hocuspocus = new Hocuspocus({
 
     onDisconnect: async (data) => {
         console.log(`Client disconnected from document: ${data.documentName}`)
+
+        // Clear any pending saves for this document
+        const timeout = saveTimeouts.get(data.documentName)
+        if (timeout) {
+            clearTimeout(timeout)
+            saveTimeouts.delete(data.documentName)
+        }
     },
 
     /**
@@ -72,27 +83,44 @@ export const hocuspocus = new Hocuspocus({
         const tripId = data.documentName
         const yDoc = data.document
 
-        // Get the current state from Yjs
-        const yNodes = yDoc.getArray("nodes")
-        const yEdges = yDoc.getArray("edges")
-
-        // Convert to plain arrays
-        const nodes = yNodes.toArray() as Node[]
-        const edges = yEdges.toArray() as Edge[]
-
-        console.log(`Change detected for trip ${tripId}: ${nodes.length} nodes, ${edges.length} edges`)
-
-        if (nodes.length > 0) {
-            const expenseNodes = convertReactFlowToExpenseNodes(nodes, edges)
-
-            // Save to database
-            const trip = await Trip.findById(tripId)
-            if (trip) {
-                trip.nodes = expenseNodes
-                await trip.saveNodes()
-                console.log(`Saved changes for trip: ${tripId}`)
-            }
+        // Clear any existing timeout for this trip
+        const existingTimeout = saveTimeouts.get(tripId)
+        if (existingTimeout) {
+            clearTimeout(existingTimeout)
         }
+
+        // Debounce the save - only save after user stops making changes
+        const timeout = setTimeout(async () => {
+            console.log(`Debounced save triggered for trip ${tripId}`)
+
+            // Get the current state from Yjs
+            const yNodes = yDoc.getArray("nodes")
+            const yEdges = yDoc.getArray("edges")
+
+            // Convert to plain arrays
+            const nodes = yNodes.toArray() as Node[]
+            const edges = yEdges.toArray() as Edge[]
+
+            console.log(`Saving trip ${tripId}: ${nodes.length} nodes, ${edges.length} edges`)
+
+            if (nodes.length > 0) {
+                const expenseNodes = convertReactFlowToExpenseNodes(nodes, edges)
+
+                // Save to database
+                const trip = await Trip.findById(tripId)
+                if (trip) {
+                    trip.nodes = expenseNodes
+                    await trip.saveNodes()
+                    console.log(`Successfully saved changes for trip: ${tripId}`)
+                }
+            }
+
+            // Clean up the timeout from the map
+            saveTimeouts.delete(tripId)
+        }, SAVE_DEBOUNCE_MS)
+
+        // Store the timeout
+        saveTimeouts.set(tripId, timeout)
     },
 })
 

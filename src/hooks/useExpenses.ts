@@ -69,6 +69,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const currency = useCurrency()
     const ydocRef = useRef<Y.Doc | null>(null)
     const provider = useRef<HocuspocusProvider | null>(null)
+    const rebuildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
@@ -207,7 +208,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         [theme, isNodeActive]
     )
 
-
     // Get all ancestor nodes (parents) of a given node, tracing back to root
     const getAncestors = useCallback(
         (nodeId?: string): ExpenseNode[] => {
@@ -250,8 +250,8 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             return
         }
 
-        const yNodes = ydocRef.current.getArray("nodes")
-        const yEdges = ydocRef.current.getArray("edges")
+        const yNodes = ydocRef.current!.getArray("nodes")
+        const yEdges = ydocRef.current!.getArray("edges")
 
         console.log(`Yjs arrays: nodes=${yNodes.length}, edges=${yEdges.length}`)
 
@@ -385,11 +385,29 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
         if (nodeIndex !== -1) {
             const currentNode = yNodes.get(nodeIndex) as Node
+
+            // Check if the update actually changes anything to avoid unnecessary syncs
+            const currentData = currentNode.data as any
+            let hasChanges = false
+
+            for (const key in updates) {
+                if (JSON.stringify(currentData[key]) !== JSON.stringify((updates as any)[key])) {
+                    hasChanges = true
+                    break
+                }
+            }
+
+            if (!hasChanges) {
+                console.log(`No changes detected for node ${nodeId}, skipping update`)
+                return
+            }
+
             const updatedNode = {
                 ...currentNode,
                 data: {
                     ...currentNode.data,
                     ...updates,
+                    updatedAt: Date.now(), // Track when it was updated
                 },
             }
 
@@ -496,6 +514,12 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 provider.current?.destroy()
                 provider.current = null
                 ydocRef.current = null
+
+                // Clear any pending rebuild timeout
+                if (rebuildTimeoutRef.current) {
+                    clearTimeout(rebuildTimeoutRef.current)
+                    rebuildTimeoutRef.current = null
+                }
             }
         }
     }, [trip?.id, rebuildTreeFromYjs])
