@@ -10,7 +10,7 @@ export const useTrip = (_tripId: string) => {
     const [loading, setLoading] = useState(false)
 
     const { authenticatedApi, user } = useUser()
-    const { data, refetch } = useQuery({ queryKey: ["trip", tripId], queryFn: () => fetchTrip(), initialData: null })
+    const { data, refetch } = useQuery({ queryKey: ["trip", tripId], queryFn: () => fetchTrip(), initialData: null, refetchOnWindowFocus: false })
 
     const [trip, setTrip] = useState(data)
 
