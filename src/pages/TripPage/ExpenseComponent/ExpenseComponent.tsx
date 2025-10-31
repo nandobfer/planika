@@ -208,6 +208,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 variant="standard"
                                 autoFocus
                                 sx={{ flex: 0.4 }}
+                                type="number"
                                 value={expense.expense.amount}
                                 onChange={
                                     helper.canEdit
@@ -236,6 +237,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                     variant="standard"
                                     autoFocus
                                     sx={{ flex: 0.3 }}
+                                    type="number"
                                     defaultValue={expense.expense.quantity}
                                     onChange={
                                         helper.canEdit

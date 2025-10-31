@@ -33,7 +33,7 @@ export const TripContainer: React.FC<TripContainerProps> = (props) => {
                 <Typography variant="subtitle1" sx={{ opacity: props.trip && !props.trip.name ? 0.5 : undefined }}>
                     {props.trip ? props.trip.name || "Viagem sem nome" : <Skeleton width={300} />}
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.5 }}>
+                <Typography variant="caption" sx={{ opacity: 0.5, textAlign: "right" }}>
                     Última edição:{" "}
                     {props.trip ? (
                         new Date(props.trip.updatedAt).toLocaleString("pt-br", {
