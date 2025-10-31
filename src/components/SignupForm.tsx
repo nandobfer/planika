@@ -69,73 +69,75 @@ export const SignupForm: React.FC<SignupFormProps> = (props) => {
     })
 
     return (
-        <Box sx={{ flexDirection: "column", width: containerWidth, gap: 2, pointerEvents: loading ? "none" : undefined }}>
+        <Box sx={{ flexDirection: "column", pointerEvents: loading ? "none" : undefined, alignItems: "center" }}>
             <Title name="Cadastrar-se" />
             {loading && <LinearProgress variant="indeterminate" sx={{ width: 1, position: "absolute", top: 0, left: 0 }} />}
-            <form onSubmit={formik.handleSubmit}>
-                <TextField
-                    label="nome"
-                    value={formik.values.name}
-                    name="name"
-                    onChange={formik.handleChange}
-                    disabled={loading}
-                    required
-                    error={!!formik.errors.name}
-                    helperText={formik.errors.name}
-                    autoComplete="off"
-                    size="small"
-                    variant="standard"
-                />
-                <TextField
-                    label="e-mail"
-                    value={formik.values.email}
-                    name="email"
-                    onChange={formik.handleChange}
-                    type="email"
-                    disabled={loading}
-                    required
-                    error={!!formik.errors.email}
-                    helperText={formik.errors.email}
-                    autoComplete="off"
-                    size="small"
-                    variant="standard"
-                    sx={autofillStyle}
-                />
-                <TextField
-                    label="senha"
-                    value={formik.values.password}
-                    name="password"
-                    onChange={formik.handleChange}
-                    type={seePassword ? "text" : "password"}
-                    disabled={loading}
-                    required
-                    error={!!formik.errors.password}
-                    helperText={formik.errors.password}
-                    autoComplete="off"
-                    variant="standard"
-                    size="small"
-                    sx={autofillStyle}
-                    slotProps={{
-                        input: {
-                            endAdornment: (
-                                <IconButton size="small" onClick={() => setSeePassword(!seePassword)}>
-                                    {seePassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-                                </IconButton>
-                            ),
-                        },
+            <Box sx={{ flexDirection: "column", width: containerWidth, gap: 2 }}>
+                <form onSubmit={formik.handleSubmit}>
+                    <TextField
+                        label="nome"
+                        value={formik.values.name}
+                        name="name"
+                        onChange={formik.handleChange}
+                        disabled={loading}
+                        required
+                        error={!!formik.errors.name}
+                        helperText={formik.errors.name}
+                        autoComplete="off"
+                        size="small"
+                        variant="standard"
+                    />
+                    <TextField
+                        label="e-mail"
+                        value={formik.values.email}
+                        name="email"
+                        onChange={formik.handleChange}
+                        type="email"
+                        disabled={loading}
+                        required
+                        error={!!formik.errors.email}
+                        helperText={formik.errors.email}
+                        autoComplete="off"
+                        size="small"
+                        variant="standard"
+                        sx={autofillStyle}
+                    />
+                    <TextField
+                        label="senha"
+                        value={formik.values.password}
+                        name="password"
+                        onChange={formik.handleChange}
+                        type={seePassword ? "text" : "password"}
+                        disabled={loading}
+                        required
+                        error={!!formik.errors.password}
+                        helperText={formik.errors.password}
+                        autoComplete="off"
+                        variant="standard"
+                        size="small"
+                        sx={autofillStyle}
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <IconButton size="small" onClick={() => setSeePassword(!seePassword)}>
+                                        {seePassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                                    </IconButton>
+                                ),
+                            },
+                        }}
+                    />
+                    <Button variant="contained" type="submit" fullWidth disabled={loading}>
+                        Cadastrar
+                    </Button>
+                </form>
+                <GoogleLogin
+                    width={containerWidth}
+                    onSuccess={(credentialResponse) => {
+                        if (credentialResponse.credential) onGoogleSuccess(credentialResponse as GoogleAuthResponse)
                     }}
+                    onError={onGoogleError}
                 />
-                <Button variant="contained" type="submit" fullWidth disabled={loading}>
-                    Cadastrar
-                </Button>
-            </form>
-            <GoogleLogin
-                width={containerWidth}
-                onSuccess={(credentialResponse) => {
-                    if (credentialResponse.credential) onGoogleSuccess(credentialResponse as GoogleAuthResponse)
-                }}
-                onError={onGoogleError}
-            />
+            </Box>
         </Box>
     )
 }

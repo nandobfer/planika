@@ -21,12 +21,12 @@ export const GetStarted: React.FC<SignupProps> = (props) => {
                 position: "relative",
             }}
         >
+            <SignupForm width={containerWidth} onSuccess={props.onSuccess} />
+            <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
             <Box sx={{ flexDirection: "column" }}>
                 <Title name="Entrar" />
                 <LoginFormMenu width={containerWidth} loadingPosition="top" onSuccess={props.onSuccess} />
             </Box>
-            <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
-            <SignupForm width={containerWidth} onSuccess={props.onSuccess} />
         </Box>
     )
 }
