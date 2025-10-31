@@ -86,7 +86,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
                         sx: {
                             flexDirection: "column",
                             bgcolor: "background.default",
-                            width: isMobile ? "60vw" : "20vw",
+                            width: { xs: "80vw", md: "20vw" },
                             alignItems: "center",
                             gap: 1,
                         },

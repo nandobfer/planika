@@ -87,11 +87,7 @@ export const LoginFormMenu: React.FC<LoginFormMenuProps> = (props) => {
                 paddingTop: 1,
                 ...autofillStyle,
             }}
-            onKeyDown={(ev) => {
-                if (ev.key === "Tab") {
-                    ev.stopPropagation()
-                }
-            }}
+            onKeyDown={(ev) => ev.stopPropagation()}
         >
             {loading && <LinearProgress variant="indeterminate" sx={{ width: 1, position: "absolute", [loadingPosition]: 0, left: 0 }} />}
             {/* <Typography>Entrar</Typography> */}
