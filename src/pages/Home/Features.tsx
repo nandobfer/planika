@@ -17,7 +17,7 @@ interface FeatureItem {
 const features: FeatureItem[] = [
     {
         icon: AccountTree,
-        title: "Visualização em Árvore Interativa",
+        title: "Árvore Interativa",
         description:
             "Organize o orçamento da sua viagem hierarquicamente — Voos, Hotéis, Atividades. Clique em qualquer categoria para ver os totais dessa ramificação instantaneamente.",
         color: "primary",
@@ -31,21 +31,20 @@ const features: FeatureItem[] = [
     },
     {
         icon: Groups,
-        title: "Colaboração em Tempo Real",
+        title: "Colaboração Simultânea",
         description:
             "Planeje juntos de forma perfeita. Convide companheiros de viagem por e-mail e veja as atualizações instantaneamente enquanto todos adicionam suas reservas.",
         color: "warning",
     },
     {
         icon: CalendarMonth,
-        title: "Visualização de Cronograma",
-        description:
-            "Planeje despesas ao longo das datas da sua viagem. Veja quando os pagamentos vencem, identifique os dias de maior gasto e acompanhe os custos do itinerário.",
+        title: "Cronograma",
+        description: "Planeje despesas ao longo das datas da sua viagem. Identifique os dias de maior gasto e acompanhe os custos do itinerário.",
         color: "primary",
     },
     {
         icon: CheckCircle,
-        title: "Rastreamento de Status de Reservas",
+        title: "Rastreamento de Status",
         description:
             "Marque itens como Pendentes, Reservados ou Pagos. Atribua quem está reservando o quê para esclarecer responsabilidades entre os companheiros de viagem.",
         color: "info",
@@ -60,9 +59,9 @@ const features: FeatureItem[] = [
 
 const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark"; mobile?: boolean }> = ({ feature, mode, mobile }) => {
     return (
-        <Paper sx={{ padding: 3, flexDirection: "column", flex: 1, height: { md: 1 }, width: mobile ? 225 : 1, gap: 2 }}>
-            <Box sx={{ justifyContent: "space-between" }}>
-                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+        <Paper sx={{ padding: 3, flexDirection: "column", flex: 1, height: { md: 1 }, width: mobile ? "max-content" : 1, gap: 2 }}>
+            <Box sx={{ justifyContent: "space-between", gap: 5 }}>
+                <Typography variant={mobile ? "subtitle1" : "h5"} sx={{ fontWeight: "bold" }}>
                     {feature.title}
                 </Typography>
                 <Paper
@@ -80,13 +79,13 @@ const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark";
                     <feature.icon color={feature.color} sx={{ height: "auto", width: 30 }} />
                 </Paper>
             </Box>
-            <Typography>{feature.description}</Typography>
+            <Typography variant={mobile ? "body2" : "body1"}>{feature.description}</Typography>
         </Paper>
     )
 }
 
 export const Features: React.FC<FeaturesProps> = (props) => {
-    const isMobile = useMediaQuery("(orientation: portrait)")
+    const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"))
     const { gradientStyle, mode } = useMuiTheme()
 
     return (
@@ -94,15 +93,15 @@ export const Features: React.FC<FeaturesProps> = (props) => {
             sx={{
                 flexDirection: "column",
                 gap: 5,
-                padding: 10,
+                padding: { xs: 5, md: 10 },
                 ...gradientStyle,
             }}
         >
-            <Typography variant="h2" sx={{ fontWeight: "bold", textAlign: "center" }}>
+            <Typography variant={isMobile ? "h4" : "h2"} sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Tudo que você precisa para planejar suas viagens
             </Typography>
 
-            <Typography variant="h5" sx={{ textAlign: "center" }}>
+            <Typography variant={isMobile ? "subtitle1" : "h5"} sx={{ textAlign: "center" }}>
                 Recursos poderosos projetados para grupos que desejam clareza e controle sobre as despesas da viagem.
             </Typography>
 

@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Typography } from "@mui/material"
+import { Box, Typography, useMediaQuery } from "@mui/material"
 import { CheckCircle, CheckCircleOutline } from "@mui/icons-material"
 import { Image } from "@mantine/core"
 import { useMuiTheme } from "../../hooks/useMuiTheme"
@@ -39,13 +39,14 @@ const features: FeatureItem[] = [
 
 export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
     const { invertedGradientStyle } = useMuiTheme()
+    const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"))
 
     return (
         <Box
             sx={{
                 flexDirection: "column",
                 gap: 5,
-                padding: 10,
+                padding: { xs: 5, md: 10 },
                 ...invertedGradientStyle,
             }}
         >
@@ -53,15 +54,15 @@ export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
                 <Box key={index} sx={{ gap: 5, alignItems: "center", flexDirection: { xs: "column", md: index % 2 === 0 ? "row" : "row-reverse" } }}>
                     <Box sx={{ flex: 1, flexDirection: "column", gap: 2, padding: 3 }}>
                         <Box sx={{ flexDirection: "column", gap: 5 }}>
-                            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                            <Typography variant={isMobile ? "h4" : "h4"} sx={{ fontWeight: "bold" }}>
                                 {feature.title}
                             </Typography>
-                            <Typography variant="h5">{feature.description}</Typography>
+                            <Typography variant={isMobile ? "subtitle1" : "h5"}>{feature.description}</Typography>
                             <Box sx={{ flexDirection: "column", gap: 1 }}>
                                 {feature.items.map((item, itemIndex) => (
                                     <Box key={itemIndex} sx={{ gap: 1, alignItems: "center" }}>
                                         <CheckCircleOutline color="primary" />
-                                        <Typography variant="h6" sx={{ fontWeight: "normal" }}>
+                                        <Typography variant={isMobile ? "caption" : "h6"} sx={{ fontWeight: "normal" }}>
                                             {item}
                                         </Typography>
                                     </Box>

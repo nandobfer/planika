@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Button, Typography } from "@mui/material"
+import { Box, Button, Typography, useMediaQuery } from "@mui/material"
 import { CtaButtons } from "../../components/CtaButtons"
 import { useMuiTheme } from "../../hooks/useMuiTheme"
 import { InlineTypography } from "../../components/InlineTypography"
@@ -8,6 +8,7 @@ interface CtaProps {}
 
 export const Cta: React.FC<CtaProps> = (props) => {
     const { gradientStyle } = useMuiTheme()
+    const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"))
 
     return (
         <Box
@@ -16,14 +17,14 @@ export const Cta: React.FC<CtaProps> = (props) => {
                 gap: 5,
                 alignItems: "center",
                 width: 1,
-                padding: 10,
+                padding: { xs: 5, md: 10 },
                 ...gradientStyle,
             }}
         >
-            <Typography variant="h2" sx={{ fontWeight: "bold", textAlign: "center" }}>
+            <Typography variant={isMobile ? "h4" : "h2"} sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Pronto para planejar sua próxima <InlineTypography highlight>Aventura Juntos?</InlineTypography>
             </Typography>
-            <Typography variant="h5" sx={{ textAlign: "center" }}>
+            <Typography variant={isMobile ? "subtitle1" : "h5"} sx={{ textAlign: "center" }}>
                 Junte-se a grupos já usam o Planika para trazer clareza e colaboração ao planejamento de suas viagens.
             </Typography>
             <CtaButtons />

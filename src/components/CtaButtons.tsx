@@ -10,7 +10,7 @@ export const CtaButtons: React.FC<CtaButtonsProps> = (props) => {
     const navigate = useNavigate()
 
     return (
-        <Box sx={{ gap: 5, flexDirection: { xs: "column", sm: "row" } }}>
+        <Box sx={{ gap: { xs: 2, md: 5 }, flexDirection: { xs: "column", sm: "row" } }}>
             <Button variant="contained" color="primary" size="large" onClick={() => navigate(user ? "/my-trips" : "/get-started")}>
                 Começar agora
             </Button>
