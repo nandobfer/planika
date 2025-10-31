@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useEffect, useMemo } from "react"
-import { Autocomplete, Box, Button, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
+import { Autocomplete, Box, Button, Divider, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
@@ -284,6 +284,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                             Adicionar custo
                         </Button>
                     )}
+                    <Divider flexItem orientation="horizontal" />
                     <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }}>
                         {currencyMask(total, { affix: expense.expense?.currency || "R$" })}
                     </Typography>
