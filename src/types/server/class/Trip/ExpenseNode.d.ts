@@ -4,6 +4,11 @@ interface Expense {
     currency: string;
     quantity?: string;
 }
+export interface ExpenseComment {
+    authorId: string;
+    content: string;
+    createdAt: number;
+}
 export declare class ExpenseNode {
     id: string;
     tripId: string;
@@ -15,7 +20,7 @@ export declare class ExpenseNode {
     expense?: Expense;
     location?: string;
     datetime?: number;
-    notes: string[];
+    notes: ExpenseComment[];
     parentId?: string;
     children: ExpenseNode[];
     totalExpenses: number;

@@ -41,5 +41,6 @@ export declare class Trip {
     saveNodes(): Promise<void>;
     deleteNode(nodeId: string): void;
     delete(): Promise<void>;
+    removeDuplicateNodes(): void;
 }
 export {};

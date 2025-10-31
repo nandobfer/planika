@@ -29,5 +29,6 @@ export declare class TripParticipant {
     constructor(data: ParticipantPrisma);
     load(data: ParticipantPrisma): void;
     update(data: Partial<TripParticipant>): Promise<void>;
+    delete(): Promise<void>;
 }
 export {};
