@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
-import { Box, Button } from "@mui/material"
+import { Box, Button, CircularProgress, LinearProgress } from "@mui/material"
 import type { useTrip } from "../../hooks/useTrip"
 import { useExpenses, type CursorAwareness } from "../../hooks/useExpenses"
 import { Background, ConnectionLineType, ReactFlow } from "@xyflow/react"
@@ -18,7 +18,7 @@ interface ExpensesPageProps {
 
 export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
     const expensesHook = useExpenses(props.tripHook)
-    const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit, hocuspocusProvider } = expensesHook
+    const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit, hocuspocusProvider, loading } = expensesHook
     const [cursors, setCursors] = useState<CursorAwareness[]>([])
 
     const totalValue = useMemo(() => {
@@ -103,7 +103,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     onConnect={onConnect}
                     // onMove={debouncedOnMove}
                     connectionLineType={ConnectionLineType.SmoothStep}
-                    fitView
+                    // fitView
                     nodeTypes={{ expense: ExpenseComponent, placeholder: ExpensePlaceholder }}
                     // style={{ margin: "-2vw",  }}
                     nodesDraggable={false}
@@ -118,9 +118,14 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     ))}
                 </ReactFlow>
             </TripProvider>
-            <Button color="success" sx={{ position: "absolute", bottom: 16, right: 16, pointerEvents: "none" }} variant="outlined">
+            <Button disabled={loading} color="success" sx={{ position: "absolute", bottom: 16, right: 16, pointerEvents: "none" }} variant="outlined">
                 {totalValue}
             </Button>
+            {loading && (
+                <Box sx={{ position: "absolute", top: 0, left: 0, width: 1, height: 1, justifyContent: "center", alignItems: "center" }}>
+                    <CircularProgress variant="indeterminate" color="primary" size={200} />
+                </Box>
+            )}
         </Box>
     )
 }

@@ -77,12 +77,14 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const ydocRef = useRef<Y.Doc | null>(null)
     const provider = useRef<HocuspocusProvider | null>(null)
     const rebuildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const firstRender = useRef(true)
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges)
     const [zoom, setZoom] = useState(1)
     const [fittingViewNode, setFittingViewNode] = useState<Node | null>(null)
+    const [loading, setLoading] = useState(true)
 
     const canEdit = trip?.participants?.some((p) => p.userId === user?.id && (p.role === "administrator" || p.role === "collaborator"))
 
@@ -121,7 +123,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         if (!nodeData.active) return false
 
         // Check all ancestors
-        const getAncestorsForNode = (id: string): boolean => {
+        const isAncestorActive = (id: string): boolean => {
             const currentNode = allNodes.find((n) => n.id === id && n.type === "expense")
             if (!currentNode) return true
 
@@ -134,10 +136,10 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
             if (!parentNode) return true
 
             const parentData = parentNode.data as ExpenseNodeData
-            return parentData.active && getAncestorsForNode(parentId)
+            return parentData.active && isAncestorActive(parentId)
         }
 
-        return getAncestorsForNode(nodeId)
+        return isAncestorActive(nodeId)
     }, [])
 
     // Recursive function to build tree nodes with placeholders
@@ -397,7 +399,15 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 return () => clearTimeout(timeoutId)
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
+        if (nodes.length > 0 && firstRender.current) {
+            firstRender.current = false
+
+            setTimeout(() => {
+                setLoading(false)
+                instance.current?.fitView({ duration: viewport_duration })
+            }, 200)
+        }
     }, [nodes, fittingViewNode])
 
     const handleAddExpense = useCallback(
@@ -783,5 +793,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         handleDeleteExpense,
         fitNodeView,
         hocuspocusProvider: provider.current,
+        loading
     }
 }
