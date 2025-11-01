@@ -54,7 +54,7 @@ export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
                 <Box key={index} sx={{ gap: 5, alignItems: "center", flexDirection: { xs: "column", md: index % 2 === 0 ? "row" : "row-reverse" } }}>
                     <Box sx={{ flex: 1, flexDirection: "column", gap: 2, padding: { md: 3 } }}>
                         <Box sx={{ flexDirection: "column", gap: 5 }}>
-                            <Typography variant={isMobile ? "h4" : "h4"} sx={{ fontWeight: "bold", textAlign: { xs: "center" } }}>
+                            <Typography variant={isMobile ? "h4" : "h4"} sx={{ fontWeight: "bold", textAlign: { xs: "center", md: "left" } }}>
                                 {feature.title}
                             </Typography>
                             <Typography variant={isMobile ? "subtitle1" : "h5"}>{feature.description}</Typography>
