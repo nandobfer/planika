@@ -92,9 +92,9 @@ export const MessageComponent: React.FC<MessageComponentProps> = (props) => {
                     className={isLink ? "link" : undefined}
                     variant="subtitle2"
                     sx={{
-                        color: isLink ? 'success.main' : "text.secondary",
+                        color: isLink ? (mode === "dark" ? "inherit" : "success.main") : "text.secondary",
                         fontWeight: isLink ? "bold" : "normal",
-                        whiteSpace: "pre-line"
+                        whiteSpace: "pre-line",
                     }}
                     onClick={isLink ? () => window.open(props.message.content, "_new") : undefined}
                 >

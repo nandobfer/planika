@@ -1,7 +1,7 @@
 import React, { useContext, useRef, useState } from "react"
 import { Box, Dialog, IconButton, TextField } from "@mui/material"
 import TripContext from "../../../../contexts/TripContext"
-import { Send } from "@mui/icons-material"
+import { Close, Send } from "@mui/icons-material"
 import { Title } from "../../../../components/Title"
 import type { ExpenseComment, ExpenseNode } from "../../../../types/server/class/Trip/ExpenseNode"
 import { NoComment } from "./NoComment"
@@ -40,19 +40,28 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
     return (
         <Dialog open={!!expense} onClose={closeNotesModal} maxWidth="sm" fullWidth>
             <Box sx={{ flexDirection: "column", gap: 2 }}>
-                <Title name="Comentários" />
-                <Box sx={{flexDirection: 'column', height: 300}}>
+                <Title
+                    name="Comentários"
+                    right={
+                        <IconButton size="small" onClick={closeNotesModal}>
+                            <Close fontSize="small" />
+                        </IconButton>
+                    }
+                />
+                <Box sx={{ flexDirection: "column", height: 300 }}>
                     {notes && notes.length > 0 ? (
                         <Virtuoso
                             ref={virtuosoRef}
-                            style={{
-                                // borderTopLeftRadius: isMobile ? "2vw" : "4px",
-                                // borderTopRightRadius: isMobile ? "2vw" : "4px",
-                                // border: mode ? `1px solid ${custom_colors.darkMode_border}` : `1px solid ${custom_colors.lightMode_border}`,
-                                // borderBottom: "none",
-                                // backgroundColor: darkMode ? custom_colors.darkMode_chatBackground : custom_colors.lightMode_chatBackground,
-                                // width: "100%",
-                            }}
+                            style={
+                                {
+                                    // borderTopLeftRadius: isMobile ? "2vw" : "4px",
+                                    // borderTopRightRadius: isMobile ? "2vw" : "4px",
+                                    // border: mode ? `1px solid ${custom_colors.darkMode_border}` : `1px solid ${custom_colors.lightMode_border}`,
+                                    // borderBottom: "none",
+                                    // backgroundColor: darkMode ? custom_colors.darkMode_chatBackground : custom_colors.lightMode_chatBackground,
+                                    // width: "100%",
+                                }
+                            }
                             data={notes.sort((a, b) => a.createdAt - b.createdAt)}
                             // components={{ Item: HeightPreservingItem }}
                             itemContent={(index, note) => {
