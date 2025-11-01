@@ -88,6 +88,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const [notesModal, setNotesModal] = useState<ExpenseNode | null>(null)
 
     const canEdit = trip?.participants?.some((p) => p.userId === user?.id && (p.role === "administrator" || p.role === "collaborator"))
+    const isAdmin = trip?.participants?.some((p) => p.userId === user?.id && p.role === "administrator")
 
     const openNotesModal = (expense: ExpenseNode) => {
         setNotesModal(expense)
@@ -806,5 +807,6 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         notesModal,
         openNotesModal,
         closeNotesModal,
+        isAdmin,
     }
 }

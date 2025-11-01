@@ -6,17 +6,15 @@ import { Title } from "../../../../components/Title"
 import type { ExpenseComment, ExpenseNode } from "../../../../types/server/class/Trip/ExpenseNode"
 import { NoComment } from "./NoComment"
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso"
-import { useMuiTheme } from "../../../../hooks/useMuiTheme"
 import { MessageComponent } from "./MessageComponent"
 
 interface NotesModalProps {}
 
 export const NotesModal: React.FC<NotesModalProps> = (props) => {
-    const { notesModal, closeNotesModal, handleUpdateExpense, user, nodes, trip } = useContext(TripContext)
+    const { notesModal, closeNotesModal, handleUpdateExpense, user, nodes, trip, canEdit } = useContext(TripContext)
     const expense = nodes.find((n) => n.id === notesModal?.id)?.data as ExpenseNode | undefined
     const notes = expense?.notes
     const virtuosoRef = useRef<VirtuosoHandle>(null)
-    const { mode } = useMuiTheme()
 
     const [inputText, setInputText] = useState("")
 
@@ -93,25 +91,27 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
                     )}
                 </Box>
 
-                <form onSubmit={onSubmit}>
-                    <TextField
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        fullWidth
-                        size="small"
-                        variant="outlined"
-                        placeholder="Adicionar um comentário"
-                        slotProps={{
-                            input: {
-                                endAdornment: (
-                                    <IconButton type="submit" size="small">
-                                        <Send fontSize="small" />
-                                    </IconButton>
-                                ),
-                            },
-                        }}
-                    />
-                </form>
+                {canEdit && (
+                    <form onSubmit={onSubmit}>
+                        <TextField
+                            value={inputText}
+                            onChange={(e) => setInputText(e.target.value)}
+                            fullWidth
+                            size="small"
+                            variant="outlined"
+                            placeholder="Adicionar um comentário"
+                            slotProps={{
+                                input: {
+                                    endAdornment: (
+                                        <IconButton type="submit" size="small">
+                                            <Send fontSize="small" />
+                                        </IconButton>
+                                    ),
+                                },
+                            }}
+                        />
+                    </form>
+                )}
             </Box>
         </Dialog>
     )
