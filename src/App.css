@@ -41,7 +41,6 @@ html {
 body {
     overflow-x: hidden;
     height: 100%;
-    
 }
 
 #root {
@@ -105,10 +104,6 @@ img {
     text-decoration: underline;
 }
 
-
-
-
-
 /* @media (orientation: portrait) {
     .MuiDataGrid-topContainer * {
         display: none;
@@ -117,14 +112,25 @@ img {
 } */
 
 .swiper-slide {
-  transition: all 0.3s ease;
-  height: 100%;
+    transition: all 0.3s ease;
+    height: 100%;
 }
 
 .swiper-slide-active {
-  z-index: 1;
+    z-index: 1;
 }
 
 .react-flow__panel {
     display: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
 }
