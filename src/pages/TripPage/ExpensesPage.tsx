@@ -10,6 +10,7 @@ import { ExpensePlaceholder } from "./ExpenseComponent/ExpensePlaceholder"
 import { CursorComponent } from "./CursorComponent/CursorComponent"
 import { currencyMask } from "../../tools/numberMask"
 import type { ExpenseNode } from "../../types/server/class/Trip/ExpenseNode"
+import { NotesModal } from "./ExpenseComponent/NotesModal/NotesModal"
 
 interface ExpensesPageProps {
     loading: boolean
@@ -117,6 +118,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                         <CursorComponent key={cursor.id} cursor={cursor} />
                     ))}
                 </ReactFlow>
+                <NotesModal />
             </TripProvider>
             <Button disabled={loading} color="success" sx={{ position: "absolute", bottom: 16, right: 16, pointerEvents: "none" }} variant="outlined">
                 {totalValue}

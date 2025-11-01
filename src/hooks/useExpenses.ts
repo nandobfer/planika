@@ -85,8 +85,17 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const [zoom, setZoom] = useState(1)
     const [fittingViewNode, setFittingViewNode] = useState<Node | null>(null)
     const [loading, setLoading] = useState(true)
+    const [notesModal, setNotesModal] = useState<ExpenseNode | null>(null)
 
     const canEdit = trip?.participants?.some((p) => p.userId === user?.id && (p.role === "administrator" || p.role === "collaborator"))
+
+    const openNotesModal = (expense: ExpenseNode) => {
+        setNotesModal(expense)
+    }
+
+    const closeNotesModal = () => {
+        setNotesModal(null)
+    }
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge({ ...params, type: ConnectionLineType.SmoothStep, animated: true }, eds)),
@@ -793,6 +802,9 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         handleDeleteExpense,
         fitNodeView,
         hocuspocusProvider: provider.current,
-        loading
+        loading,
+        notesModal,
+        openNotesModal,
+        closeNotesModal,
     }
 }

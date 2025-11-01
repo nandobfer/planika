@@ -1,9 +1,9 @@
 import React, { useContext, useRef, useEffect, useMemo } from "react"
-import { Autocomplete, Box, Button, Divider, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
+import { Autocomplete, Badge, Box, Button, Divider, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
-import { AttachMoney, CalendarMonth, Circle, Close, Delete, LocationPin, TimesOneMobiledata } from "@mui/icons-material"
+import { AttachMoney, CalendarMonth, Chat, Circle, Close, Delete, LocationPin, TimesOneMobiledata } from "@mui/icons-material"
 import dayjs from "dayjs"
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker"
 import type { CurrencyRate } from "../../../types/server/api/exchangerate"
@@ -287,9 +287,33 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         </Button>
                     )}
                     <Divider flexItem orientation="horizontal" />
-                    <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }}>
-                        {currencyMask(total, { affix: expense.expense?.currency || "R$" })}
-                    </Typography>
+                    <Box sx={{ alignItems: "center", justifyContent: "space-between" }}>
+                        <Tooltip title="Anotações e comentários">
+                            <Badge
+                                badgeContent={expense.notes.length}
+                                color="primary"
+                                overlap="circular"
+                                slotProps={{
+                                    badge: {
+                                        style: {
+                                            fontSize: 8,
+                                            padding: 0,
+                                            minWidth: 15,
+                                            width: 15,
+                                            height: 15,
+                                        },
+                                    },
+                                }}
+                            >
+                                <IconButton size="small" onClick={() => helper.openNotesModal(expense)}>
+                                    <Chat fontSize="small" />
+                                </IconButton>
+                            </Badge>
+                        </Tooltip>
+                        <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }}>
+                            {currencyMask(total, { affix: expense.expense?.currency || "R$" })}
+                        </Typography>
+                    </Box>
                 </Box>
             </Box>
 
