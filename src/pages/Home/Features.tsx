@@ -106,7 +106,7 @@ export const Features: React.FC<FeaturesProps> = (props) => {
             </Typography>
 
             {isMobile ? (
-                <Box sx={{ gap: 5, width: "100vw", overflowX: "auto", padding: 10, margin: -10 }}>
+                <Box sx={{ gap: 5, width: "100vw", overflowX: "auto", padding: 5, margin: -5 }}>
                     {features.map((feature, index) => (
                         <FeatureComponent feature={feature} mode={mode} mobile />
                     ))}
