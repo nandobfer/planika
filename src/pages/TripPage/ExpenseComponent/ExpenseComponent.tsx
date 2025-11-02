@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useEffect, useMemo } from "react"
-import { Autocomplete, Badge, Box, Button, Divider, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material"
+import { Autocomplete, Badge, Box, Button, Divider, IconButton, lighten, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
@@ -10,6 +10,7 @@ import type { CurrencyRate } from "../../../types/server/api/exchangerate"
 import { useExpenseNode } from "../../../hooks/useExpenseNode"
 import { currencyMask } from "../../../tools/numberMask"
 import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
+import { useMuiTheme } from "../../../hooks/useMuiTheme"
 
 interface ExpenseComponentProps {
     data: ExpenseNode
@@ -21,6 +22,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
     const { expense, toggleActive, updateNode, deleteNode, debouncedUpdateNode } = useExpenseNode(props.data, helper)
     const active = helper.isNodeActive(expense.id, helper.nodes)
+    const { mode, theme } = useMuiTheme()
 
     // Refs for uncontrolled inputs
     const descriptionRef = useRef<HTMLInputElement>(null)
@@ -67,6 +69,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 outlineStyle: "solid",
                 // ...(mode === "light" ? { bgcolor: "background.default" } : {}),
                 color: active ? "success.main" : "action.disabled",
+                bgcolor: mode === "light" ? (active ? lighten(theme.palette.primary.main, 0.5) : "action.disabledBackground") : undefined,
             }}
         >
             {props.data.parentId && <Handle type="target" position={Position.Left} />}

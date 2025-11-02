@@ -1,5 +1,5 @@
 import React from "react"
-import { Paper, Typography } from "@mui/material"
+import { lighten, Paper, Typography } from "@mui/material"
 import type { useReports } from "../../../hooks/useReports"
 import { Layer, Rectangle, ResponsiveContainer, Sankey, Tooltip, useChartWidth, XAxis, YAxis } from "recharts"
 import { useMuiTheme } from "../../../hooks/useMuiTheme"
@@ -10,7 +10,7 @@ interface SankeyChartProps {
 }
 
 export const SankeyChart: React.FC<SankeyChartProps> = (props) => {
-    const { theme } = useMuiTheme()
+    const { theme, mode } = useMuiTheme()
     const { api } = props
 
     const data = {
@@ -68,7 +68,7 @@ export const SankeyChart: React.FC<SankeyChartProps> = (props) => {
                 margin={{
                     bottom: 30,
                 }}
-                link={{ stroke: theme.palette.primary.main, strokeOpacity: 0.6 }}
+                link={{ stroke: theme.palette.primary.main, strokeOpacity: 0.8 }}
             >
                 <Tooltip
                     content={({ payload }) => {
@@ -82,7 +82,6 @@ export const SankeyChart: React.FC<SankeyChartProps> = (props) => {
                         )
                     }}
                 />
-                
             </Sankey>
         </ResponsiveContainer>
     )
