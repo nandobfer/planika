@@ -1,4 +1,5 @@
 export const handleCurrencyInput = (inputed: string, decimalScale: number = 2) => {
+    console.log({ inputed })
     // Remove all non-digit characters to get just the digits
     const digits = inputed.replace(/\D/g, "")
 

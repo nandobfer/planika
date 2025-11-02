@@ -45,6 +45,7 @@
         "react-swipeable-views-utils": "^0.14.0",
         "react-verification-input": "^4.2.2",
         "react-virtuoso": "^4.14.1",
+        "recharts": "^3.3.0",
         "socket.io-client": "^4.8.1",
         "swiper": "^11.2.10",
         "uid": "^2.0.2",

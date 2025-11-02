@@ -86,9 +86,18 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const [fittingViewNode, setFittingViewNode] = useState<Node | null>(null)
     const [loading, setLoading] = useState(true)
     const [notesModal, setNotesModal] = useState<ExpenseNode | null>(null)
+    const [showReports, setShowReports] = useState(false)
 
     const canEdit = trip?.participants?.some((p) => p.userId === user?.id && (p.role === "administrator" || p.role === "collaborator"))
     const isAdmin = trip?.participants?.some((p) => p.userId === user?.id && p.role === "administrator")
+
+    const openReportsDrawer = () => {
+        setShowReports(true)
+    }
+
+    const closeReportsDrawer = () => {
+        setShowReports(false)
+    }
 
     const openNotesModal = (expense: ExpenseNode) => {
         setNotesModal(expense)
@@ -808,5 +817,9 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         openNotesModal,
         closeNotesModal,
         isAdmin,
+        showReports,
+        openReportsDrawer,
+        closeReportsDrawer,
+        isNodeActive,
     }
 }

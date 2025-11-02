@@ -20,9 +20,7 @@ const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol}`
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
     const { expense, toggleActive, updateNode, deleteNode, debouncedUpdateNode } = useExpenseNode(props.data, helper)
-    const ancestors = helper.getAncestors(expense.id)
-    const ancestorsActive = ancestors.every((ancestor) => ancestor.active)
-    const active = expense.active && ancestorsActive
+    const active = helper.isNodeActive(expense.id, helper.nodes)
 
     // Refs for uncontrolled inputs
     const descriptionRef = useRef<HTMLInputElement>(null)
@@ -208,7 +206,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                 variant="standard"
                                 autoFocus
                                 sx={{ flex: 0.4 }}
-                                type="number"
+                                type="tel"
                                 value={expense.expense.amount}
                                 onChange={
                                     helper.canEdit
