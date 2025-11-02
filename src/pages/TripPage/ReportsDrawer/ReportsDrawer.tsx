@@ -15,7 +15,7 @@ export const ReportsDrawer: React.FC<ReportsDrawerProps> = (props) => {
 
     return (
         <Drawer anchor="right" open={api.showReports} onClose={api.closeReportsDrawer} slotProps={{ paper: { elevation: 1 } }}>
-            <Box sx={{ flexDirection: "column", padding: 3, height: "100%", gap: 1, width: {xs: "100vw", md: 500} }}>
+            <Box sx={{ flexDirection: "column", padding: 3, height: "100%", gap: 1, width: { xs: "100vw", md: 500 } }}>
                 <Title
                     name="Relatório"
                     right={

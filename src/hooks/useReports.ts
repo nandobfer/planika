@@ -47,14 +47,13 @@ export const useReports = (expenses: ReturnType<typeof useExpenses>) => {
     const locations = useMemo(() => {
         const locations = new Map<string, { expenses: ExpenseNode[]; total: number }>()
         validNodes.forEach((node) => {
-            const expense = { ...node.data } as unknown as ExpenseNode
-            expense.totalExpenses = calculateTotalExpenses(expense)
+            const expense = node.data as unknown as ExpenseNode
 
             const location = getLocation(expense)
             if (location) {
                 const { expenses, total } = locations.get(location) || { expenses: [], total: 0 }
                 expenses.push(expense)
-                locations.set(location, { expenses, total: total + expense.totalExpenses })
+                locations.set(location, { expenses, total: total + calculateTotalExpenses(expense) })
             }
         })
 
