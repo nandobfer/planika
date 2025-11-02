@@ -33,18 +33,18 @@ const tabs: AccountSetting[] = [
         route: "preferences",
         component: <Preferences />,
     },
-    {
-        label: "Histórico",
-        description: "Visualize sua atividade recente, alterações e linha do tempo de colaboração",
-        route: "history",
-        component: <History />,
-    },
-    {
-        label: "Colaborações",
-        description: "Gerencie orçamentos que você possui ou participa e visualize suas responsabilidades financeiras",
-        route: "collaborations",
-        component: <Collaborations />,
-    },
+    // {
+    //     label: "Histórico",
+    //     description: "Visualize sua atividade recente, alterações e linha do tempo de colaboração",
+    //     route: "history",
+    //     component: <History />,
+    // },
+    // {
+    //     label: "Colaborações",
+    //     description: "Gerencie orçamentos que você possui ou participa e visualize suas responsabilidades financeiras",
+    //     route: "collaborations",
+    //     component: <Collaborations />,
+    // },
     {
         label: "Convites",
         description: "Visualize e gerencie convites pendentes para colaborar em orçamentos",
