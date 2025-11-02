@@ -60,7 +60,7 @@ export const SankeyChart: React.FC<SankeyChartProps> = (props) => {
     }
 
     return (
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={200}>
             <Sankey
                 data={data}
                 node={MyCustomSankeyNode}
@@ -68,7 +68,7 @@ export const SankeyChart: React.FC<SankeyChartProps> = (props) => {
                 margin={{
                     bottom: 30,
                 }}
-                link={{ stroke: theme.palette.primary.main, strokeOpacity: 0.8 }}
+                link={{ stroke: mode === "light" ? theme.palette.primary.main : theme.palette.action.disabled, strokeOpacity: 0.8 }}
             >
                 <Tooltip
                     content={({ payload }) => {

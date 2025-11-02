@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useEffect, useMemo } from "react"
-import { Autocomplete, Badge, Box, Button, Divider, IconButton, lighten, Paper, TextField, Tooltip, Typography } from "@mui/material"
+import { Autocomplete, Badge, Box, Button, darken, Divider, IconButton, lighten, Paper, TextField, Tooltip, Typography } from "@mui/material"
 import type { ExpenseNode } from "../../../types/server/class/Trip/ExpenseNode"
 import TripContext from "../../../contexts/TripContext"
 import { Handle, Position } from "@xyflow/react"
@@ -69,7 +69,14 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 outlineStyle: "solid",
                 // ...(mode === "light" ? { bgcolor: "background.default" } : {}),
                 color: active ? "success.main" : "action.disabled",
-                bgcolor: mode === "light" ? (active ? lighten(theme.palette.primary.main, 0.5) : "action.disabledBackground") : undefined,
+                bgcolor:
+                    mode === "light"
+                        ? active
+                            ? lighten(theme.palette.primary.main, 0.5)
+                            : "action.disabledBackground"
+                        : active
+                        ? darken(theme.palette.success.main, 0.85)
+                        : undefined,
             }}
         >
             {props.data.parentId && <Handle type="target" position={Position.Left} />}

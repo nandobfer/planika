@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
-import { Box, Button, CircularProgress, LinearProgress } from "@mui/material"
+import { Box, Button, CircularProgress } from "@mui/material"
 import type { useTrip } from "../../hooks/useTrip"
 import { useExpenses, type CursorAwareness } from "../../hooks/useExpenses"
 import { Background, ConnectionLineType, ReactFlow } from "@xyflow/react"
@@ -12,7 +12,8 @@ import { currencyMask } from "../../tools/numberMask"
 import type { ExpenseNode } from "../../types/server/class/Trip/ExpenseNode"
 import { NotesModal } from "./ExpenseComponent/NotesModal/NotesModal"
 import { ReportsDrawer } from "./ReportsDrawer/ReportsDrawer"
-import { Assessment, AttachMoney, Report } from "@mui/icons-material"
+import { Assessment } from "@mui/icons-material"
+import { useMuiTheme } from "../../hooks/useMuiTheme"
 
 interface ExpensesPageProps {
     loading: boolean
@@ -21,6 +22,7 @@ interface ExpensesPageProps {
 
 export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
     const expensesHook = useExpenses(props.tripHook)
+    const { mode } = useMuiTheme()
     const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit, hocuspocusProvider, loading } = expensesHook
     const [cursors, setCursors] = useState<CursorAwareness[]>([])
 
@@ -130,7 +132,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                             onClick={expensesHook.openReportsDrawer}
                             startIcon={<Assessment />}
                             disabled={loading}
-                            color="primary"
+                            color={mode === "light" ? "info" : "primary"}
                             sx={{ pointerEvents: "auto", zIndex: 100 }}
                             variant="outlined"
                         >

@@ -3,6 +3,7 @@ import { Box, Button } from "@mui/material"
 import TripContext from "../../../contexts/TripContext"
 import { Add } from "@mui/icons-material"
 import { Handle, Position, useNodeId } from "@xyflow/react"
+import { useMuiTheme } from "../../../hooks/useMuiTheme"
 
 interface ExpensePlaceholderProps {}
 
@@ -11,6 +12,7 @@ export const ExpensePlaceholder: React.FC<ExpensePlaceholderProps> = (props) => 
     const nodeId = useNodeId()
     const parentId = nodeId?.split("_")[1]
     const isRoot = parentId === "root"
+    const { mode } = useMuiTheme()
 
     const onClick = () => {
         helper.handleAddExpense(!isRoot ? parentId : undefined)
@@ -26,7 +28,13 @@ export const ExpensePlaceholder: React.FC<ExpensePlaceholderProps> = (props) => 
                 // border: "1px solid red",
             }}
         >
-            <Button onClick={onClick} variant="outlined" sx={{ borderStyle: "dashed" }} startIcon={<Add />}>
+            <Button
+                color={mode === "light" ? "info" : "primary"}
+                onClick={onClick}
+                variant="outlined"
+                sx={{ borderStyle: "dashed" }}
+                startIcon={<Add />}
+            >
                 {!isRoot && <Handle type="target" position={Position.Left} />}
                 Nova despesa
             </Button>

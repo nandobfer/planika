@@ -20,22 +20,18 @@ export const DatetimeChart:React.FC<DatetimeChartProps> = (props) => {
     }))
 
     return (
-            <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data}>
-                <XAxis dataKey={"date"} />
-                <YAxis />
+        <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={data} margin={{ left: 0 }}>
+                <XAxis dataKey={"date"} fontSize={10} />
+                <YAxis tickFormatter={(value) => currencyMask(value)} fontSize={10} />
                 <Tooltip
                     content={({ payload }) => {
                         if (!payload || payload.length === 0) return null
                         const { date, totalExpenses } = payload[0].payload
                         return (
                             <Paper elevation={5} style={{ flexDirection: "column", padding: 5 }}>
-                                <Typography>
-                                    Despesa em {date}:
-                                </Typography>
-                                <Typography>
-                                    {currencyMask(totalExpenses)}
-                                </Typography>
+                                <Typography>Despesa em {date}:</Typography>
+                                <Typography>{currencyMask(totalExpenses)}</Typography>
                             </Paper>
                         )
                     }}
@@ -43,7 +39,7 @@ export const DatetimeChart:React.FC<DatetimeChartProps> = (props) => {
                 {/* <Legend /> */}
                 <CartesianGrid strokeDasharray="3 3" />
 
-                <Area dataKey={'totalExpenses'} fill={theme.palette.primary.main} type="monotone" />
+                <Area dataKey={"totalExpenses"} fill={theme.palette.primary.main} type="monotone" />
             </AreaChart>
         </ResponsiveContainer>
     )

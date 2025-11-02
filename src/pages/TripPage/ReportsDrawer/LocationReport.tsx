@@ -61,7 +61,7 @@ export const LocationReport: React.FC<LocationReportProps> = (props) => {
                         paddingLeft: depth * 3,
                         paddingY: 0.5,
                         cursor: hasChild ? "pointer" : "default",
-                        "&:hover": hasChild ? { backgroundColor: "action.hover" } : {},
+                        "&:hover": { backgroundColor: "action.hover" },
                         borderRadius: 1,
                     }}
                     onClick={hasChild ? () => toggleExpense(expense.id) : undefined}
