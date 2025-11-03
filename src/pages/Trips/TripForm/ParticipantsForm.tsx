@@ -80,56 +80,58 @@ export const ParticipantsForm: React.FC<ParticipantsFormProps> = (props) => {
     return (
         <Box sx={{ flexDirection: "column", gap: 2, width: 1 }}>
             <form onSubmit={onSubmit}>
-                <Autocomplete
-                    disabled={!props.tripForm.isAdmin}
-                    options={options}
-                    inputValue={inputValue}
-                    onInputChange={(_, newInputValue) => {
-                        setInputValue(newInputValue)
-                        debouncedSetInput(newInputValue)
-                    }}
-                    onChange={(_, newValue) => {
-                        handleUserSelect(newValue)
-                    }}
-                    renderInput={(params) => <TextField {...params} label="Convidar participante" placeholder="fulano@exemplo.com" />}
-                    getOptionLabel={(option) => {
-                        if ("type" in option && option.type === "invite") {
-                            return `Convidar ${option.email}`
-                        }
-                        const user = option as User
-                        return user.name
-                    }}
-                    filterOptions={(options) => options}
-                    getOptionKey={(option) => option.email}
-                    renderOption={(_props, option) => {
-                        if ("type" in option && option.type === "invite") {
+                {props.tripForm.isAdmin && (
+                    <Autocomplete
+                        disabled={!props.tripForm.isAdmin}
+                        options={options}
+                        inputValue={inputValue}
+                        onInputChange={(_, newInputValue) => {
+                            setInputValue(newInputValue)
+                            debouncedSetInput(newInputValue)
+                        }}
+                        onChange={(_, newValue) => {
+                            handleUserSelect(newValue)
+                        }}
+                        renderInput={(params) => <TextField {...params} label="Convidar participante" placeholder="fulano@exemplo.com" />}
+                        getOptionLabel={(option) => {
+                            if ("type" in option && option.type === "invite") {
+                                return `Convidar ${option.email}`
+                            }
+                            const user = option as User
+                            return user.name
+                        }}
+                        filterOptions={(options) => options}
+                        getOptionKey={(option) => option.email}
+                        renderOption={(_props, option) => {
+                            if ("type" in option && option.type === "invite") {
+                                return (
+                                    <MenuItem {..._props} disabled={!isValidEmail}>
+                                        <Typography>Convidar {option.email}</Typography>
+                                    </MenuItem>
+                                )
+                            }
+
+                            // TypeScript now knows option is User here
+                            const user = option as User
                             return (
-                                <MenuItem {..._props} disabled={!isValidEmail}>
-                                    <Typography>Convidar {option.email}</Typography>
+                                <MenuItem
+                                    {..._props}
+                                    sx={{ gap: 1 }}
+                                    disabled={props.tripForm.participants.some((participant) => participant.userId === user.id)}
+                                >
+                                    <Avatar src={user.picture} sx={{}} />
+                                    <Box sx={{ flexDirection: "column" }}>
+                                        <Typography>{user.name}</Typography>
+                                        <Typography variant="body2">{user.email}</Typography>
+                                    </Box>
                                 </MenuItem>
                             )
-                        }
-
-                        // TypeScript now knows option is User here
-                        const user = option as User
-                        return (
-                            <MenuItem
-                                {..._props}
-                                sx={{ gap: 1 }}
-                                disabled={props.tripForm.participants.some((participant) => participant.userId === user.id)}
-                            >
-                                <Avatar src={user.picture} sx={{}} />
-                                <Box sx={{ flexDirection: "column" }}>
-                                    <Typography>{user.name}</Typography>
-                                    <Typography variant="body2">{user.email}</Typography>
-                                </Box>
-                            </MenuItem>
-                        )
-                    }}
-                    loading={isLoading}
-                    noOptionsText={inputValue ? "Nenhum usuário encontrado" : "Digite para buscar ou convidar por e-mail"}
-                    freeSolo={false}
-                />
+                        }}
+                        loading={isLoading}
+                        noOptionsText={inputValue ? "Nenhum usuário encontrado" : "Digite para buscar ou convidar por e-mail"}
+                        freeSolo={false}
+                    />
+                )}
                 {props.tripForm.participants.map((participant) => {
                     const canEdit = props.tripForm.isAdmin && participant.userId !== user?.id
                     return (

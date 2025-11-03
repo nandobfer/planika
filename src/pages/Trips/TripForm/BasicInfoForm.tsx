@@ -57,14 +57,16 @@ export const BasicInfoForm: React.FC<BasicInfoProps> = (props) => {
                 </Box>
 
                 <Box sx={{ alignSelf: "flex-end", gap: 2 }}>
-                    {props.fromSettings && (
+                    {props.fromSettings && props.tripForm.isAdmin && (
                         <Button color="error" onClick={props.tripForm.deleteTrip}>
                             Deletar
                         </Button>
                     )}
-                    <Button type="submit" variant="contained" disabled={!props.tripForm.isAdmin}>
-                        {props.fromSettings ? "Salvar" : "Continuar"}
-                    </Button>
+                    {props.tripForm.isAdmin && (
+                        <Button type="submit" variant="contained">
+                            {props.fromSettings ? "Salvar" : "Continuar"}
+                        </Button>
+                    )}
                 </Box>
             </form>
         </Box>

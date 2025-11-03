@@ -26,12 +26,12 @@ export const routes: RouteItem[] = [
     { path: "/get-started", element: <GetStarted />, label: "Começar", id: "get-started" },
     { path: "/recovery/*", element: <PasswordRecovery />, label: "Recuperação de conta", id: "recovery" },
     { path: "/accept-invite", element: <AcceptInvitePage />, label: "Aceitar convite", id: "accept-invite" },
+    { path: "/trips/:id/*", element: <TripPage />, label: "Viagem", id: "trip" },
 ]
 
 export const authenticatedRoutes: RouteItem[] = [
     { path: "/account/*", element: <Account />, label: "Minha conta", id: "account" },
     { path: "/my-trips/*", element: <Trips />, label: "Minhas viagens", id: "trips" },
-    { path: "/trips/:id/*", element: <TripPage />, label: "Viagem", id: "trip" },
 ]
 
 export const Router: React.FC<RouterProps> = (props) => {
