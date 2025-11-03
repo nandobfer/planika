@@ -18,22 +18,21 @@ const features: FeatureItem[] = [
     {
         icon: AccountTree,
         title: "Árvore Interativa",
-        description:
-            "Organize o orçamento da sua viagem hierarquicamente — Voos, Hotéis, Atividades. Clique em qualquer categoria para ver os totais dessa ramificação instantaneamente.",
+        description: "Organize o orçamento da sua viagem hierarquicamente e veja o total de custos de cada ramificação na própria despesa.",
         color: "primary",
     },
     {
         icon: FilterAlt,
         title: "Filtragem Dinâmica",
         description:
-            "Clique em qualquer valor—destino, viajante ou status da reserva—para filtrar toda a visão da sua viagem. Explore os custos de forma interativa.",
+            "Clique em qualquer localização, viajante, data ou status da reserva para filtrar toda a visão da sua viagem. Explore os custos de forma interativa.",
         color: "info",
     },
     {
         icon: Groups,
         title: "Colaboração Simultânea",
         description:
-            "Planeje juntos de forma perfeita. Convide companheiros de viagem por e-mail e veja as atualizações instantaneamente enquanto todos adicionam suas reservas.",
+            "Convide companheiros de viagem por e-mail e veja as atualizações instantaneamente enquanto todos adicionam despesas e comentários.",
         color: "warning",
     },
     {
@@ -52,7 +51,7 @@ const features: FeatureItem[] = [
     {
         icon: Assessment,
         title: "Relatórios",
-        description: "Gere relatórios com detalhes de despesas, opções mais baratas, despesas por local/data, entre outras opções.",
+        description: "Gere relatórios com detalhes de despesas por localização e os exporte em formatos populares ou envie por e-mail.",
         color: "warning",
     },
 ]
