@@ -7,6 +7,7 @@ import { useReports } from "../../../hooks/useReports"
 import { LocationReport } from "./LocationReport"
 import { DatetimeChart } from "./DatetimeChart"
 import { SankeyChart } from "./SankeyChart"
+import { SendReportMail } from "./SendReportMail"
 
 interface ReportsDrawerProps {}
 
@@ -19,9 +20,12 @@ export const ReportsDrawer: React.FC<ReportsDrawerProps> = (props) => {
                 <Title
                     name="Relatório"
                     right={
-                        <IconButton onClick={api.closeReportsDrawer} size="small">
-                            <Close fontSize="small" />
-                        </IconButton>
+                        <Box>
+                            <SendReportMail api={api} />
+                            <IconButton onClick={api.closeReportsDrawer} size="small">
+                                <Close fontSize="small" />
+                            </IconButton>
+                        </Box>
                     }
                 />
                 {/* <DatetimeChart api={api} /> */}

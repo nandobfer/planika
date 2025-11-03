@@ -1,5 +1,5 @@
 import { Box, CircularProgress, IconButton, lighten, Typography, useMediaQuery } from "@mui/material"
-import { Refresh } from "@mui/icons-material"
+import { Close, Refresh } from "@mui/icons-material"
 import { useMuiTheme } from "../hooks/useMuiTheme"
 
 export const Title: React.FC<{
@@ -10,7 +10,8 @@ export const Title: React.FC<{
     center?: boolean
     refresh?: () => void
     refreshing?: boolean
-}> = ({ name, right, left, space, center, refresh, refreshing }) => {
+    onClose?: () => void
+}> = ({ name, right, left, space, center, refresh, refreshing, onClose }) => {
     const { theme } = useMuiTheme()
 
     return (
@@ -41,6 +42,11 @@ export const Title: React.FC<{
                 </Typography>
             </Box>
             {right && right}
+            {onClose && (
+                <IconButton size="small" onClick={onClose}>
+                    <Close fontSize="small" />
+                </IconButton>
+            )}
             {refresh && (
                 <IconButton size="small" onClick={refresh}>
                     {refreshing ? <CircularProgress size={"1rem"} /> : <Refresh fontSize="small" />}
