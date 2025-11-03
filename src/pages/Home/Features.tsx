@@ -45,7 +45,7 @@ const features: FeatureItem[] = [
         icon: CheckCircle,
         title: "Rastreamento de Status",
         description:
-            "Marque itens como Pendentes, Reservados ou Pagos. Atribua quem está reservando o quê para esclarecer responsabilidades entre os companheiros de viagem.",
+            "Marque itens como pendentes, reservados ou pagos. Atribua quem está reservando o quê para esclarecer responsabilidades entre os companheiros de viagem.",
         color: "info",
     },
     {
