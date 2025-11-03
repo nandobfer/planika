@@ -31,5 +31,5 @@ export const useExpenseNode = (data: ExpenseNode, helper: ReturnType<typeof useE
         })
     }
 
-    return { expense, toggleActive, debouncedUpdateNode, updateNode, deleteNode }
+    return { expense, toggleActive, debouncedUpdateNode, updateNode, deleteNode, ...helper }
 }

@@ -9,6 +9,7 @@ export interface ExpenseComment {
     content: string;
     createdAt: number;
 }
+export type ExpenseStatus = "pending" | "reserved" | "paid" | null;
 export declare class ExpenseNode {
     id: string;
     tripId: string;
@@ -20,6 +21,8 @@ export declare class ExpenseNode {
     expense?: Expense;
     location?: string;
     datetime?: number;
+    status?: ExpenseStatus;
+    responsibleParticipantId?: string;
     notes: ExpenseComment[];
     parentId?: string;
     children: ExpenseNode[];

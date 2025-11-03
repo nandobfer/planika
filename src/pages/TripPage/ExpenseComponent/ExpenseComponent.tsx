@@ -11,6 +11,7 @@ import { useExpenseNode } from "../../../hooks/useExpenseNode"
 import { currencyMask } from "../../../tools/numberMask"
 import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
 import { useMuiTheme } from "../../../hooks/useMuiTheme"
+import { StatusChip } from "./StatusChip"
 
 interface ExpenseComponentProps {
     data: ExpenseNode
@@ -20,7 +21,8 @@ const formatCurrencyOption = (currency: CurrencyRate) => `${currency.symbol}`
 
 export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
     const helper = useContext(TripContext)
-    const { expense, toggleActive, updateNode, deleteNode, debouncedUpdateNode } = useExpenseNode(props.data, helper)
+    const nodeHelper = useExpenseNode(props.data, helper)
+    const { expense, toggleActive, updateNode, deleteNode, debouncedUpdateNode } = nodeHelper
     const active = helper.isNodeActive(expense.id, helper.nodes)
     const { mode, theme } = useMuiTheme()
 
@@ -296,28 +298,31 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                     )}
                     <Divider flexItem orientation="horizontal" />
                     <Box sx={{ alignItems: "center", justifyContent: "space-between" }}>
-                        <Tooltip title="Anotações e comentários">
-                            <Badge
-                                badgeContent={expense.notes.length}
-                                color={mode === "light" ? "info" : "primary"}
-                                overlap="circular"
-                                slotProps={{
-                                    badge: {
-                                        style: {
-                                            fontSize: 8,
-                                            padding: 0,
-                                            minWidth: 15,
-                                            width: 15,
-                                            height: 15,
+                        <Box sx={{ alignItems: "center", gap: 1 }}>
+                            <Tooltip title="Anotações e comentários">
+                                <Badge
+                                    badgeContent={expense.notes.length}
+                                    color={mode === "light" ? "info" : "primary"}
+                                    overlap="circular"
+                                    slotProps={{
+                                        badge: {
+                                            style: {
+                                                fontSize: 8,
+                                                padding: 0,
+                                                minWidth: 15,
+                                                width: 15,
+                                                height: 15,
+                                            },
                                         },
-                                    },
-                                }}
-                            >
-                                <IconButton size="small" onClick={() => helper.openNotesModal(expense)}>
-                                    <Chat fontSize="small" />
-                                </IconButton>
-                            </Badge>
-                        </Tooltip>
+                                    }}
+                                >
+                                    <IconButton size="small" onClick={() => helper.openNotesModal(expense)}>
+                                        <Chat fontSize="small" />
+                                    </IconButton>
+                                </Badge>
+                            </Tooltip>
+                            {(helper.canEdit || expense.status) && <StatusChip api={nodeHelper} />}
+                        </Box>
                         <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }}>
                             {currencyMask(total, { affix: expense.expense?.currency || "R$" })}
                         </Typography>
