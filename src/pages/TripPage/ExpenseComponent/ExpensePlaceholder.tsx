@@ -35,7 +35,7 @@ export const ExpensePlaceholder: React.FC<ExpensePlaceholderProps> = (props) => 
                 sx={{ borderStyle: "dashed" }}
                 startIcon={<Add />}
             >
-                {!isRoot && <Handle type="target" position={Position.Left} />}
+                {!isRoot && <Handle type="target" position={Position.Left} isConnectable={false} />}
                 Nova despesa
             </Button>
         </Box>

@@ -114,6 +114,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     nodesDraggable={false}
                     onInit={onInit}
                     minZoom={0}
+                    nodesConnectable={false}
                 >
                     <Background size={1} />
                     {/* <NodeDrawer node={editingNode} onClose={() => setEditingNode(null)} saveNode={onEditNode} nodes={nodes} /> */}

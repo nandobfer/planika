@@ -79,7 +79,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         : undefined,
             }}
         >
-            {props.data.parentId && <Handle type="target" position={Position.Left} />}
+            {props.data.parentId && <Handle type="target" position={Position.Left} isConnectable={false} />}
 
             <Box sx={{ flexDirection: "column", flex: 1, height: 1, gap: 1 }}>
                 <Box sx={{ gap: 1 }}>
@@ -325,7 +325,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                 </Box>
             </Box>
 
-            <Handle type="source" position={Position.Right} />
+            <Handle type="source" position={Position.Right} isConnectable={false} />
         </Paper>
     )
 }

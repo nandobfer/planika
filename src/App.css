@@ -134,3 +134,7 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
     -moz-appearance: textfield;
 }
+
+.react-flow__edge-interaction {
+    pointer-events: none;
+}
