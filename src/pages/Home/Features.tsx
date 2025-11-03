@@ -102,7 +102,7 @@ export const Features: React.FC<FeaturesProps> = (props) => {
             </Typography>
 
             <Typography variant={isMobile ? "subtitle1" : "h5"} sx={{ textAlign: "center" }}>
-                Recursos poderosos projetados para grupos que desejam clareza e controle sobre as despesas da viagem.
+                Recursos poderosos projetados para grupos que desejam clareza, controle e opções sobre as despesas da viagem.
             </Typography>
 
             {isMobile ? (
