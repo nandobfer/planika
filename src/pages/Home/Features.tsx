@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Grid, Paper, Typography, useMediaQuery } from "@mui/material"
+import { Box, Grid, lighten, Paper, Typography, useMediaQuery } from "@mui/material"
 import type { MuiIcon } from "../../types/MuiIcon"
 import type { MuiColor } from "../../types/MuiColor"
 import { AccountTree, Assessment, CalendarMonth, CheckCircle, FilterAlt, Groups } from "@mui/icons-material"
@@ -57,6 +57,7 @@ const features: FeatureItem[] = [
 ]
 
 const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark"; mobile?: boolean }> = ({ feature, mode, mobile }) => {
+    const { theme } = useMuiTheme()
     return (
         <Paper sx={{ padding: 3, flexDirection: "column", flex: 1, height: { md: 1 }, width: mobile ? "max-content" : 1, gap: 2 }}>
             <Box sx={{ justifyContent: "space-between", gap: 5 }}>
@@ -71,7 +72,7 @@ const FeatureComponent: React.FC<{ feature: FeatureItem; mode: "light" | "dark";
                         padding: 1.5,
                         marginTop: -3,
                         marginRight: -3,
-                        bgcolor: mode === "light" ? "background.default" : undefined,
+                        bgcolor: mode === "light" ? lighten(theme.palette.primary.main, 0.85) : undefined,
                         height: "min-content",
                     }}
                 >
