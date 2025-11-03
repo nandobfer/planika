@@ -119,14 +119,8 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                     <Background size={1} />
                     {/* <NodeDrawer node={editingNode} onClose={() => setEditingNode(null)} saveNode={onEditNode} nodes={nodes} /> */}
 
-                    <Box sx={{ position: "absolute", top: 16, right: 16, flexDirection: "column", gap: 1 }}>
-                        <Button
-                            startIcon={props.tripHook.user?.defaultCurrency || "R$"}
-                            disabled={loading}
-                            color="success"
-                            sx={{ pointerEvents: "none" }}
-                            variant="outlined"
-                        >
+                    <Box sx={{ position: "absolute", top: 16, right: 16, flexDirection: "column", gap: 1, zIndex: 100, pointerEvents: "none" }}>
+                        <Button startIcon={props.tripHook.user?.defaultCurrency || "R$"} disabled={loading} color="success" variant="outlined">
                             {totalValue}
                         </Button>
                         <Button
@@ -134,7 +128,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                             startIcon={<Assessment />}
                             disabled={loading}
                             color={mode === "light" ? "info" : "primary"}
-                            sx={{ pointerEvents: "auto", zIndex: 100 }}
+                            sx={{ pointerEvents: "auto" }}
                             variant="outlined"
                         >
                             Relatórios

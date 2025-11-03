@@ -299,7 +299,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                         <Tooltip title="Anotações e comentários">
                             <Badge
                                 badgeContent={expense.notes.length}
-                                color="primary"
+                                color={mode === "light" ? "info" : "primary"}
                                 overlap="circular"
                                 slotProps={{
                                     badge: {
