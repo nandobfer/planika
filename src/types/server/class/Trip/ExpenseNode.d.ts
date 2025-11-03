@@ -22,7 +22,7 @@ export declare class ExpenseNode {
     location?: string;
     datetime?: number;
     status?: ExpenseStatus;
-    responsibleParticipantId?: string;
+    responsibleParticipantId?: string | null;
     notes: ExpenseComment[];
     parentId?: string;
     children: ExpenseNode[];

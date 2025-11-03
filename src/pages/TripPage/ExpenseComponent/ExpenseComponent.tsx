@@ -12,6 +12,7 @@ import { currencyMask } from "../../../tools/numberMask"
 import { handleCurrencyInput } from "../../../tools/handleCurrencyInput"
 import { useMuiTheme } from "../../../hooks/useMuiTheme"
 import { StatusChip } from "./StatusChip"
+import { ResponsibleAvatar } from "./ResponsibleAvatar"
 
 interface ExpenseComponentProps {
     data: ExpenseNode
@@ -321,6 +322,7 @@ export const ExpenseComponent: React.FC<ExpenseComponentProps> = (props) => {
                                     </IconButton>
                                 </Badge>
                             </Tooltip>
+                            {(helper.canEdit || expense.responsibleParticipantId) && <ResponsibleAvatar api={nodeHelper} />}
                             {(helper.canEdit || expense.status) && <StatusChip api={nodeHelper} />}
                         </Box>
                         <Typography variant="subtitle1" sx={{ alignSelf: "flex-end", fontWeight: "bold" }}>
