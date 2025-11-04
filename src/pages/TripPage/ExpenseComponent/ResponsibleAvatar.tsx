@@ -10,7 +10,7 @@ interface ResponsibleAvatarProps {
 
 export const ResponsibleAvatar: React.FC<ResponsibleAvatarProps> = (props) => {
     const { api } = props
-    const { mode } = useMuiTheme()
+    const { theme } = useMuiTheme()
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const open = Boolean(anchorEl)
@@ -39,9 +39,9 @@ export const ResponsibleAvatar: React.FC<ResponsibleAvatarProps> = (props) => {
                         <Avatar
                             src={responsibleParticipant?.user?.picture || undefined}
                             sx={{ width: 24, height: 24 }}
-                            style={{ backgroundColor: undefined }}
+                            style={{ backgroundColor: responsibleParticipant?.user ? theme.palette.primary.main : undefined }}
                         >
-                            <PersonAddAlt1 fontSize="small" />
+                            {responsibleParticipant?.user ? responsibleParticipant.user.name[0] : <PersonAddAlt1 fontSize="small" />}
                         </Avatar>
                     </Paper>
                 </IconButton>

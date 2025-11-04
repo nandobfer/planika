@@ -27,6 +27,7 @@ export declare class Trip {
     nodes: ExpenseNode[];
     totalExpenses: number;
     status: TripStatus;
+    totalLocations: string[];
     static new(data: TripForm, userId: string): Promise<Trip>;
     static findById(id: string): Promise<Trip | null>;
     static handleNodeUpdate(socket: Socket, data: ExpenseNode): Promise<void>;
@@ -42,5 +43,6 @@ export declare class Trip {
     deleteNode(nodeId: string): void;
     delete(): Promise<void>;
     removeDuplicateNodes(): void;
+    sendReportByEmail(destinations: string[]): Promise<import("nodemailer/lib/smtp-transport").SentMessageInfo>;
 }
 export {};

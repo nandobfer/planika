@@ -14,6 +14,7 @@ import { NotesModal } from "./ExpenseComponent/NotesModal/NotesModal"
 import { ReportsDrawer } from "./ReportsDrawer/ReportsDrawer"
 import { Assessment } from "@mui/icons-material"
 import { useMuiTheme } from "../../hooks/useMuiTheme"
+import { Filters } from "./Filters/Filters"
 
 interface ExpensesPageProps {
     loading: boolean
@@ -134,6 +135,7 @@ export const ExpensesPage: React.FC<ExpensesPageProps> = (props) => {
                             Relatórios
                         </Button>
                     </Box>
+                    <Filters api={expensesHook} />
                     {cursors.map((cursor: CursorAwareness) => (
                         <CursorComponent key={cursor.id} cursor={cursor} />
                     ))}

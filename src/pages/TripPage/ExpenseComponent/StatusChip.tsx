@@ -9,9 +9,9 @@ interface StatusChipProps {
     api: ReturnType<typeof useExpenseNode>
 }
 
-const statuses: ExpenseStatus[] = ["pending", "reserved", "paid"]
+export const statuses: ExpenseStatus[] = ["pending", "reserved", "paid"]
 
-const formatStatus = (status?: ExpenseStatus) => {
+export const formatStatus = (status?: ExpenseStatus) => {
     switch (status) {
         case "pending":
             return "Pendente"

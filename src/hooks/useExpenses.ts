@@ -79,6 +79,13 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const rebuildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const firstRender = useRef(true)
 
+    // Store all nodes/edges without filters applied
+    const allNodesRef = useRef<Node[]>([])
+    const allEdgesRef = useRef<Edge[]>([])
+
+    // Active filters: Map<attribute, Set<values>>
+    const [activeFilters, setActiveFilters] = useState<Map<keyof ExpenseNodeData, Set<any>>>(new Map())
+
     const { nodes: layoutedNodes, edges: layoutedEdges } = updateLayout([], [])
     const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges)
@@ -106,6 +113,141 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     const closeNotesModal = () => {
         setNotesModal(null)
     }
+
+    // Apply filters to nodes and edges
+    const applyFilters = useCallback(
+        (allNodes: Node[], allEdges: Edge[]): { nodes: Node[]; edges: Edge[] } => {
+            // If no filters, return all nodes/edges
+            if (activeFilters.size === 0) {
+                return { nodes: allNodes, edges: allEdges }
+            }
+
+            // Filter nodes based on active filters
+            const filteredNodes = allNodes.filter((node) => {
+                if (node.type !== "expense") {
+                    // Always include placeholders
+                    return true
+                }
+
+                const nodeData = node.data as ExpenseNodeData
+
+                // Node must match ALL filter attributes
+                for (const [attribute, values] of activeFilters.entries()) {
+                    if (values.size === 0) continue // Skip empty filter sets
+
+                    const nodeValue = nodeData[attribute]
+
+                    // Handle array values (like responsibleParticipants)
+                    if (Array.isArray(nodeValue)) {
+                        // Check if any of the node's values match any filter value
+                        const hasMatch = nodeValue.some((val: any) => {
+                            // Compare by id if objects, otherwise direct comparison
+                            const compareValue = typeof val === "object" && val?.id ? val.id : val
+                            return Array.from(values).some((filterVal) => {
+                                const filterCompare = typeof filterVal === "object" && filterVal?.id ? filterVal.id : filterVal
+                                return compareValue === filterCompare
+                            })
+                        })
+                        if (!hasMatch) return false
+                    } else {
+                        // For non-array values, check direct match
+                        const compareValue = typeof nodeValue === "object" && (nodeValue as any)?.id ? (nodeValue as any).id : nodeValue
+                        const hasMatch = Array.from(values).some((filterVal) => {
+                            const filterCompare = typeof filterVal === "object" && filterVal?.id ? filterVal.id : filterVal
+                            return compareValue === filterCompare
+                        })
+                        if (!hasMatch) return false
+                    }
+                }
+
+                return true
+            })
+
+            const filteredNodeIds = new Set(filteredNodes.map((n) => n.id))
+
+            // Filter edges - only include edges where both source and target are in filtered nodes
+            const filteredEdges = allEdges.filter((edge) => {
+                return filteredNodeIds.has(edge.source) && filteredNodeIds.has(edge.target)
+            })
+
+            // Remove placeholder nodes that don't have a parent expense node in the filtered set
+            const finalNodes = filteredNodes.filter((node) => {
+                if (node.type === "placeholder") {
+                    const parentId = (node.data as ExpenseNodeData).parentId
+                    // Keep root placeholder if no parentId
+                    if (!parentId) return false
+                    // Only keep placeholder if its parent expense node is in the filtered set
+                    return filteredNodeIds.has(parentId)
+                }
+                return true
+            })
+
+            setTimeout(() => instance.current?.fitView({ duration: viewport_duration }), 300)
+
+            return { nodes: finalNodes, edges: filteredEdges }
+        },
+        [activeFilters]
+    )
+
+    // Add or remove a filter value
+    const addFilter = useCallback((attribute: keyof ExpenseNodeData, value: any) => {
+        setActiveFilters((prev) => {
+            const newFilters = new Map(prev)
+            const existingValues = newFilters.get(attribute) || new Set()
+
+            // Toggle: if value exists, remove it; otherwise add it
+            const newValues = new Set(existingValues)
+
+            // Compare by id if object, otherwise direct comparison
+            const compareValue = typeof value === "object" && value?.id ? value.id : value
+            let found = false
+
+            for (const existing of newValues) {
+                const existingCompare = typeof existing === "object" && existing?.id ? existing.id : existing
+                if (existingCompare === compareValue) {
+                    newValues.delete(existing)
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                newValues.add(value)
+            }
+
+            if (newValues.size === 0) {
+                newFilters.delete(attribute)
+            } else {
+                newFilters.set(attribute, newValues)
+            }
+
+            return newFilters
+        })
+    }, [])
+
+    // Clear all filters for a specific attribute
+    const clearFilterAttribute = useCallback((attribute: keyof ExpenseNodeData) => {
+        setActiveFilters((prev) => {
+            const newFilters = new Map(prev)
+            newFilters.delete(attribute)
+            return newFilters
+        })
+        setTimeout(() => instance.current?.fitView({ duration: viewport_duration }), 300)
+    }, [])
+
+    // Clear all filters
+    const clearAllFilters = useCallback(() => {
+        setActiveFilters(new Map())
+        setTimeout(() => instance.current?.fitView({ duration: viewport_duration }), 300)
+    }, [])
+
+    // Get active filter values for a specific attribute
+    const getActiveFilterValues = useCallback(
+        (attribute: keyof ExpenseNodeData): any[] => {
+            return Array.from(activeFilters.get(attribute) || [])
+        },
+        [activeFilters]
+    )
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge({ ...params, type: ConnectionLineType.SmoothStep, animated: true }, eds)),
@@ -398,10 +540,17 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         const layouted = updateLayout(allNodes, styledEdges)
         const edgesWithColors = updateEdgeColors(layouted.nodes, layouted.edges)
 
+        // Store unfiltered nodes/edges
+        allNodesRef.current = layouted.nodes
+        allEdgesRef.current = edgesWithColors
+
+        // Apply filters before setting state
+        const { nodes: filteredNodes, edges: filteredEdges } = applyFilters(layouted.nodes, edgesWithColors)
+
         console.log("Setting nodes and edges to state")
-        setNodes(layouted.nodes)
-        setEdges(edgesWithColors)
-    }, [canEdit, theme, updateEdgeColors])
+        setNodes(filteredNodes)
+        setEdges(filteredEdges)
+    }, [canEdit, theme, updateEdgeColors, applyFilters])
 
     // Effect to fit view after nodes are updated with layout
     useEffect(() => {
@@ -788,6 +937,15 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         setEdges((eds) => updateEdgeColors(nodes, eds))
     }, [theme, updateEdgeColors])
 
+    // Re-apply filters when they change
+    useEffect(() => {
+        if (allNodesRef.current.length > 0) {
+            const { nodes: filteredNodes, edges: filteredEdges } = applyFilters(allNodesRef.current, allEdgesRef.current)
+            setNodes(filteredNodes)
+            setEdges(filteredEdges)
+        }
+    }, [activeFilters, applyFilters])
+
     return {
         nodes,
         edges,
@@ -821,5 +979,11 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         openReportsDrawer,
         closeReportsDrawer,
         isNodeActive,
+        // Filter functions
+        addOrRemoveFilter: addFilter,
+        clearFilterAttribute,
+        clearAllFilters,
+        getActiveFilterValues,
+        activeFilters,
     }
 }
