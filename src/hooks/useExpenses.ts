@@ -115,10 +115,17 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     }
 
     // Apply filters to nodes and edges
+    // Use activeFilters.size as dependency instead of full Map for better stability
+    const activeFiltersSize = activeFilters.size
+    const activeFiltersRef = useRef(activeFilters)
+    activeFiltersRef.current = activeFilters
+
     const applyFilters = useCallback(
         (allNodes: Node[], allEdges: Edge[]): { nodes: Node[]; edges: Edge[] } => {
+            const currentFilters = activeFiltersRef.current
+
             // If no filters, return all nodes/edges
-            if (activeFilters.size === 0) {
+            if (currentFilters.size === 0) {
                 return { nodes: allNodes, edges: allEdges }
             }
 
@@ -132,7 +139,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                 const nodeData = node.data as ExpenseNodeData
 
                 // Node must match ALL filter attributes
-                for (const [attribute, values] of activeFilters.entries()) {
+                for (const [attribute, values] of currentFilters.entries()) {
                     if (values.size === 0) continue // Skip empty filter sets
 
                     const nodeValue = nodeData[attribute]
@@ -186,7 +193,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
 
             return { nodes: finalNodes, edges: filteredEdges }
         },
-        [activeFilters]
+        [activeFiltersSize] // Only recreate when filter count changes
     )
 
     // Add or remove a filter value
@@ -276,6 +283,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     }
 
     // Helper to check if a node is active (including its ancestors)
+    // Stable reference - no dependencies needed as it receives allNodes as parameter
     const isNodeActive = useCallback((nodeId: string, allNodes: Node[]): boolean => {
         const node = allNodes.find((n) => n.id === nodeId && n.type === "expense")
         if (!node) return true // placeholders are always considered "active" for edge styling
@@ -363,6 +371,10 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     }
 
     // Update edge colors based on node active states
+    // Memoize theme colors to avoid recreation
+    const successColor = theme.palette.success.main
+    const disabledColor = theme.palette.action.disabled
+
     const updateEdgeColors = useCallback(
         (allNodes: Node[], allEdges: Edge[]): Edge[] => {
             return allEdges.map((edge) => {
@@ -374,13 +386,13 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
                     ...edge,
                     style: {
                         ...edge.style,
-                        stroke: bothActive ? theme.palette.success.main : theme.palette.action.disabled,
+                        stroke: bothActive ? successColor : disabledColor,
                     },
                     animated: bothActive,
                 }
             })
         },
-        [theme, isNodeActive]
+        [successColor, disabledColor, isNodeActive]
     )
 
     // Get all ancestor nodes (parents) of a given node, tracing back to root
@@ -419,6 +431,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     )
 
     // New function: Rebuild tree from Yjs (adds UI elements to backend data)
+    // CRITICAL: Stable dependencies to avoid re-creating on every filter change
     const rebuildTreeFromYjs = useCallback(() => {
         if (!ydocRef.current) {
             console.log("No ydoc ref")
@@ -550,7 +563,7 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
         console.log("Setting nodes and edges to state")
         setNodes(filteredNodes)
         setEdges(filteredEdges)
-    }, [canEdit, theme, updateEdgeColors, applyFilters])
+    }, [canEdit, successColor, disabledColor, isNodeActive, activeFiltersSize, updateEdgeColors, applyFilters])
 
     // Effect to fit view after nodes are updated with layout
     useEffect(() => {
@@ -932,10 +945,17 @@ export const useExpenses = (tripHelper: ReturnType<typeof useTrip>) => {
     //     rebuildTree()
     // }, [trip])
 
-    // Update edge colors when theme changes
+    // Update edge colors when theme changes (not on every node change)
     useEffect(() => {
-        setEdges((eds) => updateEdgeColors(nodes, eds))
-    }, [theme, updateEdgeColors])
+        if (allNodesRef.current.length > 0 && allEdgesRef.current.length > 0) {
+            const edgesWithColors = updateEdgeColors(allNodesRef.current, allEdgesRef.current)
+            allEdgesRef.current = edgesWithColors
+
+            // Apply filters to get the displayed edges
+            const { edges: filteredEdges } = applyFilters(allNodesRef.current, edgesWithColors)
+            setEdges(filteredEdges)
+        }
+    }, [successColor, disabledColor, updateEdgeColors, applyFilters])
 
     // Re-apply filters when they change
     useEffect(() => {
