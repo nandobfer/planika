@@ -5,6 +5,7 @@ import type { ExpenseComment } from "../../../../types/server/class/Trip/Expense
 import type { User } from "../../../../types/server/class/User"
 import { formatChatDate } from "../../../../tools/chatDateFormat"
 import { UserIdentifier } from "./UserIdentifier"
+import { isURL } from "../../../../tools/isUrl"
 
 interface MessageComponentProps {
     author?: User
@@ -24,18 +25,6 @@ export const MessageComponent: React.FC<MessageComponentProps> = (props) => {
     const colors = {
         sent: mode === "dark" ? theme.palette.primary.main : theme.palette.primary.main,
         received: mode === "dark" ? darken(theme.palette.primary.main, 0.7) : theme.palette.action.disabledBackground,
-    }
-
-    function isURL(str: string): boolean {
-        if (!str.toLowerCase().includes("http")) return false
-
-        try {
-            // Use the URL constructor which is more reliable
-            const url = new URL(str)
-            return ["http:", "https:"].includes(url.protocol)
-        } catch (e) {
-            return false
-        }
     }
 
     const isLink = isURL(props.message.content)
@@ -95,6 +84,7 @@ export const MessageComponent: React.FC<MessageComponentProps> = (props) => {
                         color: isLink ? (mode === "dark" ? "inherit" : "success.main") : "text.secondary",
                         fontWeight: isLink ? "bold" : "normal",
                         whiteSpace: "pre-line",
+                        wordBreak: "break-word",
                     }}
                     onClick={isLink ? () => window.open(props.message.content, "_new") : undefined}
                 >

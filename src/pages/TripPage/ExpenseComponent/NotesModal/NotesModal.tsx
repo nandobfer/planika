@@ -7,6 +7,7 @@ import type { ExpenseComment, ExpenseNode } from "../../../../types/server/class
 import { NoComment } from "./NoComment"
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso"
 import { MessageComponent } from "./MessageComponent"
+import { isURL } from "../../../../tools/isUrl"
 
 interface NotesModalProps {}
 
@@ -18,9 +19,11 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
 
     const [inputText, setInputText] = useState("")
 
+    const maxInputLength = isURL(inputText) ? Infinity : 100
+
     const onSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
         ev.preventDefault()
-        if (!expense || !inputText || !user) return
+        if (!expense || !inputText || !user || inputText.length > maxInputLength) return
 
         const updatedNotes: ExpenseComment[] = [
             ...(expense.notes || []),
@@ -100,10 +103,12 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
                             size="small"
                             variant="outlined"
                             placeholder="Adicionar um comentário"
+                            error={inputText.length > maxInputLength}
+                            helperText={inputText.length > maxInputLength ? `${inputText.length} / ${maxInputLength} caracteres.` : ""}
                             slotProps={{
                                 input: {
                                     endAdornment: (
-                                        <IconButton type="submit" size="small">
+                                        <IconButton type="submit" size="small" disabled={!inputText || inputText.length > maxInputLength}>
                                             <Send fontSize="small" />
                                         </IconButton>
                                     ),
