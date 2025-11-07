@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react"
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react"
 import { Box, Dialog, IconButton, TextField } from "@mui/material"
 import TripContext from "../../../../contexts/TripContext"
 import { Close, Send } from "@mui/icons-material"
@@ -8,14 +8,18 @@ import { NoComment } from "./NoComment"
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso"
 import { MessageComponent } from "./MessageComponent"
 import { isURL } from "../../../../tools/isUrl"
+import { useFilesDialogModal } from "../../../../hooks/useFilesDialogModal"
 
 interface NotesModalProps {}
 
 export const NotesModal: React.FC<NotesModalProps> = (props) => {
-    const { notesModal, closeNotesModal, handleUpdateExpense, user, nodes, trip, canEdit } = useContext(TripContext)
+    const { notesModal, closeNotesModal, handleUpdateExpense, user, nodes, trip, canEdit, authenticatedApi } = useContext(TripContext)
     const expense = nodes.find((n) => n.id === notesModal?.id)?.data as ExpenseNode | undefined
     const notes = expense?.notes
     const virtuosoRef = useRef<VirtuosoHandle>(null)
+    const filesDialogModal = useFilesDialogModal({
+        request: async (formData) => uploadImage(formData),
+    })
 
     const [inputText, setInputText] = useState("")
 
@@ -37,6 +41,24 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
         handleUpdateExpense(expense.id, { notes: updatedNotes })
         setInputText("")
     }
+
+    const uploadImage = async (formData: FormData) => {
+        const response = await authenticatedApi.post<string>("/trip/media", formData, { params: { trip_id: trip?.id } })
+        console.log(response.data)
+    }
+
+    const handlePaste = (event: ClipboardEvent) => {
+        filesDialogModal.openModal()
+        filesDialogModal.handlePaste(event)
+    }
+
+    useEffect(() => {
+        document.addEventListener("paste", handlePaste)
+
+        return () => {
+            document.removeEventListener("paste", handlePaste)
+        }
+    }, [handlePaste])
 
     return (
         <Dialog open={!!expense} onClose={closeNotesModal} maxWidth="sm" fullWidth>
@@ -117,6 +139,8 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
                         />
                     </form>
                 )}
+
+                {filesDialogModal.Modal}
             </Box>
         </Dialog>
     )

@@ -64,5 +64,5 @@ export function useFilesDialogModal<T>(options: FileDialogInterface<T>) {
 
     const Modal = <FilesDialogModal loading={loading} handleClose={handleClose} chooseFile={chooseFile} isOpen={isOpen} handlePaste={handlePaste} />
 
-    return { Modal, handleClose, isOpen, loading, openModal, chooseFile }
+    return { Modal, handleClose, isOpen, loading, openModal, chooseFile, handlePaste }
 }
