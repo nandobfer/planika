@@ -22,18 +22,6 @@ export const Hero: React.FC<HeroProps> = (props) => {
                 // borderRadius: 8,
             }}
         >
-            {/* <Box sx={{ position: "absolute", width: "100%", height: "200vh", zIndex: 0, top: 0 }}>
-                <Particles
-                    particleColors={[theme.palette.primary.main]}
-                    particleCount={200}
-                    particleSpread={10}
-                    speed={0.1}
-                    particleBaseSize={100}
-                    moveParticlesOnHover={true}
-                    alphaParticles={false}
-                    disableRotation={false}
-                />
-            </Box> */}
             <Box sx={{ flexDirection: "column", gap: { xs: 5, md: 5 }, alignItems: "center", width: { xs: 1, md: 0.7 }, zIndex: 1 }}>
                 <Typography variant={isMobile ? "h4" : "h2"} sx={{ fontWeight: "bold", textAlign: "center" }}>
                     Planeje sua viagem <InlineTypography highlight>Juntos</InlineTypography>
