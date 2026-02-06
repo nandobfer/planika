@@ -13,33 +13,36 @@ interface FeatureItem {
     items: string[]
 }
 
-const features: FeatureItem[] = [
-    {
-        title: "Planeje Juntos em Tempo Real",
-        description: "Todos os participantes podem atualizar o orçamento da viagem simultaneamente, mantendo todos alinhados nos custos e reservas.",
-        items: [
-            "Convites por e-mail para seu grupo de viagem",
-            "Autenticação via Google para acesso seguro",
-            "Atualizações ao vivo para todos os participantes",
-        ],
-        image: "/collaboration.jpg",
-    },
-    {
-        title: "Visualize a Linha do Tempo da Sua Viagem",
-        description:
-            "Planeje as despesas da sua viagem cronologicamente—desde a pré-reserva de voos até as atividades diárias. Entenda os padrões de gastos e prepare-se para os dias de maior custo.",
-        items: [
-            "Linha do tempo interativa ao longo das datas da viagem",
-            "Visualização de gastos diários e semanais",
-            "Rastreamento de despesas por localização e destino",
-        ],
-        image: "/timeline.jpg",
-    },
-]
+
 
 export const FeaturedFeatures: React.FC<FeaturedFeaturesProps> = (props) => {
-    const { invertedGradientStyle } = useMuiTheme()
+    const { invertedGradientStyle, mode } = useMuiTheme()
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down("md"))
+
+    const features: FeatureItem[] = [
+        {
+            title: "Planeje Juntos em Tempo Real",
+            description:
+                "Todos os participantes podem atualizar o orçamento da viagem simultaneamente, mantendo todos alinhados nos custos e reservas.",
+            items: [
+                "Convites por e-mail para seu grupo de viagem",
+                "Autenticação via Google para acesso seguro",
+                "Atualizações ao vivo para todos os participantes",
+            ],
+            image: `/crdt-${mode}.webp`,
+        },
+        {
+            title: "Adicione comentários em cada item",
+            description:
+                "Facilite a comunicação dentro do grupo adicionando comentários específicos para cada item do orçamento, permitindo discussões claras sobre cada despesa.",
+            items: [
+                "Insira comentários com texto, links ou imagens",
+                "Registre informações importantes",
+                "Colaboração eficiente para decisões de viagem",
+            ],
+            image: `/witmarsum-${mode}.webp`,
+        },
+    ]
 
     return (
         <Box

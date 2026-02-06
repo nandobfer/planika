@@ -35,7 +35,7 @@ export const Hero: React.FC<HeroProps> = (props) => {
             </Box>
 
             <Paper sx={{ borderRadius: 2, width: 1 }} elevation={5}>
-                <Image src={`hero-${mode}.png`} width="100%" fit="contain" style={{ borderRadius: 8, zIndex: 1 }} />
+                <Image src={`hero-${mode}.webp`} width="100%" fit="contain" style={{ borderRadius: 8, zIndex: 1 }} />
             </Paper>
         </Box>
     )

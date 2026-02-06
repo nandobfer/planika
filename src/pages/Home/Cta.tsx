@@ -22,10 +22,10 @@ export const Cta: React.FC<CtaProps> = (props) => {
             }}
         >
             <Typography variant={isMobile ? "h4" : "h2"} sx={{ fontWeight: "bold", textAlign: "center" }}>
-                Pronto para planejar sua próxima <InlineTypography highlight>Aventura Juntos?</InlineTypography>
+                Pronto para <InlineTypography highlight>Planejar?</InlineTypography>
             </Typography>
             <Typography variant={isMobile ? "subtitle1" : "h5"} sx={{ textAlign: "center" }}>
-                Junte-se a grupos já usam o Planika para trazer clareza e colaboração ao planejamento de suas viagens.
+                Junte-se a grupos que já usam o Planika para trazer clareza e colaboração ao planejamento de suas viagens.
             </Typography>
             <CtaButtons />
         </Box>
