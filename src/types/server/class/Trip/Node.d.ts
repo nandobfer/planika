@@ -3,7 +3,7 @@ interface Expense {
     amount: number;
     currency: string;
 }
-export declare class ExpenseNode {
+export declare class Node {
     id: string;
     tripId: string;
     description: string;
@@ -16,10 +16,10 @@ export declare class ExpenseNode {
     datetime?: number;
     notes: string[];
     parentId?: string;
-    children?: ExpenseNode[];
+    children?: Node[];
     totalExpenses: number;
     totalLocations: string[];
-    constructor(data: WithoutFunctions<ExpenseNode>);
+    constructor(data: WithoutFunctions<Node>);
     getTotalExpenses(): number;
     getTotalLocations(): string[];
 }

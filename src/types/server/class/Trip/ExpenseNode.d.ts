@@ -8,6 +8,7 @@ export interface ExpenseComment {
     authorId: string;
     content: string;
     createdAt: number;
+    isImage?: boolean;
 }
 export type ExpenseStatus = "pending" | "reserved" | "paid" | null;
 export declare class ExpenseNode {

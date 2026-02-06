@@ -56,10 +56,14 @@ export function useFilesDialogModal<T>(options: FileDialogInterface<T>) {
                     })
 
                     handleImageChange([renamedFile])
+                    return true
                 }
             }
+
+            return false
         },
-        [handleImageChange]
+
+        [handleImageChange],
     )
 
     const Modal = <FilesDialogModal loading={loading} handleClose={handleClose} chooseFile={chooseFile} isOpen={isOpen} handlePaste={handlePaste} />

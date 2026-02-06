@@ -1,7 +1,7 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { Box, Dialog, IconButton, TextField } from "@mui/material"
 import TripContext from "../../../../contexts/TripContext"
-import { Close, Send } from "@mui/icons-material"
+import { AddPhotoAlternate, Close, Image, ImageSearch, Send } from "@mui/icons-material"
 import { Title } from "../../../../components/Title"
 import type { ExpenseComment, ExpenseNode } from "../../../../types/server/class/Trip/ExpenseNode"
 import { NoComment } from "./NoComment"
@@ -25,31 +25,42 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
 
     const maxInputLength = isURL(inputText) ? Infinity : 100
 
-    const onSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
-        ev.preventDefault()
-        if (!expense || !inputText || !user || inputText.length > maxInputLength) return
+    const newNote = (note: ExpenseComment) => {
+        if (!expense || !user) return
 
-        const updatedNotes: ExpenseComment[] = [
-            ...(expense.notes || []),
-            {
-                authorId: user?.id,
-                content: inputText,
-                createdAt: Date.now(),
-            },
-        ]
+        const updatedNotes: ExpenseComment[] = [...(expense.notes || []), note]
 
         handleUpdateExpense(expense.id, { notes: updatedNotes })
+    }
+
+    const onSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
+        ev.preventDefault()
+        if (!inputText || inputText.length > maxInputLength) return
+
+        newNote({
+            authorId: user!.id,
+            content: inputText,
+            createdAt: Date.now(),
+        })
+
         setInputText("")
     }
 
     const uploadImage = async (formData: FormData) => {
         const response = await authenticatedApi.post<string>("/trip/media", formData, { params: { trip_id: trip?.id } })
         console.log(response.data)
+        newNote({
+            authorId: user!.id,
+            content: response.data,
+            createdAt: Date.now(),
+            isImage: true,
+        })
     }
 
     const handlePaste = (event: ClipboardEvent) => {
-        filesDialogModal.openModal()
-        filesDialogModal.handlePaste(event)
+        if (filesDialogModal.handlePaste(event)) {
+            filesDialogModal.openModal()
+        }
     }
 
     useEffect(() => {
@@ -129,6 +140,11 @@ export const NotesModal: React.FC<NotesModalProps> = (props) => {
                             helperText={inputText.length > maxInputLength ? `${inputText.length} / ${maxInputLength} caracteres.` : ""}
                             slotProps={{
                                 input: {
+                                    startAdornment: (
+                                        <IconButton size="small" sx={{ marginLeft: -1 }} onClick={filesDialogModal.openModal}>
+                                            <AddPhotoAlternate fontSize="small" />
+                                        </IconButton>
+                                    ),
                                     endAdornment: (
                                         <IconButton type="submit" size="small" disabled={!inputText || inputText.length > maxInputLength}>
                                             <Send fontSize="small" />

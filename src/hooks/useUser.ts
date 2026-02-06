@@ -45,7 +45,7 @@ export const useUser = () => {
 
     const authenticatedApi = useMemo(
         () => axios.create({ baseURL: api_url, headers: { Authorization: `Bearer ${context.accessToken?.value}` } }),
-        [context.accessToken?.value]
+        [context.accessToken?.value],
     )
 
     const patch = async (data: Partial<User>) => {

@@ -77,19 +77,23 @@ export const MessageComponent: React.FC<MessageComponentProps> = (props) => {
                     borderBottomLeftRadius: !props.from_me && props.same_as_next ? BORDER_RADIUS : undefined,
                 }}
             >
-                <Typography
-                    className={isLink ? "link" : undefined}
-                    variant="subtitle2"
-                    sx={{
-                        color: isLink ? (mode === "dark" ? "inherit" : "success.main") : "text.secondary",
-                        fontWeight: isLink ? "bold" : "normal",
-                        whiteSpace: "pre-line",
-                        wordBreak: "break-word",
-                    }}
-                    onClick={isLink ? () => window.open(props.message.content, "_new") : undefined}
-                >
-                    {props.message.content}
-                </Typography>
+                {props.message.isImage ? (
+                    <img src={props.message.content} alt="image" style={{ maxWidth: "100%", borderRadius: BORDER_RADIUS }} />
+                ) : (
+                    <Typography
+                        className={isLink ? "link" : undefined}
+                        variant="subtitle2"
+                        sx={{
+                            color: isLink ? (mode === "dark" ? "inherit" : "success.main") : "text.secondary",
+                            fontWeight: isLink ? "bold" : "normal",
+                            whiteSpace: "pre-line",
+                            wordBreak: "break-word",
+                        }}
+                        onClick={isLink ? () => window.open(props.message.content, "_new") : undefined}
+                    >
+                        {props.message.content}
+                    </Typography>
+                )}
             </Box>
         </Box>
     )
